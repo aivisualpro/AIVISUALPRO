@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV to MongoDB Uploader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .upload-form {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        #status {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>CSV to MongoDB Uploader</h1>
+    <div class="upload-form">
+        <form id="uploadForm">
+            <h3>Select CSV File to Upload</h3>
+            <div style="margin: 20px 0;">
+                <label for="collectionName">Collection Name:</label>
+                <input type="text" name="collectionName" id="collectionName" required
+                    placeholder="Enter collection name"
+                    style="padding: 8px; margin-left: 10px; border-radius: 4px; border: 1px solid #ccc;">
+            </div>
+            <input type="file" id="csvFile" accept=".csv" required>
+            <br>
+            <button type="submit" class="button">Upload CSV</button>
+        </form>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = 'Uploading and processing...';
+
+            const collection = document.getElementById('collectionName').value;
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                statusDiv.textContent = 'Please select a file.';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const csvData = event.target.result;
+                try {
+                    const res = await fetch('/webhook/rebelXDbUploader', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ collection, csvData })
+                    });
+
+                    const data = await res.json();
+                    if (res.ok) {
+                        statusDiv.textContent = 'Success:\n' + JSON.stringify(data, null, 2);
+                    } else {
+                        statusDiv.textContent = 'Error:\n' + JSON.stringify(data, null, 2);
+                    }
+                } catch (err) {
+                    statusDiv.textContent = 'Network Error: ' + err.message;
+                }
+            };
+
+            reader.onerror = () => {
+                statusDiv.textContent = 'Error reading file';
+            };
+
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+
+</html>
