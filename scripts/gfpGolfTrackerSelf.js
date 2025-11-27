@@ -74,7 +74,7 @@ export default async function practiceTracker(payload) {
         Properties: {
             Locale: "en-US",
             Timezone: "Pacific Standard Time",
-            RunAsUserEmail: general.athlete,
+            RunAsUserEmail: general.createBy,
         },
         Rows: allRows,
     };
