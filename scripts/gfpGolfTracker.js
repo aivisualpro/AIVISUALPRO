@@ -1,7 +1,3 @@
-// scripts/practiceTracker.js
-
-// 🔐 Ideally move these to environment variables in Render
-// and read them via process.env.
 const APP_ID = process.env.GFPAPPSHEET_APP_ID;
 const API_KEY = process.env.GFPAPPSHEET_API_KEY;
 const TABLE_NAME = "Golf Practice Tracker";
@@ -74,7 +70,7 @@ export default async function practiceTracker(payload) {
         Properties: {
             Locale: "en-US",
             Timezone: "Pacific Standard Time",
-            RunAsUserEmail: general.athlete,
+            RunAsUserEmail: general.createBy,
         },
         Rows: allRows,
     };

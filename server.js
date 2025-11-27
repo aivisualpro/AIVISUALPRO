@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
+import "dotenv/config";
 
 const app = express();
 app.use(express.json());
