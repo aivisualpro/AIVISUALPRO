@@ -2,8 +2,8 @@
 
 // 🔐 Ideally move these to environment variables in Render
 // and read them via process.env.
-const APP_ID = process.env.GFPAPPSHEET_APP_ID;
-const API_KEY = process.env.GFPAPPSHEET_API_KEY;
+const APP_ID = process.env.GFPAPPSHEET_APP_IDSELF;
+const API_KEY = process.env.GFPAPPSHEET_API_KEYSELF;
 const TABLE_NAME = "Golf Practice Tracker";
 
 const APPSHEET_URL = `https://api.appsheet.com/api/v2/apps/${encodeURIComponent(
