@@ -2,11 +2,11 @@ import { MongoClient } from 'mongodb';
 import csv from 'csv-parser';
 import { Readable } from 'stream';
 
-const { REBELXMONGODB_URI, DB_NAME } = process.env;
+const { REBELXMONGODB_URI, REBELXDB_NAME } = process.env;
 
 export default async function rebelXDbUploader(payload) {
-    if (!REBELXMONGODB_URI || !DB_NAME) {
-        throw new Error('❌ Missing REBELXMONGODB_URI or DB_NAME in .env');
+    if (!REBELXMONGODB_URI || !REBELXDB_NAME) {
+        throw new Error('❌ Missing REBELXMONGODB_URI or REBELXDB_NAME in .env');
     }
 
     const { collection, csvData, noHeader, delimiter = ',', batchSize = '1000' } = payload;
@@ -19,7 +19,7 @@ export default async function rebelXDbUploader(payload) {
 
     try {
         await client.connect();
-        const db = client.db(DB_NAME);
+        const db = client.db(REBELXDB_NAME);
         const coll = db.collection(collection);
 
         const parser = csv({
