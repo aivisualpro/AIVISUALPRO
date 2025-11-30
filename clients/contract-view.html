@@ -1379,11 +1379,6 @@
             btnDownload.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span>';
 
             try {
-                const pdfBody = document.getElementById("pdf-body");
-                const pdfSig = document.getElementById("pdf-signature");
-                const pdfSigContent = document.getElementById("pdf-sig-content");
-                const pdfContent = document.getElementById("pdf-content");
-
                 // Clean the contract text for PDF
                 let pdfText = currentContract.contractText || "";
                 const sigIndex = pdfText.indexOf("9. AGREEMENT & SIGNATURES");
@@ -1397,83 +1392,87 @@
                     }
                 }
 
-                pdfBody.textContent = pdfText;
+                // Create a temporary container for PDF generation
+                const tempContainer = document.createElement('div');
+                tempContainer.style.cssText = 'position: fixed; left: 0; top: 0; width: 700px; background: white; padding: 40px; font-family: Georgia, serif; z-index: 9999;';
                 
-                // Temporarily show the PDF content for rendering
-                pdfContent.style.position = 'fixed';
-                pdfContent.style.left = '0';
-                pdfContent.style.top = '0';
-                pdfContent.style.zIndex = '-1';
-                pdfContent.style.opacity = '1';
-
+                let signatureHtml = '';
                 if (currentContract.status === "Signed" && currentContract.clientSignature) {
-                    pdfSig.style.display = "block";
                     const signedDate = currentContract.signedAt || currentContract.updatedAt;
-                    pdfSigContent.innerHTML = `
-                        <div style="margin-bottom: 20px; padding: 15px; background: #1a1a2e; border-radius: 8px; color: white;">
-                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Culture Gourmet</p>
-                            <div style="display: flex; gap: 30px;">
-                                <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">REP</p>
-                                    <p style="margin: 0; font-size: 14px; font-style: italic;">Culture Gourmet Team</p>
-                                </div>
-                                <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">SIGNATURE</p>
-                                    <p style="margin: 0; font-size: 14px; font-style: italic;">Culture Gourmet</p>
-                                    <p style="margin: 4px 0 0; font-size: 11px; color: rgba(255,255,255,0.7);">${formatDateTime(signedDate)}</p>
+                    signatureHtml = `
+                        <div style="margin-top: 30px; padding: 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;">
+                            <h4 style="margin: 0 0 15px; color: #166534;">✓ Signed & Executed</h4>
+                            <div style="margin-bottom: 20px; padding: 15px; background: #1a1a2e; border-radius: 8px; color: white;">
+                                <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Culture Gourmet</p>
+                                <div style="display: flex; gap: 30px;">
+                                    <div>
+                                        <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">REP</p>
+                                        <p style="margin: 0; font-size: 14px; font-style: italic;">Culture Gourmet Team</p>
+                                    </div>
+                                    <div>
+                                        <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">DATE</p>
+                                        <p style="margin: 0; font-size: 14px;">${formatDateTime(signedDate)}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div style="padding: 15px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
-                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #166534;">Client</p>
-                            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-                                <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">NAME</p>
-                                    <p style="margin: 0; font-size: 16px; font-family: cursive;">${currentContract.clientName}</p>
-                                </div>
-                                <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">SIGNATURE</p>
-                                    <img src="${currentContract.clientSignature}" alt="Signature" style="max-width: 150px; max-height: 50px; border-bottom: 2px solid #1a1a2e;" />
-                                    <p style="margin: 8px 0 0; font-size: 11px; color: #166534;">${formatDateTime(signedDate)}</p>
+                            <div style="padding: 15px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
+                                <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #166534;">Client</p>
+                                <div style="display: flex; gap: 30px; flex-wrap: wrap; align-items: center;">
+                                    <div>
+                                        <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">NAME</p>
+                                        <p style="margin: 0; font-size: 16px; font-family: cursive;">${currentContract.clientName}</p>
+                                    </div>
+                                    <div>
+                                        <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">SIGNATURE</p>
+                                        <img src="${currentContract.clientSignature}" style="max-width: 150px; max-height: 50px; border-bottom: 2px solid #1a1a2e;" crossorigin="anonymous" />
+                                    </div>
+                                    <div>
+                                        <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">DATE</p>
+                                        <p style="margin: 0; font-size: 14px; color: #166534;">${formatDateTime(signedDate)}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     `;
-                } else {
-                    pdfSig.style.display = "none";
                 }
 
+                tempContainer.innerHTML = `
+                    <div style="text-align: center; border-bottom: 2px solid #1a1a2e; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="color: #1a1a2e; font-size: 24px; margin: 0;">🍽️ Culture Gourmet</h1>
+                        <p style="color: #6b7280; margin: 5px 0 0;">Premium Catering Services</p>
+                    </div>
+                    <div style="white-space: pre-wrap; line-height: 1.6; font-size: 12px; color: #374151;">${pdfText}</div>
+                    ${signatureHtml}
+                `;
+
+                document.body.appendChild(tempContainer);
+
+                // Wait for images to load and DOM to render
+                await new Promise(resolve => setTimeout(resolve, 500));
+
                 await html2pdf().set({
-                    margin: [0.5, 0.5, 0.5, 0.5],
+                    margin: [0.4, 0.4, 0.4, 0.4],
                     filename: `CultureGourmet-${currentContract.clientName?.replace(/\s+/g, '-') || 'Contract'}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { 
                         scale: 2, 
                         useCORS: true, 
-                        logging: false,
-                        windowWidth: 700,
-                        windowHeight: pdfContent.scrollHeight
+                        logging: true,
+                        allowTaint: true
                     },
-                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                }).from(pdfContent).save();
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                }).from(tempContainer).save();
                 
-                // Hide the PDF content again
-                pdfContent.style.position = 'absolute';
-                pdfContent.style.left = '-9999px';
-                pdfContent.style.zIndex = '';
-                pdfContent.style.opacity = '';
+                // Remove temp container
+                document.body.removeChild(tempContainer);
                 
                 showToast('PDF downloaded!', 'success');
 
             } catch (e) {
-                console.error(e);
-                // Make sure to hide PDF content on error
-                const pdfContent = document.getElementById("pdf-content");
-                pdfContent.style.position = 'absolute';
-                pdfContent.style.left = '-9999px';
-                pdfContent.style.zIndex = '';
-                pdfContent.style.opacity = '';
+                console.error('PDF Error:', e);
+                // Clean up temp container if it exists
+                const temp = document.querySelector('div[style*="z-index: 9999"]');
+                if (temp) document.body.removeChild(temp);
                 showToast('Failed to generate PDF', 'error');
             } finally {
                 btnDownload.disabled = false;
