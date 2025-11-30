@@ -289,47 +289,62 @@ async function sendContract(payload) {
     let emailError = null;
 
     if (settings.smtpHost && settings.smtpUser && settings.smtpPass) {
-        try {
-            const port = parseInt(settings.smtpPort || "587");
-            const transporter = nodemailer.createTransport({
-                host: settings.smtpHost,
-                port: port,
-                secure: port === 465, // true for 465, false for other ports
-                auth: {
-                    user: settings.smtpUser,
-                    pass: settings.smtpPass,
-                },
-            });
+        // Try multiple ports in case some are blocked (common on cloud providers like Render)
+        const portsToTry = [
+            parseInt(settings.smtpPort || "587"),
+            2525,  // Alternative port often allowed on cloud
+            587,   // TLS
+            465    // SSL
+        ];
+        // Remove duplicates
+        const uniquePorts = [...new Set(portsToTry)];
+        
+        const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
+        console.log('[CG] Contract Link being sent:', fullLink);
 
-            const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
+        const fromAddress = settings.smtpFrom
+            ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
+            : settings.smtpUser;
 
-            console.log('[CG] Contract Link being sent:', fullLink);
+        for (const port of uniquePorts) {
+            if (emailSent) break;
+            
+            try {
+                console.log(`[CG] Trying SMTP on port ${port}...`);
+                const transporter = nodemailer.createTransport({
+                    host: settings.smtpHost,
+                    port: port,
+                    secure: port === 465,
+                    connectionTimeout: 10000, // 10 second timeout
+                    greetingTimeout: 10000,
+                    auth: {
+                        user: settings.smtpUser,
+                        pass: settings.smtpPass,
+                    },
+                });
 
-            const fromAddress = settings.smtpFrom
-                ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
-                : settings.smtpUser;
+                console.log('[CG] Sending email via SMTP...');
+                console.log('[CG] From:', fromAddress);
+                console.log('[CG] To:', contract.clientEmail);
 
-            console.log('[CG] Sending email via SMTP...');
-            console.log('[CG] From:', fromAddress);
-            console.log('[CG] To:', contract.clientEmail);
-            console.log('[CG] Subject: Culture Gourmet Catering Agreement');
-
-            await transporter.sendMail({
-                from: fromAddress,
-                to: contract.clientEmail,
-                subject: "Culture Gourmet Catering Agreement",
-                text: `Hi ${contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`,
-                html: `<p>Hi ${contract.clientName},</p><p>Here is your catering agreement:</p><p><a href="${fullLink}">View & Sign Contract</a></p><p>Thank you,<br>Culture Gourmet</p>`,
-            });
-            emailSent = true;
-            console.log('[CG] Email sent successfully!');
-        } catch (err) {
-            console.error("[CG] SMTP Error:", err);
-            console.error("[CG] Error details:", err.message);
-            if (err.response) {
-                console.error("[CG] SMTP server response:", err.response);
+                await transporter.sendMail({
+                    from: fromAddress,
+                    to: contract.clientEmail,
+                    subject: "Culture Gourmet Catering Agreement",
+                    text: `Hi ${contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`,
+                    html: `<p>Hi ${contract.clientName},</p><p>Here is your catering agreement:</p><p><a href="${fullLink}">View & Sign Contract</a></p><p>Thank you,<br>Culture Gourmet</p>`,
+                });
+                emailSent = true;
+                console.log(`[CG] Email sent successfully on port ${port}!`);
+            } catch (err) {
+                console.error(`[CG] SMTP Error on port ${port}:`, err.message);
+                emailError = err.message;
+                // Continue to try next port
             }
-            emailError = err.message;
+        }
+        
+        if (!emailSent) {
+            console.error("[CG] All SMTP ports failed. Last error:", emailError);
         }
     }
 
