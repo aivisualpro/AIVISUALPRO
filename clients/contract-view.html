@@ -1349,8 +1349,24 @@
                 contentEl.style.display = "block";
                 resizeCanvas();
 
+                // Clean contract text - remove old signature fields that are now shown separately
+                let cleanedText = c.contractText || "";
+                // Remove everything after "9. AGREEMENT & SIGNATURES" line + the "By signing below..." line
+                const sigIndex = cleanedText.indexOf("9. AGREEMENT & SIGNATURES");
+                if (sigIndex !== -1) {
+                    // Find the end of the "By signing below..." sentence
+                    const bySigningMatch = cleanedText.indexOf("By signing below, the Client acknowledges and agrees to all terms outlined.");
+                    if (bySigningMatch !== -1) {
+                        // Keep up to and including the "By signing below..." line
+                        const endOfLine = cleanedText.indexOf("\n", bySigningMatch);
+                        if (endOfLine !== -1) {
+                            cleanedText = cleanedText.substring(0, endOfLine).trim();
+                        }
+                    }
+                }
+
                 // Populate contract text
-                contractTextEl.textContent = c.contractText;
+                contractTextEl.textContent = cleanedText;
                 signerNameInput.value = c.clientName || "";
 
                 // Populate meta info with beautiful cards
