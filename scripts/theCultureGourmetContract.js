@@ -337,6 +337,110 @@ async function sendContract(payload) {
     const fromName = settings.smtpFrom || "Culture Gourmet";
     const fromEmail = settings.smtpUser || "noreply@aivisualpro.com";
 
+    // Beautiful HTML email template
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f4; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 40px 30px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">Culture Gourmet</h1>
+                            <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Premium Catering Services</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h2 style="margin: 0 0 20px; color: #1a1a2e; font-size: 22px; font-weight: 600;">Hello ${contract.clientName}! 👋</h2>
+                            
+                            <p style="margin: 0 0 24px; color: #4a4a68; font-size: 16px; line-height: 1.6;">
+                                Thank you for choosing Culture Gourmet for your upcoming event. Your catering agreement is ready for review and signature.
+                            </p>
+                            
+                            <!-- Event Details Card -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fc; border-radius: 12px; margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p style="margin: 0 0 12px; color: #667eea; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Event Details</p>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Event Date:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${contract.eventDate || 'To be confirmed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${contract.eventLocation || 'To be confirmed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Guest Count:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${contract.guestCount || 'To be confirmed'}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- CTA Button -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="padding: 10px 0 30px;">
+                                        <a href="${fullLink}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s;">
+                                            ✍️ View & Sign Contract
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 0; color: #9ca3af; font-size: 13px; text-align: center; line-height: 1.5;">
+                                If the button doesn't work, copy and paste this link into your browser:<br>
+                                <a href="${fullLink}" style="color: #667eea; word-break: break-all;">${fullLink}</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fc; padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0 0 8px; color: #1a1a2e; font-size: 14px; font-weight: 600;">Culture Gourmet</p>
+                            <p style="margin: 0 0 16px; color: #6b7280; font-size: 13px;">Elevating Your Events with Exceptional Cuisine</p>
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                                © ${new Date().getFullYear()} Culture Gourmet. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+    const emailText = `Hello ${contract.clientName},
+
+Thank you for choosing Culture Gourmet for your upcoming event. Your catering agreement is ready for review and signature.
+
+Event Details:
+- Event Date: ${contract.eventDate || 'To be confirmed'}
+- Location: ${contract.eventLocation || 'To be confirmed'}
+- Guest Count: ${contract.guestCount || 'To be confirmed'}
+
+View & Sign Your Contract:
+${fullLink}
+
+Thank you,
+Culture Gourmet
+Elevating Your Events with Exceptional Cuisine`;
+
     // Method 1: Try Resend API first (works on Render and other cloud providers)
     if (settings.resendApiKey && !emailSent) {
         try {
@@ -346,9 +450,9 @@ async function sendContract(payload) {
             const { data, error } = await resend.emails.send({
                 from: `${fromName} <${settings.resendFromEmail || 'onboarding@resend.dev'}>`,
                 to: [contract.clientEmail],
-                subject: "Culture Gourmet Catering Agreement",
-                text: `Hi ${contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`,
-                html: `<p>Hi ${contract.clientName},</p><p>Here is your catering agreement:</p><p><a href="${fullLink}">View & Sign Contract</a></p><p>Thank you,<br>Culture Gourmet</p>`,
+                subject: "🍽️ Your Culture Gourmet Catering Agreement",
+                text: emailText,
+                html: emailHtml,
             });
 
             if (error) {
@@ -399,9 +503,9 @@ async function sendContract(payload) {
                 await transporter.sendMail({
                     from: fromAddress,
                     to: contract.clientEmail,
-                    subject: "Culture Gourmet Catering Agreement",
-                    text: `Hi ${contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`,
-                    html: `<p>Hi ${contract.clientName},</p><p>Here is your catering agreement:</p><p><a href="${fullLink}">View & Sign Contract</a></p><p>Thank you,<br>Culture Gourmet</p>`,
+                    subject: "🍽️ Your Culture Gourmet Catering Agreement",
+                    text: emailText,
+                    html: emailHtml,
                 });
                 emailSent = true;
                 console.log(`[CG] Email sent successfully via SMTP on port ${port}!`);
