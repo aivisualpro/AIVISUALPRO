@@ -25,7 +25,7 @@
         .header {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
+            padding: 0.75rem 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -35,166 +35,175 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             color: white;
         }
 
         .logo-icon {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: white;
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .logo-text h1 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
         .logo-text span {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.9;
+        }
+
+        /* Ticker */
+        .ticker-wrap {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            overflow: hidden;
+            padding: 8px 0;
+        }
+
+        .ticker {
+            display: flex;
+            animation: ticker 20s linear infinite;
+            white-space: nowrap;
+        }
+
+        .ticker-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            padding: 0 40px;
+        }
+
+        .ticker-item i {
+            color: #667eea;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         /* Main Container */
         .main-container {
-            max-width: 1400px;
+            max-width: 1500px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem;
+            height: calc(100vh - 100px);
+            display: flex;
+            flex-direction: column;
         }
 
         .content-wrapper {
             display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 2rem;
-            align-items: start;
+            grid-template-columns: 1fr 400px;
+            gap: 1.5rem;
+            flex: 1;
+            min-height: 0;
         }
 
-        /* Contract Panel - ENHANCED */
+        /* Contract Panel */
         .contract-panel {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
+        /* Contract Header - Compact with stats on right */
         .contract-header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
-            padding: 2rem 2.5rem;
-            position: relative;
-            overflow: hidden;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .contract-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .contract-header::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -10%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(118, 75, 162, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .contract-header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .header-left {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .contract-header h2 i {
+        .header-left i {
+            font-size: 1.5rem;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 10px;
             border-radius: 10px;
+        }
+
+        .header-left h2 {
             font-size: 1.25rem;
+            font-weight: 700;
         }
 
-        .contract-header p {
-            opacity: 0.8;
-            font-size: 0.95rem;
-            margin-left: 54px;
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
         }
 
-        .contract-meta {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        .meta-card {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 12px 16px;
-            border-radius: 12px;
-            transition: all 0.3s;
+        .stat-item i {
+            font-size: 1rem;
+            color: #667eea;
         }
 
-        .meta-card:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: translateY(-2px);
+        .stat-item .stat-content {
+            display: flex;
+            flex-direction: column;
         }
 
-        .meta-card i {
-            font-size: 1.25rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .meta-card .label {
-            font-size: 0.7rem;
+        .stat-item .stat-label {
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             opacity: 0.6;
-            display: block;
         }
 
-        .meta-card .value {
+        .stat-item .stat-value {
             font-size: 0.9rem;
             font-weight: 600;
-            margin-top: 2px;
         }
 
-        /* Contract Body */
+        .stat-item .stat-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Contract Body - Maximized */
         .contract-body {
-            padding: 0;
-            max-height: calc(100vh - 400px);
+            flex: 1;
             overflow-y: auto;
+            padding: 1.5rem;
+            background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
+            min-height: 0;
         }
 
         .contract-body::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         .contract-body::-webkit-scrollbar-track {
@@ -203,42 +212,30 @@
 
         .contract-body::-webkit-scrollbar-thumb {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 4px;
-        }
-
-        .contract-document {
-            padding: 2.5rem;
-            background: linear-gradient(180deg, #fafbfc 0%, #ffffff 100%);
-            position: relative;
-        }
-
-        .contract-document::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
         }
 
         .contract-text {
             white-space: pre-wrap;
             font-family: 'Georgia', 'Times New Roman', serif;
-            line-height: 1.9;
-            font-size: 0.95rem;
+            line-height: 1.8;
+            font-size: 0.9rem;
             color: #374151;
+            padding-left: 1rem;
+            border-left: 3px solid #667eea;
         }
 
-        /* Signature Sections on Contract */
+        /* Signature Sections */
         .contract-signatures-wrapper {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px dashed #e5e7eb;
         }
 
         .signature-section-block {
-            padding: 1.5rem 2rem;
-            border-radius: 16px;
-            margin-bottom: 1rem;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 0.75rem;
         }
 
         .signature-section-block.company {
@@ -252,8 +249,8 @@
         }
 
         .signature-section-block h4 {
-            font-size: 0.9rem;
-            margin-bottom: 1.25rem;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -271,20 +268,16 @@
         .signature-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        .signature-col {
-            display: flex;
-            flex-direction: column;
+            gap: 1.5rem;
         }
 
         .signature-col label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
+            display: block;
         }
 
         .signature-section-block.company .signature-col label {
@@ -296,10 +289,10 @@
         }
 
         .signature-value {
-            font-size: 1.1rem;
-            padding-bottom: 8px;
+            font-size: 1rem;
+            padding-bottom: 6px;
             border-bottom: 2px solid;
-            min-height: 40px;
+            min-height: 35px;
             display: flex;
             align-items: flex-end;
         }
@@ -308,7 +301,7 @@
             color: white;
             border-color: rgba(255, 255, 255, 0.3);
             font-family: 'Brush Script MT', cursive;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
 
         .signature-section-block.client .signature-value {
@@ -318,23 +311,23 @@
 
         .signature-section-block.client .signature-value.name-value {
             font-family: 'Brush Script MT', cursive;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
         }
 
         .signature-col img {
-            max-width: 200px;
-            max-height: 60px;
+            max-width: 180px;
+            max-height: 50px;
             object-fit: contain;
         }
 
         .signature-timestamp {
-            font-size: 0.8rem;
-            margin-top: 8px;
-            padding: 6px 14px;
-            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 6px;
+            padding: 4px 10px;
+            border-radius: 15px;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             width: fit-content;
         }
 
@@ -349,62 +342,43 @@
             border: 1px solid #86efac;
         }
 
-        /* Responsive for tablets and mobile */
-        @media (max-width: 768px) {
-            .signature-row {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-        }
-
         /* Contract Footer */
         .contract-footer {
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             background: #f8f9fc;
             border-top: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .contract-status {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
-        .contract-status.signed {
-            color: #166534;
-        }
-
-        .contract-status.signed i {
-            color: #22c55e;
-        }
-
-        .contract-status.pending {
-            color: #92400e;
-        }
-
-        .contract-status.pending i {
-            color: #f59e0b;
-        }
+        .contract-status.signed { color: #166534; }
+        .contract-status.signed i { color: #22c55e; }
+        .contract-status.pending { color: #92400e; }
+        .contract-status.pending i { color: #f59e0b; }
 
         .contract-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .action-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 0.85rem;
+            gap: 5px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
@@ -414,23 +388,16 @@
         .action-btn.download {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .action-btn.download:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         .action-btn.email {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
-        .action-btn.email:hover {
+        .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .action-btn:disabled {
@@ -442,52 +409,35 @@
         /* Signature Panel */
         .signature-panel {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
             overflow: hidden;
-            position: sticky;
-            top: 2rem;
+            display: flex;
+            flex-direction: column;
         }
 
         .signature-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 1.5rem 2rem;
+            padding: 1.25rem 1.5rem;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .signature-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            border-radius: 50%;
         }
 
         .signature-header h3 {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
-            position: relative;
         }
 
         .signature-header p {
             opacity: 0.9;
-            font-size: 0.85rem;
-            position: relative;
+            font-size: 0.8rem;
         }
 
         .signature-body {
-            padding: 2rem;
-        }
-
-        .signature-steps {
-            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            flex: 1;
+            overflow-y: auto;
         }
 
         .step {
@@ -498,18 +448,17 @@
         }
 
         .step-number {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 700;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
         }
 
         .step-content {
@@ -519,17 +468,17 @@
         .step-content label {
             font-weight: 600;
             color: #1f2937;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .form-input {
             width: 100%;
-            padding: 14px 18px;
+            padding: 12px 14px;
             border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 1rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             transition: all 0.3s;
             background: #f9fafb;
         }
@@ -538,13 +487,13 @@
             outline: none;
             border-color: #667eea;
             background: white;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .canvas-container {
             border: 2px dashed #d1d5db;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            border-radius: 10px;
+            background: #fafafa;
             position: relative;
             overflow: hidden;
             transition: all 0.3s;
@@ -552,7 +501,6 @@
 
         .canvas-container:hover {
             border-color: #667eea;
-            background: linear-gradient(135deg, #f0f0ff 0%, #f5f0ff 100%);
         }
 
         .canvas-container.active {
@@ -564,7 +512,7 @@
         canvas {
             display: block;
             width: 100%;
-            height: 150px;
+            height: 120px;
             cursor: crosshair;
         }
 
@@ -574,22 +522,19 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: #9ca3af;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             pointer-events: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-align: center;
         }
 
         .canvas-hint i {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.5;
+            font-size: 2rem;
+            color: #667eea;
+            opacity: 0.4;
         }
 
         .canvas-hint.hidden {
@@ -598,20 +543,19 @@
 
         .clear-btn {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 6px;
+            right: 6px;
             background: white;
             border: 1px solid #e5e7eb;
-            padding: 6px 12px;
-            font-size: 0.75rem;
-            border-radius: 8px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
             transition: all 0.2s;
             z-index: 10;
-            font-weight: 500;
         }
 
         .clear-btn:hover {
@@ -622,26 +566,26 @@
 
         .submit-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            margin-top: 1.5rem;
+            margin-top: 1rem;
         }
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
 
         .submit-btn:disabled {
@@ -651,127 +595,93 @@
         }
 
         .status-msg {
-            margin-top: 1rem;
-            padding: 12px 16px;
-            border-radius: 10px;
+            margin-top: 0.75rem;
+            padding: 10px;
+            border-radius: 8px;
             text-align: center;
             font-weight: 500;
+            font-size: 0.85rem;
             display: none;
-            font-size: 0.9rem;
         }
 
-        .status-msg.show {
-            display: block;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .status-msg.success {
-            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-            color: #166534;
-            border: 1px solid #86efac;
-        }
-
-        .status-msg.error {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            color: #dc2626;
-            border: 1px solid #fca5a5;
-        }
-
-        .status-msg.loading {
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            color: #6b7280;
-            border: 1px solid #d1d5db;
-        }
+        .status-msg.show { display: block; }
+        .status-msg.success { background: #dcfce7; color: #166534; }
+        .status-msg.error { background: #fee2e2; color: #dc2626; }
+        .status-msg.loading { background: #f3f4f6; color: #6b7280; }
 
         /* Signed State */
         .signed-panel {
             text-align: center;
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .signed-icon {
-            width: 90px;
-            height: 90px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.35);
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
             animation: bounceIn 0.6s ease;
         }
 
         @keyframes bounceIn {
-            0% {
-                transform: scale(0);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .signed-icon i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: white;
         }
 
         .signed-panel h3 {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: #1f2937;
             margin-bottom: 0.5rem;
         }
 
         .signed-panel p {
             color: #6b7280;
-            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
         }
 
         .signed-date {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            gap: 6px;
+            background: #f0fdf4;
             color: #166534;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
             border: 1px solid #86efac;
         }
 
         .signature-preview {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
             border-top: 1px solid #e5e7eb;
         }
 
         .signature-preview p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #9ca3af;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .signature-preview img {
-            max-width: 200px;
+            max-width: 150px;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
-            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            border-radius: 6px;
+            padding: 8px;
+            background: #fafafa;
         }
 
         /* Loading State */
@@ -786,9 +696,9 @@
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -796,152 +706,97 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
-        /* Toast notification */
+        /* Toast */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 20px;
+            right: 20px;
             background: #1f2937;
             color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
             display: none;
             align-items: center;
-            gap: 12px;
-            font-size: 0.95rem;
+            gap: 10px;
+            font-size: 0.9rem;
             z-index: 1000;
-            animation: slideUp 0.3s ease;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .toast.show { display: flex; }
+        .toast.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .toast.error { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
 
-        .toast.show {
-            display: flex;
-        }
-
-        .toast.success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .toast.error {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        /* Animated Numbers */
+        .animated-number {
+            display: inline-block;
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
             .content-wrapper {
                 grid-template-columns: 1fr;
+                height: auto;
             }
 
-            .signature-panel {
-                position: static;
+            .main-container {
+                height: auto;
+                padding: 1rem;
             }
 
             .contract-body {
-                max-height: 400px;
+                max-height: 50vh;
             }
 
-            .contract-meta {
-                grid-template-columns: repeat(2, 1fr);
+            .stats-row {
+                display: none;
+            }
+
+            .signature-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
         }
 
         @media (max-width: 640px) {
-            .main-container {
-                padding: 1rem;
+            .header {
+                padding: 0.5rem 1rem;
             }
 
             .contract-header {
-                padding: 1.5rem;
+                padding: 0.75rem 1rem;
             }
 
-            .contract-header h2 {
-                font-size: 1.25rem;
-            }
-
-            .contract-document {
-                padding: 1.5rem;
-            }
-
-            .contract-text {
-                font-size: 0.9rem;
-            }
-
-            .signature-body {
-                padding: 1.5rem;
-            }
-
-            .contract-footer {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .contract-actions {
-                width: 100%;
-                flex-direction: column;
-            }
-
-            .action-btn {
-                justify-content: center;
-            }
-
-            .signature-display {
-                flex-direction: column;
-                gap: 1.5rem;
-            }
-
-            .meta-card {
-                padding: 10px 14px;
-            }
-        }
-
-        /* Print/PDF Styles */
-        @media print {
-            body {
-                background: white !important;
-            }
-
-            .header,
-            .signature-panel,
-            .contract-footer {
-                display: none !important;
-            }
-
-            .content-wrapper {
-                display: block;
-            }
-
-            .contract-panel {
-                box-shadow: none;
-                border-radius: 0;
+            .header-left h2 {
+                font-size: 1rem;
             }
 
             .contract-body {
-                max-height: none;
-                overflow: visible;
+                padding: 1rem;
             }
 
-            .contract-document::before {
-                display: none;
+            .contract-text {
+                font-size: 0.85rem;
+            }
+
+            .signature-body {
+                padding: 1rem;
             }
         }
 
-        /* PDF Generation Hidden Element */
+        /* Print/PDF */
+        @media print {
+            body { background: white !important; }
+            .header, .ticker-wrap, .signature-panel, .contract-footer { display: none !important; }
+            .content-wrapper { display: block; }
+            .contract-panel { box-shadow: none; }
+            .contract-body { max-height: none; overflow: visible; }
+        }
+
+        /* Hidden PDF Content */
         #pdf-content {
             position: absolute;
             left: -9999px;
@@ -949,7 +804,7 @@
             width: 800px;
             background: white;
             padding: 40px;
-            font-family: 'Georgia', 'Times New Roman', serif;
+            font-family: 'Georgia', serif;
         }
 
         #pdf-content .pdf-header {
@@ -984,16 +839,6 @@
             border: 1px solid #e5e7eb;
             border-radius: 8px;
         }
-
-        #pdf-content .pdf-signature h4 {
-            color: #166534;
-            margin-bottom: 15px;
-        }
-
-        #pdf-content .pdf-signature img {
-            max-width: 200px;
-            max-height: 60px;
-        }
     </style>
 </head>
 
@@ -1009,6 +854,20 @@
         </div>
     </header>
 
+    <!-- Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker" id="ticker">
+            <span class="ticker-item"><i class="bi bi-info-circle"></i> Please review the contract details below before signing</span>
+            <span class="ticker-item"><i class="bi bi-pen"></i> Sign using the panel on the right</span>
+            <span class="ticker-item"><i class="bi bi-shield-check"></i> Your signature is legally binding</span>
+            <span class="ticker-item"><i class="bi bi-envelope"></i> A copy will be sent to your email</span>
+            <span class="ticker-item"><i class="bi bi-info-circle"></i> Please review the contract details below before signing</span>
+            <span class="ticker-item"><i class="bi bi-pen"></i> Sign using the panel on the right</span>
+            <span class="ticker-item"><i class="bi bi-shield-check"></i> Your signature is legally binding</span>
+            <span class="ticker-item"><i class="bi bi-envelope"></i> A copy will be sent to your email</span>
+        </div>
+    </div>
+
     <!-- Loading State -->
     <div id="loading" class="main-container">
         <div class="loading-container">
@@ -1020,121 +879,114 @@
     <!-- Main Content -->
     <div id="content" class="main-container" style="display: none;">
         <div class="content-wrapper">
-            <!-- Contract Panel (Left on Desktop) -->
+            <!-- Contract Panel -->
             <div class="contract-panel">
                 <div class="contract-header">
-                    <div class="header-content">
-                        <h2><i class="bi bi-file-earmark-text"></i> Catering Agreement</h2>
-                        <p>Please review the contract details below before signing</p>
-                        <div class="contract-meta" id="contract-meta">
-                            <!-- Populated by JS -->
-                        </div>
+                    <div class="header-left">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <h2>Catering Agreement</h2>
+                    </div>
+                    <div class="stats-row" id="stats-row">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
-                <div class="contract-body">
-                    <div class="contract-document">
-                        <div class="contract-text" id="contract-text"></div>
-                        
-                        <!-- Signature Sections (shown after signing) -->
-                        <div class="contract-signatures-wrapper" id="contract-signatures-wrapper" style="display: none;">
-                            
-                            <!-- Culture Gourmet Section -->
-                            <div class="signature-section-block company">
-                                <h4><i class="bi bi-building"></i> Culture Gourmet</h4>
-                                <div class="signature-row">
-                                    <div class="signature-col">
-                                        <label>Culture Gourmet Rep</label>
-                                        <div class="signature-value">Culture Gourmet Team</div>
-                                    </div>
-                                    <div class="signature-col">
-                                        <label>Signature</label>
-                                        <div class="signature-value">Culture Gourmet</div>
-                                        <div class="signature-timestamp">
-                                            <i class="bi bi-calendar-check"></i>
-                                            <span id="company-sig-date">-</span>
-                                        </div>
+                <div class="contract-body" id="contract-body">
+                    <div class="contract-text" id="contract-text"></div>
+                    
+                    <!-- Signature Sections -->
+                    <div class="contract-signatures-wrapper" id="contract-signatures-wrapper" style="display: none;">
+                        <!-- Culture Gourmet Section -->
+                        <div class="signature-section-block company">
+                            <h4><i class="bi bi-building"></i> Culture Gourmet</h4>
+                            <div class="signature-row">
+                                <div class="signature-col">
+                                    <label>Culture Gourmet Rep</label>
+                                    <div class="signature-value">Culture Gourmet Team</div>
+                                </div>
+                                <div class="signature-col">
+                                    <label>Signature</label>
+                                    <div class="signature-value">Culture Gourmet</div>
+                                    <div class="signature-timestamp">
+                                        <i class="bi bi-calendar-check"></i>
+                                        <span id="company-sig-date">-</span>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- Client Section -->
-                            <div class="signature-section-block client">
-                                <h4><i class="bi bi-check-circle-fill"></i> Client Signature</h4>
-                                <div class="signature-row">
-                                    <div class="signature-col">
-                                        <label>Client Name</label>
-                                        <div class="signature-value name-value" id="client-name-display">-</div>
+                        <!-- Client Section -->
+                        <div class="signature-section-block client">
+                            <h4><i class="bi bi-check-circle-fill"></i> Client Signature</h4>
+                            <div class="signature-row">
+                                <div class="signature-col">
+                                    <label>Client Name</label>
+                                    <div class="signature-value name-value" id="client-name-display">-</div>
+                                </div>
+                                <div class="signature-col">
+                                    <label>Client Signature</label>
+                                    <div class="signature-value" id="client-sig-display">
+                                        <img id="contract-sig-img" src="" alt="Client Signature" />
                                     </div>
-                                    <div class="signature-col">
-                                        <label>Client Signature</label>
-                                        <div class="signature-value" id="client-sig-display">
-                                            <img id="contract-sig-img" src="" alt="Client Signature" />
-                                        </div>
-                                        <div class="signature-timestamp">
-                                            <i class="bi bi-calendar-check"></i>
-                                            <span id="client-sig-timestamp">-</span>
-                                        </div>
+                                    <div class="signature-timestamp">
+                                        <i class="bi bi-calendar-check"></i>
+                                        <span id="client-sig-timestamp">-</span>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
                 <div class="contract-footer">
                     <div class="contract-status pending" id="contract-status">
                         <i class="bi bi-clock"></i>
-                        <span>Awaiting Your Signature</span>
+                        <span>Awaiting Signature</span>
                     </div>
                     <div class="contract-actions" id="contract-actions" style="display: none;">
                         <button type="button" class="action-btn download" id="btn-download">
-                            <i class="bi bi-file-pdf"></i> Download PDF
+                            <i class="bi bi-file-pdf"></i> PDF
                         </button>
                         <button type="button" class="action-btn email" id="btn-email">
-                            <i class="bi bi-envelope-check"></i> Email Me Copy
+                            <i class="bi bi-envelope"></i> Email
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Signature Panel (Right on Desktop) -->
+            <!-- Signature Panel -->
             <div class="signature-panel">
-                <!-- Sign Form -->
                 <div id="sign-form">
                     <div class="signature-header">
                         <h3>✍️ Sign Contract</h3>
-                        <p>Complete the steps below to sign</p>
+                        <p>Complete the steps below</p>
                     </div>
                     <div class="signature-body">
-                        <div class="signature-steps">
-                            <div class="step">
-                                <div class="step-number">1</div>
-                                <div class="step-content">
-                                    <label for="signer-name">Your Full Name</label>
-                                    <input type="text" id="signer-name" class="form-input" placeholder="Enter your full legal name" />
-                                </div>
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <label for="signer-name">Your Full Name</label>
+                                <input type="text" id="signer-name" class="form-input" placeholder="Enter your full legal name" />
                             </div>
-                            <div class="step">
-                                <div class="step-number">2</div>
-                                <div class="step-content">
-                                    <label>Draw Your Signature</label>
-                                    <div class="canvas-container" id="canvas-container">
-                                        <canvas id="sig-canvas"></canvas>
-                                        <div class="canvas-hint" id="canvas-hint">
-                                            <i class="bi bi-vector-pen"></i>
-                                            <span>Draw your signature here</span>
-                                        </div>
-                                        <button type="button" class="clear-btn" id="clear-sig">
-                                            <i class="bi bi-eraser"></i> Clear
-                                        </button>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <label>Draw Your Signature</label>
+                                <div class="canvas-container" id="canvas-container">
+                                    <canvas id="sig-canvas"></canvas>
+                                    <div class="canvas-hint" id="canvas-hint">
+                                        <i class="bi bi-vector-pen"></i>
+                                        <span>Draw here</span>
                                     </div>
+                                    <button type="button" class="clear-btn" id="clear-sig">
+                                        <i class="bi bi-eraser"></i> Clear
+                                    </button>
                                 </div>
                             </div>
                         </div>
 
                         <button type="button" class="submit-btn" id="btn-submit">
                             <i class="bi bi-check2-circle"></i>
-                            Sign & Accept Contract
+                            Sign & Accept
                         </button>
 
                         <div id="msg" class="status-msg"></div>
@@ -1145,28 +997,26 @@
                 <div id="signed-state" style="display: none;">
                     <div class="signature-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                         <h3>✓ Contract Signed</h3>
-                        <p>Thank you for your signature</p>
+                        <p>Thank you!</p>
                     </div>
                     <div class="signed-panel">
                         <div class="signed-icon">
                             <i class="bi bi-check-lg"></i>
                         </div>
                         <h3>Successfully Signed!</h3>
-                        <p>Your contract has been signed and submitted.</p>
+                        <p>Your contract has been submitted.</p>
                         <div class="signed-date">
                             <i class="bi bi-calendar-check"></i>
                             <span id="signed-date">-</span>
                         </div>
-                        <div class="signature-preview" id="signature-preview">
-                            <!-- Signature image added by JS if available -->
-                        </div>
+                        <div class="signature-preview" id="signature-preview"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="toast">
         <i class="bi bi-check-circle-fill"></i>
         <span id="toast-message"></span>
@@ -1195,7 +1045,8 @@
         const loadingEl = document.getElementById("loading");
         const contentEl = document.getElementById("content");
         const contractTextEl = document.getElementById("contract-text");
-        const contractMetaEl = document.getElementById("contract-meta");
+        const contractBodyEl = document.getElementById("contract-body");
+        const statsRowEl = document.getElementById("stats-row");
         const contractStatusEl = document.getElementById("contract-status");
         const contractActionsEl = document.getElementById("contract-actions");
         const contractSigWrapper = document.getElementById("contract-signatures-wrapper");
@@ -1222,7 +1073,7 @@
         function resizeCanvas() {
             const rect = canvas.parentElement.getBoundingClientRect();
             canvas.width = rect.width;
-            canvas.height = 150;
+            canvas.height = 120;
             ctx.lineWidth = 2.5;
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
@@ -1234,10 +1085,7 @@
             const rect = canvas.getBoundingClientRect();
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
+            return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
         function startDraw(e) {
@@ -1259,15 +1107,12 @@
             ctx.stroke();
         }
 
-        function stopDraw() {
-            isDrawing = false;
-        }
+        function stopDraw() { isDrawing = false; }
 
         canvas.addEventListener("mousedown", startDraw);
         canvas.addEventListener("mousemove", draw);
         canvas.addEventListener("mouseup", stopDraw);
         canvas.addEventListener("mouseout", stopDraw);
-
         canvas.addEventListener("touchstart", startDraw);
         canvas.addEventListener("touchmove", draw);
         canvas.addEventListener("touchend", stopDraw);
@@ -1287,31 +1132,42 @@
         function showToast(message, type = 'success') {
             toast.className = `toast show ${type}`;
             toastMessage.textContent = message;
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+            setTimeout(() => toast.classList.remove('show'), 4000);
         }
 
         function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
         }
 
         function formatDateTime(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
+            return new Date(dateStr).toLocaleString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
             });
+        }
+
+        // Animated number counter
+        function animateNumber(element, target, duration = 1000) {
+            const start = 0;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.floor(start + (target - start) * easeOut);
+                element.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = target;
+                }
+            }
+            
+            requestAnimationFrame(update);
         }
 
         async function loadContract() {
@@ -1349,15 +1205,12 @@
                 contentEl.style.display = "block";
                 resizeCanvas();
 
-                // Clean contract text - remove old signature fields that are now shown separately
+                // Clean contract text
                 let cleanedText = c.contractText || "";
-                // Remove everything after "9. AGREEMENT & SIGNATURES" line + the "By signing below..." line
                 const sigIndex = cleanedText.indexOf("9. AGREEMENT & SIGNATURES");
                 if (sigIndex !== -1) {
-                    // Find the end of the "By signing below..." sentence
                     const bySigningMatch = cleanedText.indexOf("By signing below, the Client acknowledges and agrees to all terms outlined.");
                     if (bySigningMatch !== -1) {
-                        // Keep up to and including the "By signing below..." line
                         const endOfLine = cleanedText.indexOf("\n", bySigningMatch);
                         if (endOfLine !== -1) {
                             cleanedText = cleanedText.substring(0, endOfLine).trim();
@@ -1365,33 +1218,51 @@
                     }
                 }
 
-                // Populate contract text
                 contractTextEl.textContent = cleanedText;
                 signerNameInput.value = c.clientName || "";
 
-                // Populate meta info with beautiful cards
-                contractMetaEl.innerHTML = `
-                    <div class="meta-card">
+                // Populate stats with icons and animated numbers
+                const guestCount = parseInt(c.guestCount) || 0;
+                statsRowEl.innerHTML = `
+                    <div class="stat-item">
                         <i class="bi bi-person-circle"></i>
-                        <span class="label">Client</span>
-                        <span class="value">${c.clientName || 'TBD'}</span>
+                        <div class="stat-content">
+                            <span class="stat-label">Client</span>
+                            <span class="stat-value">${c.clientName || 'TBD'}</span>
+                        </div>
                     </div>
-                    <div class="meta-card">
+                    <div class="stat-item">
                         <i class="bi bi-calendar-event"></i>
-                        <span class="label">Event Date</span>
-                        <span class="value">${c.eventDate || 'TBD'}</span>
+                        <div class="stat-content">
+                            <span class="stat-label">Event</span>
+                            <span class="stat-value">${c.eventDate || 'TBD'}</span>
+                        </div>
                     </div>
-                    <div class="meta-card">
+                    <div class="stat-item">
                         <i class="bi bi-geo-alt-fill"></i>
-                        <span class="label">Location</span>
-                        <span class="value">${c.eventLocation || 'TBD'}</span>
+                        <div class="stat-content">
+                            <span class="stat-label">Location</span>
+                            <span class="stat-value">${c.eventLocation || 'TBD'}</span>
+                        </div>
                     </div>
-                    <div class="meta-card">
+                    <div class="stat-item">
                         <i class="bi bi-people-fill"></i>
-                        <span class="label">Guests</span>
-                        <span class="value">${c.guestCount || 'TBD'}</span>
+                        <div class="stat-content">
+                            <span class="stat-label">Guests</span>
+                            <span class="stat-number animated-number" id="guest-count">0</span>
+                        </div>
                     </div>
                 `;
+
+                // Animate the guest count
+                setTimeout(() => {
+                    const guestEl = document.getElementById('guest-count');
+                    if (guestEl && guestCount > 0) {
+                        animateNumber(guestEl, guestCount, 1500);
+                    } else if (guestEl) {
+                        guestEl.textContent = c.guestCount || 'TBD';
+                    }
+                }, 300);
 
                 // Check if signed
                 if (c.status === "Signed") {
@@ -1414,32 +1285,31 @@
             signedState.style.display = "block";
             contractActionsEl.style.display = "flex";
             
-            contractStatusEl.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>Contract Signed</span>';
+            contractStatusEl.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>Signed</span>';
             contractStatusEl.className = 'contract-status signed';
             
             const signedDate = c.signedAt || c.updatedAt;
             signedDateEl.textContent = formatDate(signedDate);
 
-            // Show signature sections on the contract
+            // Show signature sections
             contractSigWrapper.style.display = "block";
-            
-            // Set company signature date (same as client signed date)
             document.getElementById("company-sig-date").textContent = formatDateTime(signedDate);
-            
-            // Set client name
             document.getElementById("client-name-display").textContent = c.clientName || "Client";
             
-            // Set client signature image and timestamp
             if (c.clientSignature && c.clientSignature.startsWith("data:image")) {
                 document.getElementById("contract-sig-img").src = c.clientSignature;
                 document.getElementById("client-sig-timestamp").textContent = formatDateTime(signedDate);
 
-                // Also show in the right panel
                 signaturePreviewEl.innerHTML = `
                     <p>Your Signature:</p>
                     <img src="${c.clientSignature}" alt="Signature" />
                 `;
             }
+
+            // Scroll to signatures section
+            setTimeout(() => {
+                contractSigWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
         }
 
         btnSubmit.addEventListener("click", async () => {
@@ -1457,8 +1327,8 @@
             }
 
             btnSubmit.disabled = true;
-            btnSubmit.innerHTML = '<span class="spinner" style="width:20px;height:20px;border-width:2px;margin-right:8px;"></span> Signing...';
-            showMessage("Processing your signature...", "loading");
+            btnSubmit.innerHTML = '<span class="spinner" style="width:18px;height:18px;border-width:2px;margin-right:6px;"></span> Signing...';
+            showMessage("Processing...", "loading");
 
             const signatureData = canvas.toDataURL();
 
@@ -1476,21 +1346,19 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    showMessage("Contract signed successfully!", "success");
+                    showMessage("Signed successfully!", "success");
                     currentContract = data.result.contract;
-                    setTimeout(() => {
-                        showSignedState(currentContract);
-                    }, 1000);
+                    setTimeout(() => showSignedState(currentContract), 800);
                 } else {
-                    showMessage(data.message || "Error signing contract. Please try again.", "error");
+                    showMessage(data.message || "Error signing.", "error");
                     btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = '<i class="bi bi-check2-circle"></i> Sign & Accept Contract';
+                    btnSubmit.innerHTML = '<i class="bi bi-check2-circle"></i> Sign & Accept';
                 }
             } catch (e) {
                 console.error(e);
-                showMessage("Network error. Please check your connection.", "error");
+                showMessage("Network error.", "error");
                 btnSubmit.disabled = false;
-                btnSubmit.innerHTML = '<i class="bi bi-check2-circle"></i> Sign & Accept Contract';
+                btnSubmit.innerHTML = '<i class="bi bi-check2-circle"></i> Sign & Accept';
             }
         });
 
@@ -1499,7 +1367,7 @@
             if (!currentContract) return;
 
             btnDownload.disabled = true;
-            btnDownload.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span> Generating...';
+            btnDownload.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span>';
 
             try {
                 const pdfBody = document.getElementById("pdf-body");
@@ -1507,10 +1375,8 @@
                 const pdfSigContent = document.getElementById("pdf-sig-content");
                 const pdfContent = document.getElementById("pdf-content");
 
-                // Set contract text
                 pdfBody.textContent = currentContract.contractText;
 
-                // Add signature if signed
                 if (currentContract.status === "Signed" && currentContract.clientSignature) {
                     pdfSig.style.display = "block";
                     const signedDate = currentContract.signedAt || currentContract.updatedAt;
@@ -1519,7 +1385,7 @@
                             <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Culture Gourmet</p>
                             <div style="display: flex; gap: 30px;">
                                 <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">CULTURE GOURMET REP</p>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">REP</p>
                                     <p style="margin: 0; font-size: 14px; font-style: italic;">Culture Gourmet Team</p>
                                 </div>
                                 <div>
@@ -1530,16 +1396,16 @@
                             </div>
                         </div>
                         <div style="padding: 15px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
-                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #166534;">Client Signature</p>
+                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #166534;">Client</p>
                             <div style="display: flex; gap: 30px; flex-wrap: wrap;">
                                 <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">CLIENT NAME</p>
-                                    <p style="margin: 0; font-size: 16px; font-family: 'Brush Script MT', cursive;">${currentContract.clientName}</p>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">NAME</p>
+                                    <p style="margin: 0; font-size: 16px; font-family: cursive;">${currentContract.clientName}</p>
                                 </div>
                                 <div>
-                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">CLIENT SIGNATURE</p>
-                                    <img src="${currentContract.clientSignature}" alt="Signature" style="max-width: 150px; max-height: 50px; border-bottom: 2px solid #1a1a2e; padding-bottom: 4px;" />
-                                    <p style="margin: 8px 0 0; font-size: 11px; color: #166534; background: #dcfce7; padding: 4px 10px; border-radius: 12px; display: inline-block;">${formatDateTime(signedDate)}</p>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">SIGNATURE</p>
+                                    <img src="${currentContract.clientSignature}" alt="Signature" style="max-width: 150px; max-height: 50px; border-bottom: 2px solid #1a1a2e;" />
+                                    <p style="margin: 8px 0 0; font-size: 11px; color: #166534;">${formatDateTime(signedDate)}</p>
                                 </div>
                             </div>
                         </div>
@@ -1548,56 +1414,51 @@
                     pdfSig.style.display = "none";
                 }
 
-                // Generate PDF
-                const opt = {
+                await html2pdf().set({
                     margin: 0.5,
-                    filename: `CultureGourmet-Contract-${currentContract.clientName?.replace(/\s+/g, '-') || 'Client'}.pdf`,
+                    filename: `CultureGourmet-${currentContract.clientName?.replace(/\s+/g, '-') || 'Contract'}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                };
-
-                await html2pdf().set(opt).from(pdfContent).save();
-                showToast('PDF downloaded successfully!', 'success');
+                }).from(pdfContent).save();
+                
+                showToast('PDF downloaded!', 'success');
 
             } catch (e) {
-                console.error("PDF generation error:", e);
+                console.error(e);
                 showToast('Failed to generate PDF', 'error');
             } finally {
                 btnDownload.disabled = false;
-                btnDownload.innerHTML = '<i class="bi bi-file-pdf"></i> Download PDF';
+                btnDownload.innerHTML = '<i class="bi bi-file-pdf"></i> PDF';
             }
         });
 
-        // Email signed copy
+        // Email copy
         btnEmail.addEventListener("click", async () => {
             if (!currentContract) return;
 
             btnEmail.disabled = true;
-            btnEmail.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;"></span> Sending...';
+            btnEmail.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span>';
 
             try {
                 const res = await fetch(API_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        action: "sendSignedCopy",
-                        contractId
-                    })
+                    body: JSON.stringify({ action: "sendSignedCopy", contractId })
                 });
                 const data = await res.json();
 
                 if (data.success) {
-                    showToast(`Signed contract sent to ${currentContract.clientEmail}!`, 'success');
+                    showToast(`Sent to ${currentContract.clientEmail}!`, 'success');
                 } else {
-                    showToast(data.message || 'Failed to send email', 'error');
+                    showToast(data.message || 'Failed to send', 'error');
                 }
             } catch (e) {
-                console.error("Email error:", e);
-                showToast('Failed to send email', 'error');
+                console.error(e);
+                showToast('Failed to send', 'error');
             } finally {
                 btnEmail.disabled = false;
-                btnEmail.innerHTML = '<i class="bi bi-envelope-check"></i> Email Me Copy';
+                btnEmail.innerHTML = '<i class="bi bi-envelope"></i> Email';
             }
         });
 
