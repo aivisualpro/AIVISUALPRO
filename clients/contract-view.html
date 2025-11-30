@@ -1384,7 +1384,27 @@
                 const pdfSigContent = document.getElementById("pdf-sig-content");
                 const pdfContent = document.getElementById("pdf-content");
 
-                pdfBody.textContent = currentContract.contractText;
+                // Clean the contract text for PDF
+                let pdfText = currentContract.contractText || "";
+                const sigIndex = pdfText.indexOf("9. AGREEMENT & SIGNATURES");
+                if (sigIndex !== -1) {
+                    const bySigningMatch = pdfText.indexOf("By signing below, the Client acknowledges and agrees to all terms outlined.");
+                    if (bySigningMatch !== -1) {
+                        const endOfLine = pdfText.indexOf("\n", bySigningMatch);
+                        if (endOfLine !== -1) {
+                            pdfText = pdfText.substring(0, endOfLine).trim();
+                        }
+                    }
+                }
+
+                pdfBody.textContent = pdfText;
+                
+                // Temporarily show the PDF content for rendering
+                pdfContent.style.position = 'fixed';
+                pdfContent.style.left = '0';
+                pdfContent.style.top = '0';
+                pdfContent.style.zIndex = '-1';
+                pdfContent.style.opacity = '1';
 
                 if (currentContract.status === "Signed" && currentContract.clientSignature) {
                     pdfSig.style.display = "block";
@@ -1426,16 +1446,34 @@
                 await html2pdf().set({
                     margin: [0.5, 0.5, 0.5, 0.5],
                     filename: `CultureGourmet-${currentContract.clientName?.replace(/\s+/g, '-') || 'Contract'}.pdf`,
-                    image: { type: 'jpeg', quality: 0.95 },
-                    html2canvas: { scale: 1.5, useCORS: true, logging: false },
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        logging: false,
+                        windowWidth: 700,
+                        windowHeight: pdfContent.scrollHeight
+                    },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
                     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
                 }).from(pdfContent).save();
+                
+                // Hide the PDF content again
+                pdfContent.style.position = 'absolute';
+                pdfContent.style.left = '-9999px';
+                pdfContent.style.zIndex = '';
+                pdfContent.style.opacity = '';
                 
                 showToast('PDF downloaded!', 'success');
 
             } catch (e) {
                 console.error(e);
+                // Make sure to hide PDF content on error
+                const pdfContent = document.getElementById("pdf-content");
+                pdfContent.style.position = 'absolute';
+                pdfContent.style.left = '-9999px';
+                pdfContent.style.zIndex = '';
+                pdfContent.style.opacity = '';
                 showToast('Failed to generate PDF', 'error');
             } finally {
                 btnDownload.disabled = false;
