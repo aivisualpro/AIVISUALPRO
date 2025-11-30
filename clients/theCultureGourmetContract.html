@@ -514,19 +514,20 @@
                             <div id="viewContracts" class="accordion-collapse collapse show" data-bs-parent="#contractsAccordion">
                                 <div class="accordion-body p-0">
                                     <div class="table-scroll-container">
-                                        <table class="table table-hover mb-0">
+                                        <table class="table table-hover mb-0" style="font-size: 0.85rem;">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th class="border-0 py-3 ps-4">Client</th>
-                                                    <th class="border-0 py-3">Event Date</th>
-                                                    <th class="border-0 py-3">Status</th>
-                                                    <th class="border-0 py-3">Created At</th>
-                                                    <th class="border-0 py-3">Actions</th>
+                                                    <th class="border-0 py-2 ps-4">Client</th>
+                                                    <th class="border-0 py-2">Template</th>
+                                                    <th class="border-0 py-2">Event Date</th>
+                                                    <th class="border-0 py-2">Status</th>
+                                                    <th class="border-0 py-2">Created</th>
+                                                    <th class="border-0 py-2 text-center">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="contracts-table-body">
                                                 <tr>
-                                                    <td colspan="5" class="text-center py-5 text-muted">
+                                                    <td colspan="6" class="text-center py-5 text-muted">
                                                         No contracts found. Create your first contract to get started.
                                                     </td>
                                                 </tr>
@@ -1444,6 +1445,24 @@ Event Time: {{eventTime}}"></textarea>
             initializeTemplateModal();
             // Initialize template search
             initializeTemplateSearch();
+            
+            // Contracts accordion - ensure at least one is always open
+            const createContractEl = document.getElementById('createContract');
+            const viewContractsEl = document.getElementById('viewContracts');
+            
+            // When viewContracts is hidden, open createContract
+            viewContractsEl.addEventListener('hidden.bs.collapse', () => {
+                if (!createContractEl.classList.contains('show')) {
+                    new bootstrap.Collapse(createContractEl, { show: true });
+                }
+            });
+            
+            // When createContract is hidden, open viewContracts
+            createContractEl.addEventListener('hidden.bs.collapse', () => {
+                if (!viewContractsEl.classList.contains('show')) {
+                    new bootstrap.Collapse(viewContractsEl, { show: true });
+                }
+            });
         });
 
         function addContactField(contactData = null) {
@@ -1888,7 +1907,7 @@ Event Time: {{eventTime}}"></textarea>
             const paginatedContracts = sortedContracts.slice(startIndex, endIndex);
             
             if (!contracts.length) {
-                contractsTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">No contracts found. Create your first contract to get started.</td></tr>';
+                contractsTableBody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-muted">No contracts found. Create your first contract to get started.</td></tr>';
             } else {
                 paginatedContracts.forEach((c) => {
                     const tr = document.createElement("tr");
@@ -1897,26 +1916,28 @@ Event Time: {{eventTime}}"></textarea>
                     const statusText = statusMap[status] || status;
                     const badgeClass = status === 'Signed' ? 'bg-success' : status === 'Under Review' ? 'bg-warning text-dark' : status === 'Sent' ? 'bg-info' : 'bg-secondary';
                     
+                    // Get template name
+                    const template = contractFormTemplates.find(t => t.id === c.templateId);
+                    const templateName = template ? template.name : '—';
+                    
                     // Format created at timestamp
                     const createdAt = c.createdAt ? new Date(c.createdAt).toLocaleString('en-US', {
                         month: 'short',
                         day: 'numeric',
-                        year: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
+                        year: 'numeric'
                     }) : '—';
 
                     tr.innerHTML = `
                         <td class="ps-4">${c.clientName || "—"}</td>
+                        <td><small class="text-muted">${templateName}</small></td>
                         <td>${c.eventDate ? new Date(c.eventDate).toLocaleDateString() : "—"}</td>
-                        <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td><span class="badge ${badgeClass}" style="font-size: 0.7rem;">${statusText}</span></td>
                         <td><small class="text-muted">${createdAt}</small></td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm me-1" data-edit-id="${c.id}">Edit</button>
-                            <button class="btn btn-outline-info btn-sm me-1" data-resend-id="${c.id}">Resend</button>
-                            <button class="btn btn-outline-danger btn-sm me-1" data-delete-id="${c.id}">Delete</button>
-                            <a href="theCultureGourmetContractAdmin.html?contractId=${c.id}" class="btn btn-outline-success btn-sm">Open</a>
+                        <td class="text-center">
+                            <button class="btn btn-outline-primary btn-sm px-2 py-1 me-1" data-edit-id="${c.id}" title="Edit"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-outline-info btn-sm px-2 py-1 me-1" data-resend-id="${c.id}" title="Resend"><i class="bi bi-send"></i></button>
+                            <button class="btn btn-outline-danger btn-sm px-2 py-1 me-1" data-delete-id="${c.id}" title="Delete"><i class="bi bi-trash"></i></button>
+                            <a href="theCultureGourmetContractAdmin.html?contractId=${c.id}" class="btn btn-outline-success btn-sm px-2 py-1" title="Open"><i class="bi bi-box-arrow-up-right"></i></a>
                         </td>
                     `;
                     contractsTableBody.appendChild(tr);
@@ -2061,11 +2082,17 @@ Event Time: {{eventTime}}"></textarea>
                 contractSendBtn.parentNode.insertBefore(cancelBtn, contractSendMessage);
             }
             
+            // Select the contract's template in the dropdown
+            if (contract.templateId && contractTemplateSelect) {
+                contractTemplateSelect.value = contract.templateId;
+                selectedTemplateId = contract.templateId;
+            }
+            
             // Open the Create Contract accordion
             const createContractAccordion = document.getElementById('createContract');
             const bsCollapse = new bootstrap.Collapse(createContractAccordion, { show: true });
             
-            // Update preview
+            // Update preview with the contract's template
             updateContractPreview();
             
             // Scroll to form
@@ -2397,6 +2424,9 @@ Event Time: {{eventTime}}"></textarea>
         // ---------- Initial Load ----------
         async function loadInitialData() {
             try {
+                // Load templates first so they're available for contract rendering
+                await populateTemplateDropdown();
+                
                 const [clientsResp, contractsResp] = await Promise.all([
                     callCG({ action: "listClients" }),
                     callCG({ action: "listContracts" }),
@@ -2412,7 +2442,6 @@ Event Time: {{eventTime}}"></textarea>
             loadEmailSettings();
             loadCompanySettings();
             initializeClientSearch();
-            populateTemplateDropdown(); // Load templates for contract form
         }
 
         // ---------- Email Settings (Resend API) ----------

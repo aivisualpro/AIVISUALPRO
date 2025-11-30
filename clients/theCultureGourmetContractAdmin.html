@@ -19,8 +19,11 @@
         .header-section {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
-            padding: 1.5rem;
+            padding: 1rem 1.5rem;
             border-radius: 16px 16px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         .status-badge {
             font-size: 0.9rem;
@@ -142,26 +145,23 @@
 </head>
 <body>
     <div class="container-fluid py-4">
-        <!-- Back Button -->
-        <a href="theCultureGourmetContract.html#contracts-section" class="btn btn-light mb-3">
-            <i class="bi bi-arrow-left me-2"></i>Back to Contracts
-        </a>
+        
 
         <!-- Main Card -->
         <div class="card main-card border-0" id="main-content" style="display: none;">
             <!-- Header -->
             <div class="header-section">
-                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                    <div>
-                        <h4 class="mb-1" id="client-name">Loading...</h4>
-                        <p class="mb-0 opacity-75" id="contract-id">Contract ID: ---</p>
-                    </div>
-                    <div class="text-end">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <a href="theCultureGourmetContract.html#contracts-section" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i>Back
+                        </a>
+                        <h4 class="mb-0" id="client-name">Loading...</h4>
                         <span class="badge status-badge bg-secondary" id="status-badge">Loading</span>
-                        <div class="live-indicator mt-2">
-                            <span class="dot"></span>
-                            <span>Live Updates</span>
-                        </div>
+                    </div>
+                    <div class="live-indicator">
+                        <span class="dot"></span>
+                        <span>Live Updates</span>
                     </div>
                 </div>
             </div>
@@ -276,7 +276,6 @@
         const errorMessage = document.getElementById("error-message");
 
         const clientNameEl = document.getElementById("client-name");
-        const contractIdEl = document.getElementById("contract-id");
         const statusBadge = document.getElementById("status-badge");
         const eventDateEl = document.getElementById("event-date");
         const eventTimeEl = document.getElementById("event-time");
@@ -337,7 +336,6 @@
             currentContract = contract;
 
             clientNameEl.textContent = contract.clientName || "Unknown Client";
-            contractIdEl.textContent = `Contract ID: ${contract.id}`;
             
             statusBadge.textContent = contract.status || "Draft";
             statusBadge.className = `badge status-badge ${getStatusBadgeClass(contract.status)}`;
@@ -394,9 +392,10 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: "getContract", contractId })
                 });
-                const data = await res.json();
+                const raw = await res.json();
+                const data = raw.result || raw;
 
-                if (!data.success || !data.result?.contract) {
+                if (!data.success || !data.contract) {
                     loadingState.style.display = "none";
                     errorState.style.display = "block";
                     errorMessage.textContent = data.message || "Contract not found.";
@@ -405,7 +404,7 @@
 
                 loadingState.style.display = "none";
                 mainContent.style.display = "block";
-                renderContract(data.result.contract);
+                renderContract(data.contract);
 
             } catch (err) {
                 console.error("Error loading contract:", err);
