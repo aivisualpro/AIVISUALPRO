@@ -256,8 +256,34 @@ async function deleteClient(payload) {
     return { success: true };
 }
 
+// Get default settings from environment variables
+function getDefaultSettings() {
+    return {
+        resendApiKey: process.env.CG_RESEND_API_KEY || "",
+        resendFromEmail: process.env.CG_RESEND_FROM_EMAIL || "onboarding@resend.dev",
+        smtpHost: process.env.CG_SMTP_HOST || "",
+        smtpPort: process.env.CG_SMTP_PORT || "587",
+        smtpUser: process.env.CG_SMTP_USER || "",
+        smtpPass: process.env.CG_SMTP_PASS || "",
+        smtpFrom: process.env.CG_SMTP_FROM || ""
+    };
+}
+
 async function getSettings() {
-    const settings = readJsonSafe(settingsFile);
+    let settings = readJsonSafe(settingsFile);
+    const defaults = getDefaultSettings();
+    
+    // Merge: use file settings if available, otherwise use env defaults
+    settings = {
+        resendApiKey: settings.resendApiKey || defaults.resendApiKey,
+        resendFromEmail: settings.resendFromEmail || defaults.resendFromEmail,
+        smtpHost: settings.smtpHost || defaults.smtpHost,
+        smtpPort: settings.smtpPort || defaults.smtpPort,
+        smtpUser: settings.smtpUser || defaults.smtpUser,
+        smtpPass: settings.smtpPass || defaults.smtpPass,
+        smtpFrom: settings.smtpFrom || defaults.smtpFrom
+    };
+    
     return { success: true, settings };
 }
 
@@ -284,8 +310,20 @@ async function sendContract(payload) {
     // Point to the new HTML view
     contract.fileUrl = `/clients/contract-view.html?contractId=${contract.id}`;
 
-    // Try to send email
-    const settings = readJsonSafe(settingsFile);
+    // Try to send email - merge file settings with env defaults
+    const fileSettings = readJsonSafe(settingsFile);
+    const defaults = getDefaultSettings();
+    const settings = {
+        resendApiKey: fileSettings.resendApiKey || defaults.resendApiKey,
+        resendFromEmail: fileSettings.resendFromEmail || defaults.resendFromEmail,
+        smtpHost: fileSettings.smtpHost || defaults.smtpHost,
+        smtpPort: fileSettings.smtpPort || defaults.smtpPort,
+        smtpUser: fileSettings.smtpUser || defaults.smtpUser,
+        smtpPass: fileSettings.smtpPass || defaults.smtpPass,
+        smtpFrom: fileSettings.smtpFrom || defaults.smtpFrom
+    };
+    console.log('[CG] Using settings - Resend:', settings.resendApiKey ? 'configured' : 'not configured', ', SMTP:', settings.smtpHost ? 'configured' : 'not configured');
+    
     let emailSent = false;
     let emailError = null;
     
