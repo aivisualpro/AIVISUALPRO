@@ -8,6 +8,7 @@ const clientsFile = path.join(dbDir, "clients.txt");
 const settingsFile = path.join(dbDir, "settings.txt");
 
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 // ---------- low-level helpers ----------
 
@@ -261,8 +262,8 @@ async function getSettings() {
 }
 
 async function saveSettings(payload) {
-    const { smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom } = payload;
-    const settings = { smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom };
+    const { resendApiKey, resendFromEmail, smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom } = payload;
+    const settings = { resendApiKey, resendFromEmail, smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom };
     writeJsonSafe(settingsFile, settings);
     return { success: true, settings };
 }
@@ -283,24 +284,51 @@ async function sendContract(payload) {
     // Point to the new HTML view
     contract.fileUrl = `/clients/contract-view.html?contractId=${contract.id}`;
 
-    // Try to send email via SMTP if configured
+    // Try to send email
     const settings = readJsonSafe(settingsFile);
     let emailSent = false;
     let emailError = null;
+    
+    const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
+    console.log('[CG] Contract Link being sent:', fullLink);
 
-    if (settings.smtpHost && settings.smtpUser && settings.smtpPass) {
-        // Try multiple ports in case some are blocked (common on cloud providers like Render)
+    const fromName = settings.smtpFrom || "Culture Gourmet";
+    const fromEmail = settings.smtpUser || "noreply@aivisualpro.com";
+
+    // Method 1: Try Resend API first (works on Render and other cloud providers)
+    if (settings.resendApiKey && !emailSent) {
+        try {
+            console.log('[CG] Trying Resend API...');
+            const resend = new Resend(settings.resendApiKey);
+            
+            const { data, error } = await resend.emails.send({
+                from: `${fromName} <${settings.resendFromEmail || 'onboarding@resend.dev'}>`,
+                to: [contract.clientEmail],
+                subject: "Culture Gourmet Catering Agreement",
+                text: `Hi ${contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`,
+                html: `<p>Hi ${contract.clientName},</p><p>Here is your catering agreement:</p><p><a href="${fullLink}">View & Sign Contract</a></p><p>Thank you,<br>Culture Gourmet</p>`,
+            });
+
+            if (error) {
+                console.error('[CG] Resend API Error:', error);
+                emailError = error.message || JSON.stringify(error);
+            } else {
+                emailSent = true;
+                console.log('[CG] Email sent successfully via Resend! ID:', data?.id);
+            }
+        } catch (err) {
+            console.error('[CG] Resend Error:', err.message);
+            emailError = err.message;
+        }
+    }
+
+    // Method 2: Fall back to SMTP (works on localhost)
+    if (settings.smtpHost && settings.smtpUser && settings.smtpPass && !emailSent) {
         const portsToTry = [
             parseInt(settings.smtpPort || "587"),
-            2525,  // Alternative port often allowed on cloud
-            587,   // TLS
-            465    // SSL
+            2525, 587, 465
         ];
-        // Remove duplicates
         const uniquePorts = [...new Set(portsToTry)];
-        
-        const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
-        console.log('[CG] Contract Link being sent:', fullLink);
 
         const fromAddress = settings.smtpFrom
             ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
@@ -315,7 +343,7 @@ async function sendContract(payload) {
                     host: settings.smtpHost,
                     port: port,
                     secure: port === 465,
-                    connectionTimeout: 10000, // 10 second timeout
+                    connectionTimeout: 10000,
                     greetingTimeout: 10000,
                     auth: {
                         user: settings.smtpUser,
@@ -323,7 +351,6 @@ async function sendContract(payload) {
                     },
                 });
 
-                console.log('[CG] Sending email via SMTP...');
                 console.log('[CG] From:', fromAddress);
                 console.log('[CG] To:', contract.clientEmail);
 
@@ -335,11 +362,10 @@ async function sendContract(payload) {
                     html: `<p>Hi ${contract.clientName},</p><p>Here is your catering agreement:</p><p><a href="${fullLink}">View & Sign Contract</a></p><p>Thank you,<br>Culture Gourmet</p>`,
                 });
                 emailSent = true;
-                console.log(`[CG] Email sent successfully on port ${port}!`);
+                console.log(`[CG] Email sent successfully via SMTP on port ${port}!`);
             } catch (err) {
                 console.error(`[CG] SMTP Error on port ${port}:`, err.message);
                 emailError = err.message;
-                // Continue to try next port
             }
         }
         
@@ -354,7 +380,7 @@ async function sendContract(payload) {
     contract.timeline.push({
         at: nowIso(),
         type: "sent",
-        note: emailSent ? "Contract sent via SMTP" : "Contract link generated (SMTP not used)",
+        note: emailSent ? "Contract sent via email" : "Contract link generated (email not sent)",
     });
 
     contract.contractText = buildContractText(contract);

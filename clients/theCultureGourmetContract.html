@@ -376,10 +376,27 @@
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header bg-white py-3">
                                     <h5 class="card-title mb-0 fw-semibold">
-                                        <i class="bi bi-envelope-at me-2 text-primary"></i>SMTP Email Settings
+                                        <i class="bi bi-envelope-at me-2 text-primary"></i>Email Settings
                                     </h5>
                                 </div>
                                 <div class="card-body">
+                                    <!-- Resend API (Recommended for Cloud) -->
+                                    <div class="alert alert-info mb-3">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        <strong>Resend API</strong> is recommended for cloud hosting (Render, Vercel, etc.)
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="resend-api-key" class="form-label fw-semibold">Resend API Key</label>
+                                        <input id="resend-api-key" type="password" class="form-control" placeholder="re_xxxxxxxxx" />
+                                        <small class="text-muted">Get your API key from <a href="https://resend.com" target="_blank">resend.com</a></small>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="resend-from-email" class="form-label fw-semibold">Resend From Email</label>
+                                        <input id="resend-from-email" type="text" class="form-control" placeholder="onboarding@resend.dev" />
+                                        <small class="text-muted">Use your verified domain or onboarding@resend.dev for testing</small>
+                                    </div>
+                                    <hr class="my-3">
+                                    <p class="text-muted small mb-2"><i class="bi bi-info-circle me-1"></i>SMTP is used as fallback (works on localhost)</p>
                                     <div class="mb-3">
                                         <label for="smtp-host" class="form-label fw-semibold">SMTP Host</label>
                                         <input id="smtp-host" type="text" class="form-control" placeholder="smtp.gmail.com" />
@@ -397,11 +414,11 @@
                                         <input id="smtp-pass" type="password" class="form-control" placeholder="App Password" />
                                     </div>
                                     <div class="mb-3">
-                                        <label for="smtp-from" class="form-label fw-semibold">From Email (Optional)</label>
-                                        <input id="smtp-from" type="text" class="form-control" placeholder="Culture Gourmet <you@gmail.com>" />
+                                        <label for="smtp-from" class="form-label fw-semibold">From Name (Optional)</label>
+                                        <input id="smtp-from" type="text" class="form-control" placeholder="Culture Gourmet" />
                                     </div>
                                     <button id="btn-save-smtp" class="btn btn-primary w-100" type="button">
-                                        <i class="bi bi-check-circle me-1"></i>Save SMTP Settings
+                                        <i class="bi bi-check-circle me-1"></i>Save Email Settings
                                     </button>
                                     <div id="smtp-msg" class="mt-2"></div>
                                 </div>
@@ -1417,7 +1434,9 @@ Date: ____________________
             initializeClientSearch();
         }
 
-        // ---------- SMTP Settings ----------
+        // ---------- Email Settings ----------
+        const resendApiKeyInput = document.getElementById("resend-api-key");
+        const resendFromEmailInput = document.getElementById("resend-from-email");
         const smtpHostInput = document.getElementById("smtp-host");
         const smtpPortInput = document.getElementById("smtp-port");
         const smtpUserInput = document.getElementById("smtp-user");
@@ -1431,6 +1450,8 @@ Date: ____________________
                 const resp = await callCG({ action: "getSettings" });
                 if (resp.success && resp.settings) {
                     const s = resp.settings;
+                    resendApiKeyInput.value = s.resendApiKey || "";
+                    resendFromEmailInput.value = s.resendFromEmail || "";
                     smtpHostInput.value = s.smtpHost || "";
                     smtpPortInput.value = s.smtpPort || "";
                     smtpUserInput.value = s.smtpUser || "";
@@ -1446,7 +1467,16 @@ Date: ____________________
             btnSaveSmtp.disabled = true;
             smtpMsg.textContent = "Saving...";
             try {
-                const resp = await callCG({ action: "saveSettings", smtpHost: smtpHostInput.value.trim(), smtpPort: smtpPortInput.value.trim(), smtpUser: smtpUserInput.value.trim(), smtpPass: smtpPassInput.value.trim(), smtpFrom: smtpFromInput.value.trim() });
+                const resp = await callCG({ 
+                    action: "saveSettings", 
+                    resendApiKey: resendApiKeyInput.value.trim(),
+                    resendFromEmail: resendFromEmailInput.value.trim(),
+                    smtpHost: smtpHostInput.value.trim(), 
+                    smtpPort: smtpPortInput.value.trim(), 
+                    smtpUser: smtpUserInput.value.trim(), 
+                    smtpPass: smtpPassInput.value.trim(), 
+                    smtpFrom: smtpFromInput.value.trim() 
+                });
                 if (resp.success) smtpMsg.innerHTML = '<span class="text-success">✅ Settings saved.</span>';
                 else smtpMsg.innerHTML = '<span class="text-danger">❌ Error saving settings.</span>';
             } catch (e) {
