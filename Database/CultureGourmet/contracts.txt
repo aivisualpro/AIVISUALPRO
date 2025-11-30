@@ -10,7 +10,7 @@
     "status": "Sent",
     "fileUrl": "/clients/contract-view.html?contractId=mil4dcwa-kjbgw1bm",
     "createdAt": "2025-11-30T02:47:03.562Z",
-    "updatedAt": "2025-11-30T03:42:36.748Z",
+    "updatedAt": "2025-11-30T04:07:23.346Z",
     "timeline": [
       {
         "at": "2025-11-30T02:47:03.562Z",
@@ -29,6 +29,11 @@
       },
       {
         "at": "2025-11-30T03:42:36.748Z",
+        "type": "sent",
+        "note": "Contract sent via SMTP"
+      },
+      {
+        "at": "2025-11-30T04:07:23.346Z",
         "type": "sent",
         "note": "Contract sent via SMTP"
       }

@@ -258,7 +258,7 @@ async function deleteClient(payload) {
 
 // Get default settings from environment variables
 function getDefaultSettings() {
-    return {
+    const defaults = {
         resendApiKey: process.env.CG_RESEND_API_KEY || "",
         resendFromEmail: process.env.CG_RESEND_FROM_EMAIL || "onboarding@resend.dev",
         smtpHost: process.env.CG_SMTP_HOST || "",
@@ -267,6 +267,8 @@ function getDefaultSettings() {
         smtpPass: process.env.CG_SMTP_PASS || "",
         smtpFrom: process.env.CG_SMTP_FROM || ""
     };
+    console.log('[CG] Environment check - CG_RESEND_API_KEY:', process.env.CG_RESEND_API_KEY ? 'SET' : 'NOT SET');
+    return defaults;
 }
 
 async function getSettings() {
