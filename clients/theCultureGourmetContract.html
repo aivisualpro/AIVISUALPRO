@@ -577,17 +577,26 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('confirm-yes').addEventListener('click', () => {
+                const resolver = confirmResolve;
+                confirmResolve = null;
                 if (confirmModal) confirmModal.hide();
-                if (confirmResolve) confirmResolve(true);
+                if (resolver) resolver(true);
             });
 
             document.getElementById('confirm-no').addEventListener('click', () => {
+                const resolver = confirmResolve;
+                confirmResolve = null;
                 if (confirmModal) confirmModal.hide();
-                if (confirmResolve) confirmResolve(false);
+                if (resolver) resolver(false);
             });
 
             document.getElementById('confirmModal').addEventListener('hidden.bs.modal', () => {
-                if (confirmResolve) confirmResolve(false);
+                // Only resolve if not already resolved by button click
+                if (confirmResolve) {
+                    const resolver = confirmResolve;
+                    confirmResolve = null;
+                    resolver(false);
+                }
             });
         });
 
@@ -1188,7 +1197,10 @@ Date: ____________________
 
         async function handleEditContract(contractId) {
             const contract = contracts.find((c) => c.id === contractId);
-            if (!contract) return;
+            if (!contract) {
+                showToast("Contract not found locally.", "error");
+                return;
+            }
 
             const clientName = prompt("Client Name", contract.clientName || "");
             if (clientName === null) return;
@@ -1204,27 +1216,38 @@ Date: ____________________
             if (eventTime === null) return;
 
             try {
+                console.log("[Edit] Sending update for contract:", contractId);
                 const resp = await callCG({ action: "updateContractFields", contractId, clientName, clientEmail, eventDate, eventLocation, guestCount, eventTime });
-                if (!resp.success) { alert(resp.message || "Error updating contract."); return; }
+                console.log("[Edit] Response:", resp);
+                if (!resp.success) { 
+                    showToast(resp.message || "Error updating contract.", "error"); 
+                    return; 
+                }
                 const idx = contracts.findIndex((c) => c.id === contractId);
                 if (idx !== -1) contracts[idx] = resp.contract;
                 renderContracts();
+                showToast("Contract updated successfully!", "success");
             } catch (err) {
-                console.error(err);
+                console.error("[Edit] Error:", err);
                 showToast("Error contacting server.", "error");
             }
         }
 
         async function handleDeleteContract(contractId) {
             try {
+                console.log("[Delete] Deleting contract:", contractId);
                 const resp = await callCG({ action: "deleteContract", contractId });
-                if (!resp.success) { showToast(resp.message || "Error deleting contract.", "error"); return; }
+                console.log("[Delete] Response:", resp);
+                if (!resp.success) { 
+                    showToast(resp.message || "Error deleting contract.", "error"); 
+                    return; 
+                }
                 const idx = contracts.findIndex((c) => c.id === contractId);
                 if (idx !== -1) contracts.splice(idx, 1);
                 renderContracts();
                 showToast("Contract deleted.", "success");
             } catch (err) {
-                console.error(err);
+                console.error("[Delete] Error:", err);
                 showToast("Error contacting server.", "error");
             }
         }
