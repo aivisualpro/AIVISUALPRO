@@ -268,11 +268,13 @@ async function saveSettings(payload) {
 }
 
 async function sendContract(payload) {
-    const { contractId } = payload;
-    const contracts = readJsonSafe(contractsFile);
-    const idx = contracts.findIndex((c) => c.id === contractId);
+    try {
+        console.log('[CG] sendContract called with payload:', JSON.stringify(payload));
+        const { contractId } = payload;
+        const contracts = readJsonSafe(contractsFile);
+        const idx = contracts.findIndex((c) => c.id === contractId);
 
-    if (idx === -1) {
+        if (idx === -1) {
         return { success: false, message: "Contract not found" };
     }
 
@@ -344,7 +346,13 @@ async function sendContract(payload) {
     contracts[idx] = contract;
     writeJsonSafe(contractsFile, contracts);
 
+    console.log('[CG] sendContract completed successfully');
     return { success: true, contract, emailSent, emailError };
+    } catch (err) {
+        console.error('[CG] sendContract FATAL ERROR:', err);
+        console.error('[CG] Error stack:', err.stack);
+        return { success: false, message: 'Server error: ' + err.message };
+    }
 }
 
 async function getContract(payload) {
