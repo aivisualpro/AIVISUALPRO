@@ -116,16 +116,6 @@ Client is responsible for any damages to equipment, rentals, or property caused 
 
 9. AGREEMENT & SIGNATURES
 By signing below, the Client acknowledges and agrees to all terms outlined.
-
-Client Name: ${c.clientName || "____________________________"}
-Client Signature: ________________________________
-Date: ____________________
-
-Culture Gourmet Representative: ______________________________
-Signature: _____________________________________
-Date: ____________________
-
-Status: ${c.status}
   `.trim();
 }
 

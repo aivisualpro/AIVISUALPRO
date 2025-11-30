@@ -230,65 +230,131 @@
             color: #374151;
         }
 
-        /* Signature on Contract */
-        .contract-signature-section {
+        /* Signature Sections on Contract */
+        .contract-signatures-wrapper {
             margin-top: 2rem;
-            padding: 2rem;
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .signature-section-block {
+            padding: 1.5rem 2rem;
             border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .signature-section-block.company {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+        }
+
+        .signature-section-block.client {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
             border: 2px solid #86efac;
         }
 
-        .contract-signature-section h4 {
-            color: #166534;
-            font-size: 1rem;
-            margin-bottom: 1rem;
+        .signature-section-block h4 {
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 600;
         }
 
-        .signature-display {
-            display: flex;
-            align-items: flex-start;
+        .signature-section-block.company h4 {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .signature-section-block.client h4 {
+            color: #166534;
+        }
+
+        .signature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            flex-wrap: wrap;
         }
 
-        .signature-item {
-            flex: 1;
-            min-width: 200px;
+        .signature-col {
+            display: flex;
+            flex-direction: column;
         }
 
-        .signature-item label {
-            font-size: 0.75rem;
+        .signature-col label {
+            font-size: 0.7rem;
             text-transform: uppercase;
-            color: #6b7280;
-            letter-spacing: 0.5px;
-            display: block;
+            letter-spacing: 1px;
             margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        .signature-item img {
-            max-width: 250px;
-            max-height: 80px;
-            border-bottom: 2px solid #1f2937;
-            padding-bottom: 4px;
+        .signature-section-block.company .signature-col label {
+            color: rgba(255, 255, 255, 0.6);
         }
 
-        .signature-item .signed-name {
+        .signature-section-block.client .signature-col label {
+            color: #6b7280;
+        }
+
+        .signature-value {
+            font-size: 1.1rem;
+            padding-bottom: 8px;
+            border-bottom: 2px solid;
+            min-height: 40px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .signature-section-block.company .signature-value {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
             font-family: 'Brush Script MT', cursive;
-            font-size: 1.5rem;
-            color: #1a1a2e;
-            border-bottom: 2px solid #1a1a2e;
-            padding-bottom: 4px;
-            display: inline-block;
+            font-size: 1.3rem;
         }
 
-        .signature-item .signed-date {
-            font-size: 0.9rem;
-            color: #1f2937;
-            margin-top: 4px;
+        .signature-section-block.client .signature-value {
+            color: #1a1a2e;
+            border-color: #1a1a2e;
+        }
+
+        .signature-section-block.client .signature-value.name-value {
+            font-family: 'Brush Script MT', cursive;
+            font-size: 1.4rem;
+        }
+
+        .signature-col img {
+            max-width: 200px;
+            max-height: 60px;
+            object-fit: contain;
+        }
+
+        .signature-timestamp {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+        }
+
+        .signature-section-block.company .signature-timestamp {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .signature-section-block.client .signature-timestamp {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        /* Responsive for tablets and mobile */
+        @media (max-width: 768px) {
+            .signature-row {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
         }
 
         /* Contract Footer */
@@ -969,21 +1035,49 @@
                     <div class="contract-document">
                         <div class="contract-text" id="contract-text"></div>
                         
-                        <!-- Signature on Contract (shown after signing) -->
-                        <div class="contract-signature-section" id="contract-signature-section" style="display: none;">
-                            <h4><i class="bi bi-check-circle-fill"></i> Signed & Executed</h4>
-                            <div class="signature-display">
-                                <div class="signature-item">
-                                    <label>Client Signature</label>
-                                    <img id="contract-sig-img" src="" alt="Client Signature" />
-                                    <div class="signed-date" id="contract-sig-date"></div>
-                                </div>
-                                <div class="signature-item">
-                                    <label>Signed By</label>
-                                    <div class="signed-name" id="contract-sig-name"></div>
-                                    <div class="signed-date" id="contract-sig-time"></div>
+                        <!-- Signature Sections (shown after signing) -->
+                        <div class="contract-signatures-wrapper" id="contract-signatures-wrapper" style="display: none;">
+                            
+                            <!-- Culture Gourmet Section -->
+                            <div class="signature-section-block company">
+                                <h4><i class="bi bi-building"></i> Culture Gourmet</h4>
+                                <div class="signature-row">
+                                    <div class="signature-col">
+                                        <label>Culture Gourmet Rep</label>
+                                        <div class="signature-value">Culture Gourmet Team</div>
+                                    </div>
+                                    <div class="signature-col">
+                                        <label>Signature</label>
+                                        <div class="signature-value">Culture Gourmet</div>
+                                        <div class="signature-timestamp">
+                                            <i class="bi bi-calendar-check"></i>
+                                            <span id="company-sig-date">-</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Client Section -->
+                            <div class="signature-section-block client">
+                                <h4><i class="bi bi-check-circle-fill"></i> Client Signature</h4>
+                                <div class="signature-row">
+                                    <div class="signature-col">
+                                        <label>Client Name</label>
+                                        <div class="signature-value name-value" id="client-name-display">-</div>
+                                    </div>
+                                    <div class="signature-col">
+                                        <label>Client Signature</label>
+                                        <div class="signature-value" id="client-sig-display">
+                                            <img id="contract-sig-img" src="" alt="Client Signature" />
+                                        </div>
+                                        <div class="signature-timestamp">
+                                            <i class="bi bi-calendar-check"></i>
+                                            <span id="client-sig-timestamp">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -1104,7 +1198,7 @@
         const contractMetaEl = document.getElementById("contract-meta");
         const contractStatusEl = document.getElementById("contract-status");
         const contractActionsEl = document.getElementById("contract-actions");
-        const contractSigSection = document.getElementById("contract-signature-section");
+        const contractSigWrapper = document.getElementById("contract-signatures-wrapper");
         const signForm = document.getElementById("sign-form");
         const signedState = document.getElementById("signed-state");
         const signedDateEl = document.getElementById("signed-date");
@@ -1310,13 +1404,19 @@
             const signedDate = c.signedAt || c.updatedAt;
             signedDateEl.textContent = formatDate(signedDate);
 
-            // Show signature on the contract itself
+            // Show signature sections on the contract
+            contractSigWrapper.style.display = "block";
+            
+            // Set company signature date (same as client signed date)
+            document.getElementById("company-sig-date").textContent = formatDateTime(signedDate);
+            
+            // Set client name
+            document.getElementById("client-name-display").textContent = c.clientName || "Client";
+            
+            // Set client signature image and timestamp
             if (c.clientSignature && c.clientSignature.startsWith("data:image")) {
-                contractSigSection.style.display = "block";
                 document.getElementById("contract-sig-img").src = c.clientSignature;
-                document.getElementById("contract-sig-name").textContent = c.clientName || "Client";
-                document.getElementById("contract-sig-date").textContent = formatDate(signedDate);
-                document.getElementById("contract-sig-time").textContent = formatDateTime(signedDate);
+                document.getElementById("client-sig-timestamp").textContent = formatDateTime(signedDate);
 
                 // Also show in the right panel
                 signaturePreviewEl.innerHTML = `
@@ -1399,10 +1499,34 @@
                     pdfSig.style.display = "block";
                     const signedDate = currentContract.signedAt || currentContract.updatedAt;
                     pdfSigContent.innerHTML = `
-                        <p style="margin: 0 0 10px; font-size: 14px;"><strong>Client:</strong> ${currentContract.clientName}</p>
-                        <p style="margin: 0 0 10px; font-size: 14px;"><strong>Signature:</strong></p>
-                        <img src="${currentContract.clientSignature}" alt="Signature" style="max-width: 200px; border-bottom: 2px solid #333; padding-bottom: 5px;" />
-                        <p style="margin: 10px 0 0; font-size: 13px; color: #666;"><strong>Date:</strong> ${formatDateTime(signedDate)}</p>
+                        <div style="margin-bottom: 20px; padding: 15px; background: #1a1a2e; border-radius: 8px; color: white;">
+                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7);">Culture Gourmet</p>
+                            <div style="display: flex; gap: 30px;">
+                                <div>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">CULTURE GOURMET REP</p>
+                                    <p style="margin: 0; font-size: 14px; font-style: italic;">Culture Gourmet Team</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: rgba(255,255,255,0.6);">SIGNATURE</p>
+                                    <p style="margin: 0; font-size: 14px; font-style: italic;">Culture Gourmet</p>
+                                    <p style="margin: 4px 0 0; font-size: 11px; color: rgba(255,255,255,0.7);">${formatDateTime(signedDate)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding: 15px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px;">
+                            <p style="margin: 0 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #166534;">Client Signature</p>
+                            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                                <div>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">CLIENT NAME</p>
+                                    <p style="margin: 0; font-size: 16px; font-family: 'Brush Script MT', cursive;">${currentContract.clientName}</p>
+                                </div>
+                                <div>
+                                    <p style="margin: 0 0 4px; font-size: 11px; color: #6b7280;">CLIENT SIGNATURE</p>
+                                    <img src="${currentContract.clientSignature}" alt="Signature" style="max-width: 150px; max-height: 50px; border-bottom: 2px solid #1a1a2e; padding-bottom: 4px;" />
+                                    <p style="margin: 8px 0 0; font-size: 11px; color: #166534; background: #dcfce7; padding: 4px 10px; border-radius: 12px; display: inline-block;">${formatDateTime(signedDate)}</p>
+                                </div>
+                            </div>
+                        </div>
                     `;
                 } else {
                     pdfSig.style.display = "none";
