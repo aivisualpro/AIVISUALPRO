@@ -44,6 +44,11 @@ async function getSettingsCollection() {
     return database.collection("settings");
 }
 
+async function getTemplatesCollection() {
+    const database = await getDb();
+    return database.collection("templates");
+}
+
 // ---------- Helpers ----------
 
 function nowIso() {
@@ -58,64 +63,62 @@ function makeId() {
     );
 }
 
-// Build the human-readable contract text
-function buildContractText(c, companySettings = {}) {
-    const companyName = companySettings.companyName || "Culture Gourmet";
-    const repName = companySettings.repName || "";
+// Replace template variables with actual values
+function replaceTemplateVariables(templateBody, contractData, companySettings = {}) {
+    const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     
-    return `
-${companyName.toUpperCase()} – CATERING AGREEMENT
-(One-Page Contract)
+    const variables = {
+        '{{clientName}}': contractData.clientName || '____________________________',
+        '{{clientEmail}}': contractData.clientEmail || '____________________________',
+        '{{eventDate}}': contractData.eventDate || '____________________________',
+        '{{eventLocation}}': contractData.eventLocation || '____________________________',
+        '{{guestCount}}': contractData.guestCount || '____________________________',
+        '{{eventTime}}': contractData.eventTime || '____________________________',
+        '{{companyName}}': companySettings.companyName || 'Culture Gourmet',
+        '{{repName}}': companySettings.repName || '____________________________',
+        '{{todayDate}}': today,
+    };
+    
+    let result = templateBody;
+    for (const [key, value] of Object.entries(variables)) {
+        result = result.split(key).join(value);
+    }
+    
+    return result;
+}
 
-This Catering Agreement ("Agreement") is entered into between ${companyName} ("Caterer") and the undersigned ${c.clientName || "Client"} ("Client") for catering services on the date listed below.
-
-1. EVENT DETAILS
-Client Name: ${c.clientName || "____________________________"}
-Event Date: ${c.eventDate || "____________________________"}
-Event Location: ${c.eventLocation || "____________________________"}
-Guest Count: ${c.guestCount || "____________________________"}
-Event Start/End Time: ${c.eventTime || "____________________________"}
-
-2. SERVICE AREA
-${companyName} provides catering services locally within the DMV and nationwide, subject to travel fees.
-
-3. DEPOSIT & BOOKING POLICY
-- A 50% deposit is required to secure the event date.
-- The deposit is non-refundable and holds the selected date.
-- In cases of inclement weather, the deposit is fully transferable to a new mutually agreed-upon date.
-
-4. CANCELLATION POLICY
-If the Client cancels for any reason:
-- Payments made are credited in full toward a future event date within 12 months.
-- No cash refunds will be provided.
-
-5. RESCHEDULING POLICY
-- Rescheduling due to weather or unforeseen circumstances is allowed at no additional cost, pending availability.
-- New dates are subject to availability and may incur rate differences on holidays or peak days.
-
-6. PAYMENT TERMS
-- Accepted payment methods: Credit Card or Cash.
-- All events must be paid in full no later than 14 days prior to the event date.
-- If an event is booked within 14 days of the event date, the full invoice amount is due at the time of booking.
-- Final payment is non-refundable but fully creditable toward a future date if the event is canceled.
-
-7. ALCOHOL SERVICE (If Applicable)
-- Alcohol service is provided only to guests 21+.
-- ${companyName} is not responsible for guest behavior related to alcohol.
-- Client agrees to maintain compliance with all state and local alcohol laws.
-
-8. LIABILITY & DAMAGES
-Client is responsible for any damages to equipment, rentals, or property caused by guests. ${companyName} is not liable for circumstances outside of its control, including venue limitations, acts of nature, or client-provided items.
-
-9. AGREEMENT & SIGNATURES
-By signing below, the Client acknowledges and agrees to all terms outlined.
-
-${companyName} Representative: ${repName || "____________________________"}
-${companyName} Signature: ____________________________
-
-Client Name: ${c.clientName || "____________________________"}
-Client Signature: ____________________________
-  `.trim();
+// Build the human-readable contract text from template (template required)
+async function buildContractTextFromTemplate(c, companySettings = {}, templateId = null) {
+    const templatesCollection = await getTemplatesCollection();
+    
+    // Try to get the specified template
+    let template = null;
+    if (templateId) {
+        template = await templatesCollection.findOne({ id: templateId });
+    }
+    
+    // Fall back to default template if specified template not found
+    if (!template) {
+        template = await templatesCollection.findOne({ isDefault: true });
+    }
+    
+    // Fall back to any template
+    if (!template) {
+        template = await templatesCollection.findOne({});
+    }
+    
+    // Template is required - return error message if none found
+    if (!template || !template.body) {
+        return "ERROR: No contract template found. Please create a template first.";
+    }
+    
+    // Increment usage count
+    await templatesCollection.updateOne(
+        { id: template.id },
+        { $inc: { usageCount: 1 } }
+    );
+    
+    return replaceTemplateVariables(template.body, c, companySettings);
 }
 
 // ---------- Contract Actions ----------
@@ -130,7 +133,13 @@ async function createContract(payload) {
         eventLocation,
         guestCount,
         eventTime,
+        templateId,
     } = payload;
+
+    // Template is now required for new contracts
+    if (!templateId) {
+        return { success: false, message: "Please select a contract template." };
+    }
 
     // Get company settings for contract text
     const companySettingsResult = await getCompanySettings();
@@ -153,12 +162,14 @@ async function createContract(payload) {
         companyName: companySettings.companyName || "Culture Gourmet",
         repName: companySettings.repName || "",
         repSignature: companySettings.repSignature || "",
+        templateId: templateId || null,
         timeline: [
             { at: nowIso(), type: "created", note: "Contract created" },
         ],
     };
 
-    contract.contractText = buildContractText(contract, companySettings);
+    // Use template-based contract text if available
+    contract.contractText = await buildContractTextFromTemplate(contract, companySettings, templateId);
 
     await collection.insertOne(contract);
     
@@ -253,9 +264,10 @@ async function updateContractFields(payload) {
 
     updates.updatedAt = nowIso();
     
-    // Merge with existing contract to rebuild text
+    // Merge with existing contract to rebuild text using template
     const updatedContract = { ...contract, ...updates };
-    updates.contractText = buildContractText(updatedContract);
+    const companySettings = await getCompanySettings();
+    updates.contractText = await buildContractTextFromTemplate(updatedContract, companySettings, contract.templateId);
     
     // Add timeline entry
     const timelineEntry = {
@@ -291,16 +303,12 @@ async function updateContractStatus(payload) {
         note: `Status changed to ${status}`,
     };
 
-    const updatedContract = { ...contract, status };
-    const contractText = buildContractText(updatedContract);
-
     await collection.updateOne(
         { id: contractId },
         { 
             $set: { 
                 status, 
-                updatedAt: nowIso(),
-                contractText 
+                updatedAt: nowIso()
             },
             $push: { timeline: timelineEntry }
         }
@@ -346,9 +354,6 @@ async function signContract(payload) {
     };
     
     if (clientName) updates.clientName = clientName;
-    
-    const updatedContract = { ...contract, ...updates };
-    updates.contractText = buildContractText(updatedContract);
 
     await collection.updateOne(
         { id: contractId },
@@ -699,17 +704,13 @@ Elevating Your Events with Exceptional Cuisine`;
             note: emailSent ? "Contract sent via email" : "Contract link generated (email not sent)",
         };
 
-        const updatedContract = { ...contract, status: "Sent" };
-        const contractText = buildContractText(updatedContract);
-
         await collection.updateOne(
             { id: contractId },
             { 
                 $set: { 
                     status: "Sent",
                     fileUrl: contract.fileUrl,
-                    updatedAt: nowIso(),
-                    contractText
+                    updatedAt: nowIso()
                 },
                 $push: { timeline: timelineEntry }
             }
@@ -925,6 +926,175 @@ Elevating Your Events with Exceptional Cuisine`;
     }
 }
 
+// ---------- Template Actions ----------
+
+// Available variables for templates
+const TEMPLATE_VARIABLES = [
+    { key: '{{clientName}}', label: 'Client Name', description: 'The name of the client' },
+    { key: '{{clientEmail}}', label: 'Client Email', description: 'The email of the client' },
+    { key: '{{eventDate}}', label: 'Event Date', description: 'The date of the event' },
+    { key: '{{eventLocation}}', label: 'Event Location', description: 'The venue/address of the event' },
+    { key: '{{guestCount}}', label: 'Guest Count', description: 'Number of guests expected' },
+    { key: '{{eventTime}}', label: 'Event Time', description: 'Start/End time of the event' },
+    { key: '{{companyName}}', label: 'Company Name', description: 'Your company name from settings' },
+    { key: '{{repName}}', label: 'Representative Name', description: 'Your representative name from settings' },
+    { key: '{{todayDate}}', label: 'Today\'s Date', description: 'Current date when contract is created' },
+];
+
+async function listTemplates() {
+    const collection = await getTemplatesCollection();
+    const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    return { success: true, templates, variables: TEMPLATE_VARIABLES };
+}
+
+async function getTemplate(payload) {
+    const { templateId } = payload;
+    const collection = await getTemplatesCollection();
+    const template = await collection.findOne({ id: templateId });
+
+    if (!template) {
+        return { success: false, message: "Template not found" };
+    }
+
+    return { success: true, template, variables: TEMPLATE_VARIABLES };
+}
+
+async function createTemplate(payload) {
+    const collection = await getTemplatesCollection();
+    const { name, description, body, isDefault } = payload;
+
+    if (!name || !body) {
+        return { success: false, message: "Template name and body are required" };
+    }
+
+    // If this template is set as default, unset any existing default
+    if (isDefault) {
+        await collection.updateMany({ isDefault: true }, { $set: { isDefault: false } });
+    }
+
+    const id = makeId();
+    const template = {
+        id,
+        name,
+        description: description || "",
+        body,
+        isDefault: isDefault || false,
+        usageCount: 0,
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+    };
+
+    await collection.insertOne(template);
+    
+    const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    return { success: true, template, templates };
+}
+
+async function updateTemplate(payload) {
+    const { templateId, name, description, body, isDefault } = payload;
+    const collection = await getTemplatesCollection();
+    
+    const template = await collection.findOne({ id: templateId });
+    if (!template) {
+        return { success: false, message: "Template not found" };
+    }
+
+    // If this template is set as default, unset any existing default
+    if (isDefault) {
+        await collection.updateMany({ isDefault: true }, { $set: { isDefault: false } });
+    }
+
+    const updates = { updatedAt: nowIso() };
+    if (name !== undefined) updates.name = name;
+    if (description !== undefined) updates.description = description;
+    if (body !== undefined) updates.body = body;
+    if (isDefault !== undefined) updates.isDefault = isDefault;
+
+    await collection.updateOne({ id: templateId }, { $set: updates });
+    
+    const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    const updatedTemplate = await collection.findOne({ id: templateId });
+    return { success: true, template: updatedTemplate, templates };
+}
+
+async function deleteTemplate(payload) {
+    const { templateId } = payload;
+    const collection = await getTemplatesCollection();
+    
+    const template = await collection.findOne({ id: templateId });
+    if (!template) {
+        return { success: false, message: "Template not found" };
+    }
+
+    await collection.deleteOne({ id: templateId });
+    
+    const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    return { success: true, message: "Template deleted", templates };
+}
+
+async function duplicateTemplate(payload) {
+    const { templateId } = payload;
+    const collection = await getTemplatesCollection();
+    
+    const template = await collection.findOne({ id: templateId });
+    if (!template) {
+        return { success: false, message: "Template not found" };
+    }
+
+    const newId = makeId();
+    const newTemplate = {
+        ...template,
+        _id: undefined,
+        id: newId,
+        name: `${template.name} (Copy)`,
+        isDefault: false,
+        usageCount: 0,
+        createdAt: nowIso(),
+        updatedAt: nowIso(),
+    };
+    delete newTemplate._id;
+
+    await collection.insertOne(newTemplate);
+    
+    const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    return { success: true, template: newTemplate, templates };
+}
+
+async function setDefaultTemplate(payload) {
+    const { templateId } = payload;
+    const collection = await getTemplatesCollection();
+    
+    // Unset all defaults first
+    await collection.updateMany({ isDefault: true }, { $set: { isDefault: false } });
+    
+    // Set the new default
+    await collection.updateOne({ id: templateId }, { $set: { isDefault: true, updatedAt: nowIso() } });
+    
+    const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
+    return { success: true, templates };
+}
+
+async function incrementTemplateUsage(templateId) {
+    const collection = await getTemplatesCollection();
+    await collection.updateOne(
+        { id: templateId },
+        { $inc: { usageCount: 1 } }
+    );
+}
+
+// Get default template or first available
+async function getDefaultTemplate() {
+    const collection = await getTemplatesCollection();
+    let template = await collection.findOne({ isDefault: true });
+    
+    if (!template) {
+        // Fall back to first template
+        template = await collection.findOne({});
+    }
+    
+    return { success: true, template, variables: TEMPLATE_VARIABLES };
+}
+
 // ---------- Main Handler ----------
 
 export default async function theCultureGourmetContract(payload = {}) {
@@ -975,6 +1145,23 @@ export default async function theCultureGourmetContract(payload = {}) {
                 return await updateContractFields(payload);
             case "deleteContract":
                 return await deleteContract(payload);
+            // Template actions
+            case "listTemplates":
+                return await listTemplates();
+            case "getTemplate":
+                return await getTemplate(payload);
+            case "createTemplate":
+                return await createTemplate(payload);
+            case "updateTemplate":
+                return await updateTemplate(payload);
+            case "deleteTemplate":
+                return await deleteTemplate(payload);
+            case "duplicateTemplate":
+                return await duplicateTemplate(payload);
+            case "setDefaultTemplate":
+                return await setDefaultTemplate(payload);
+            case "getDefaultTemplate":
+                return await getDefaultTemplate();
             default:
                 console.warn("[CG] Unknown action:", action);
                 return { success: false, message: `Unknown action: ${action}` };

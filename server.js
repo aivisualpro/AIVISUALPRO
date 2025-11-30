@@ -19,7 +19,7 @@ const scriptsPath = path.join(process.cwd(), "scripts");
 app.use(express.static(path.join(process.cwd(), "clients")));
 app.use("/clients", express.static(path.join(process.cwd(), "clients")));
 // serve file-based "database" (txt docs) as static files
-app.use("/Database", express.static(path.join(process.cwd(), "Database")));
+// app.use("/Database", express.static(path.join(process.cwd(), "Database")));
 
 
 // webhook handler - each file becomes a webhook
