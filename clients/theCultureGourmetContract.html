@@ -5,854 +5,576 @@
     <meta charset="UTF-8" />
     <title>Culture Gourmet Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        .center-wrapper {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-
-        .card {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 30px 26px 26px;
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
-            max-width: 420px;
-            width: 100%;
-        }
-
-        .heading-xl {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-            margin-bottom: 4px;
-            color: #0f172a;
-        }
-
-        .text-muted {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 18px;
-        }
-
-        .field {
-            margin-bottom: 14px;
-        }
-
-        .field label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #111827;
-        }
-
-        .field input,
-        .field textarea {
-            width: 100%;
-            border-radius: 12px;
-            border: 1px solid #d1d5db;
-            padding: 9px 11px;
-            font-size: 14px;
-            outline: none;
-            background: #f9fafb;
-            transition: border-color .15s, box-shadow .15s, background .15s;
-        }
-
-        .field input:focus,
-        .field textarea:focus {
-            border-color: #16a34a;
-            box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.25);
-            background: #ffffff;
-        }
-
-        .btn-primary {
-            width: 100%;
-            border: none;
-            border-radius: 14px;
-            background: #16a34a;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            padding: 10px 0;
-            margin-top: 4px;
-            box-shadow: 0 16px 40px rgba(22, 163, 74, 0.4);
-            transition: transform .08s, box-shadow .08s, background .12s;
-        }
-
-        .btn-primary:hover {
-            background: #15803d;
-            transform: translateY(-1px);
-            box-shadow: 0 20px 48px rgba(21, 128, 61, 0.5);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 12px 32px rgba(21, 128, 61, 0.4);
-        }
-
-        .error-text {
-            font-size: 13px;
-            color: #b91c1c;
-            margin-top: 8px;
-            min-height: 18px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* APP LAYOUT */
-        .app-shell {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 22px;
-            background: #020617;
-            color: #e5e7eb;
-            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
-        }
-
-        .app-header-title {
-            font-weight: 600;
-            letter-spacing: -0.04em;
-            font-size: 18px;
-        }
-
-        .pill {
-            background: rgba(148, 163, 184, 0.25);
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-        }
-
-        .btn-ghost {
-            border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.6);
-            background: transparent;
-            color: #e5e7eb;
-            font-size: 12px;
-            padding: 4px 10px;
-        }
-
-        .app-main {
-            display: flex;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .sidebar {
-            width: 210px;
-            background: #020617;
-            padding: 16px 12px;
-            color: #cbd5f5;
-        }
-
-        .sidebar-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: .14em;
-            color: #6b7280;
-            margin-bottom: 8px;
-        }
-
-        .nav-item {
-            padding: 8px 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            color: #9ca3af;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-        }
-
-        .nav-item span.label {
-            display: inline-block;
-        }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #ffffff;
-            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.7);
-        }
-
-        .nav-badge {
-            font-size: 11px;
-            background: rgba(15, 23, 42, 0.35);
-            border-radius: 999px;
-            padding: 2px 6px;
-        }
-
-        .content {
-            flex: 1;
-            padding: 22px;
-            overflow-y: auto;
-        }
-
-        .content h2 {
-            margin: 0 0 4px;
-            font-size: 22px;
-        }
-
-        .content .sub {
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 18px;
-        }
-
-        .grid-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 14px;
-            margin-bottom: 22px;
-        }
-
-        .metric-card {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 12px 14px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-            border: 1px solid #e5e7eb;
-        }
-
-        .metric-label {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 2px;
-        }
-
-        .metric-value {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.04em;
-        }
-
-        .metric-tag {
-            font-size: 11px;
-            margin-top: 4px;
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            background: #ecfdf3;
-            color: #166534;
-        }
-
-        .panel {
-            background: #ffffff;
-            border-radius: 18px;
-            padding: 14px 16px 16px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-            border: 1px solid #e5e7eb;
-            margin-bottom: 18px;
-        }
-
-        .panel-title-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .panel-title {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .panel-sub {
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th,
-        td {
-            padding: 8px 9px;
-            border-bottom: 1px solid #e5e7eb;
-            text-align: left;
-        }
-
-        thead {
-            background: #f3f4f6;
-        }
-
-        th {
-            font-size: 12px;
-            font-weight: 600;
-            color: #4b5563;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        .badge-soft {
-            display: inline-block;
-            font-size: 11px;
-            padding: 2px 8px;
-            border-radius: 999px;
-            background: #eef2ff;
-            color: #4f46e5;
-        }
-
-        .btn-sm {
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid #d1d5db;
-            background: #f9fafb;
-        }
-
-        .btn-sm.danger {
-            border-color: #fecaca;
-            background: #fef2f2;
-            color: #b91c1c;
-        }
-
-        .two-column {
-            display: grid;
-            grid-template-columns: 1.2fr 1.7fr;
-            gap: 16px;
-        }
-
-        @media (max-width:900px) {
-            .app-main {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                display: flex;
-                overflow-x: auto;
-            }
-
-            .content {
-                padding: 16px;
-            }
-
-            .two-column {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .contract-preview {
-            background: #f9fafb;
-            border-radius: 16px;
-            padding: 12px;
-            border: 1px solid #e5e7eb;
-            font-size: 13px;
-            white-space: pre-wrap;
-            line-height: 1.55;
-        }
-
-        /* TOASTS */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none;
-        }
-
-        .toast {
-            background: #fff;
-            border-left: 4px solid #3b82f6;
-            padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            min-width: 300px;
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            font-size: 14px;
-            font-weight: 500;
-            color: #1f2937;
-            pointer-events: auto;
-        }
-
-        .toast.success {
-            border-left-color: #22c55e;
-        }
-
-        .toast.error {
-            border-left-color: #ef4444;
-        }
-
-        .toast.warning {
-            border-left-color: #f59e0b;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-        }
-
-        /* MODAL */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .modal-overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-box {
-            background: #ffffff;
-            padding: 28px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            transform: scale(0.95) translateY(10px);
-            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .modal-overlay.open .modal-box {
-            transform: scale(1) translateY(0);
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #0f172a;
-        }
-
-        .modal-text {
-            font-size: 15px;
-            color: #64748b;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
+        .hidden { display: none !important; }
+        .sidebar { min-height: 100vh; }
+        .nav-link.active { background-color: var(--bs-primary); color: white !important; }
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
     </style>
 </head>
 
-<body>
+<body class="bg-light">
     <!-- LOGIN -->
-    <div id="login-section" class="center-wrapper">
-        <div class="card">
-            <div class="heading-xl">Culture Gourmet Portal</div>
-            <div class="text-muted">
-                Login to manage clients and catering contracts.
+    <div id="login-section" class="min-vh-100 d-flex align-items-center justify-content-center p-4">
+        <div class="card shadow-sm border-0" style="max-width: 420px; width: 100%;">
+            <div class="card-body p-4">
+                <h2 class="fw-bold mb-2">Culture Gourmet Portal</h2>
+                <p class="text-muted mb-4">Login to manage clients and catering contracts.</p>
+                <div class="mb-3">
+                    <label for="cg-user-id" class="form-label fw-semibold">User ID</label>
+                    <input id="cg-user-id" type="text" class="form-control" placeholder="****" />
+                </div>
+                <div class="mb-3">
+                    <label for="cg-user-pass" class="form-label fw-semibold">Password</label>
+                    <input id="cg-user-pass" type="password" class="form-control" placeholder="****" />
+                </div>
+                <button id="cg-login-btn" class="btn btn-primary w-100" type="button">Login</button>
+                <div id="cg-login-error" class="text-danger small mt-2"></div>
             </div>
-            <div class="field">
-                <label for="cg-user-id">User ID</label>
-                <input id="cg-user-id" type="text" placeholder="****" />
-            </div>
-            <div class="field">
-                <label for="cg-user-pass">Password</label>
-                <input id="cg-user-pass" type="password" placeholder="****" />
-            </div>
-            <button id="cg-login-btn" class="btn-primary" type="button">Login</button>
-            <div id="cg-login-error" class="error-text"></div>
-
         </div>
     </div>
 
     <!-- APP -->
-    <div id="app-section" class="app-shell hidden">
-        <header class="app-header">
-            <div class="app-header-title">Culture Gourmet Contracts</div>
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div class="pill">admin</div>
-                <button id="btn-logout" class="btn-ghost" type="button">Log out</button>
-            </div>
-        </header>
-
-        <main class="app-main">
-            <aside class="sidebar">
-                <div style="width:100%;">
-                    <div class="sidebar-title">Portal</div>
-                    <div class="nav-item active" data-section="home-section" id="nav-home">
-                        <span class="label">Home</span>
+    <div id="app-section" class="hidden">
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <aside class="sidebar bg-white border-end p-3" style="width: 250px;">
+                <div class="d-flex flex-column h-100">
+                    <div>
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Portal</h6>
+                        <nav class="nav flex-column gap-1">
+                            <a class="nav-link rounded text-secondary d-flex justify-content-between align-items-center active" href="#" data-section="home-section" id="nav-home">
+                                <span>Home</span>
+                            </a>
+                            <a class="nav-link rounded text-secondary d-flex justify-content-between align-items-center" href="#" data-section="clients-section" id="nav-clients">
+                                <span>Clients</span>
+                                <span class="badge bg-primary rounded-pill" id="clients-count-badge">0</span>
+                            </a>
+                            <a class="nav-link rounded text-secondary d-flex justify-content-between align-items-center" href="#" data-section="contracts-section" id="nav-contracts">
+                                <span>Contracts</span>
+                                <span class="badge bg-primary rounded-pill" id="contracts-count-badge">0</span>
+                            </a>
+                            <a class="nav-link rounded text-secondary d-flex justify-content-between align-items-center" href="#" data-section="admin-section" id="nav-admin">
+                                <span>Admin</span>
+                            </a>
+                        </nav>
                     </div>
-                    <div class="nav-item" data-section="clients-section" id="nav-clients">
-                        <span class="label">Clients</span>
-                        <span class="nav-badge" id="clients-count-badge">0</span>
-                    </div>
-                    <div class="nav-item" data-section="contracts-section" id="nav-contracts">
-                        <span class="label">Contracts</span>
-                        <span class="nav-badge" id="contracts-count-badge">0</span>
-                    </div>
-                    <div class="nav-item" data-section="admin-section" id="nav-admin">
-                        <span class="label">Admin</span>
+                    <div class="mt-auto pt-4 border-top">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Account</h6>
+                        <div class="mb-2">
+                            <span class="badge bg-primary-subtle text-primary">admin</span>
+                        </div>
+                        <button id="btn-logout" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-box-arrow-right me-1"></i>Log out
+                        </button>
                     </div>
                 </div>
             </aside>
 
-            <section class="content">
+            <!-- Main Content -->
+            <main class="flex-grow-1 p-4" style="min-height: 100vh;">
                 <!-- HOME -->
                 <section id="home-section">
-                    <h2>Dashboard</h2>
-                    <div class="sub">Overview of your Culture Gourmet contracts.</div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard</h2>
+                            <p class="text-muted mb-0">Overview of your Culture Gourmet contracts and business metrics</p>
+                        </div>
+                        <button class="btn btn-outline-primary" type="button">
+                            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Data
+                        </button>
+                    </div>
 
-                    <div class="grid-metrics">
-                        <div class="metric-card">
-                            <div class="metric-label">Total Contracts</div>
-                            <div class="metric-value" id="metric-total">0</div>
-                            <div class="metric-tag">All statuses</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-3 p-3 me-3">
+                                            <i class="bi bi-file-earmark-text text-white fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small text-uppercase">Total Contracts</div>
+                                            <div class="fs-3 fw-bold" id="metric-total">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Sent</div>
-                            <div class="metric-value" id="metric-sent">0</div>
-                            <div class="metric-tag">Awaiting open</div>
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info rounded-3 p-3 me-3">
+                                            <i class="bi bi-send text-white fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small text-uppercase">Sent</div>
+                                            <div class="fs-3 fw-bold" id="metric-sent">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Under Review</div>
-                            <div class="metric-value" id="metric-under-review">0</div>
-                            <div class="metric-tag">Opened, not signed</div>
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-warning rounded-3 p-3 me-3">
+                                            <i class="bi bi-eye text-white fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small text-uppercase">Under Review</div>
+                                            <div class="fs-3 fw-bold" id="metric-under-review">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="metric-card">
-                            <div class="metric-label">Signed</div>
-                            <div class="metric-value" id="metric-signed">0</div>
-                            <div class="metric-tag">Fully executed</div>
+                        <div class="col-xl-3 col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success rounded-3 p-3 me-3">
+                                            <i class="bi bi-check-circle text-white fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted small text-uppercase">Signed</div>
+                                            <div class="fs-3 fw-bold" id="metric-signed">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="panel">
-                        <div class="panel-title-row">
-                            <div>
-                                <div class="panel-title">Recent activity</div>
-                                <div class="panel-sub">Last few contract events.</div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title mb-0 fw-semibold">
+                                <i class="bi bi-clock-history me-2 text-primary"></i>Recent Activity
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-0 py-3 ps-4">Client</th>
+                                            <th class="border-0 py-3">Event</th>
+                                            <th class="border-0 py-3">When</th>
+                                            <th class="border-0 py-3 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-activity-body">
+                                        <tr>
+                                            <td colspan="4" class="text-center py-5 text-muted">
+                                                <i class="bi bi-clock-history d-block mb-2" style="font-size: 2rem;"></i>
+                                                No recent activity
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Client</th>
-                                    <th>Event</th>
-                                    <th>When</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-activity-body">
-                                <tr>
-                                    <td colspan="4" style="text-align:center;color:#9ca3af;">
-                                        Activity will appear once you create contracts.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </section>
 
                 <!-- CLIENTS -->
                 <section id="clients-section" class="hidden">
-                    <h2>Clients</h2>
-                    <div class="sub">Manage client records (file-based storage).</div>
-
-                    <div class="panel">
-                        <div class="panel-title-row">
-                            <div>
-                                <div class="panel-title">Client List</div>
-                                <div class="panel-sub">Stored in Database/CultureGourmet/clients.txt</div>
-                            </div>
-                            <button id="btn-add-client" class="btn-sm" type="button">+ Add Client</button>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Clients</h2>
+                            <p class="text-muted mb-0">Manage your client database and contact information</p>
                         </div>
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Client Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Contacts</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="clients-table-body">
-                                <tr>
-                                    <td colspan="5" style="text-align:center;color:#9ca3af;">
-                                        No clients yet. Click “Add Client” to create one.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <button id="btn-add-client" class="btn btn-primary" type="button">
+                            <i class="bi bi-plus-circle me-2"></i>Add New Client
+                        </button>
                     </div>
-
-                    <div id="client-form-panel" class="panel hidden">
-                        <div class="panel-title-row">
-                            <div class="panel-title">New Client</div>
+                    
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 fw-semibold">
+                                    <i class="bi bi-table me-2 text-primary"></i>All Clients
+                                </h5>
+                                <div class="input-group" style="width: 250px;">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-search text-muted"></i>
+                                    </span>
+                                    <input type="text" class="form-control border-start-0 bg-light" placeholder="Search clients...">
+                                </div>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label for="client-name-input">Client Name</label>
-                            <input id="client-name-input" type="text" />
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="border-0 py-3 ps-4">Client Name</th>
+                                            <th class="border-0 py-3">Email</th>
+                                            <th class="border-0 py-3">Phone</th>
+                                            <th class="border-0 py-3 text-center">Contacts</th>
+                                            <th class="border-0 py-3 text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clients-table-body">
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <i class="bi bi-people d-block mb-2" style="font-size: 2rem;"></i>
+                                                No clients yet
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label for="client-email-input">Primary Email</label>
-                            <input id="client-email-input" type="email" />
-                        </div>
-                        <div class="field">
-                            <label for="client-phone-input">Primary Phone</label>
-                            <input id="client-phone-input" type="text" />
-                        </div>
-                        <div class="field">
-                            <label for="client-contacts-input">Additional Contacts (one per line)</label>
-                            <textarea id="client-contacts-input" rows="4"></textarea>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button id="client-save-btn" class="btn-sm" type="button">Save Client</button>
-                            <button id="client-cancel-btn" class="btn-sm danger" type="button">Cancel</button>
-                        </div>
-                        <div id="client-form-msg" class="success-text" style="margin-top:6px;"></div>
                     </div>
                 </section>
 
                 <!-- CONTRACTS -->
                 <section id="contracts-section" class="hidden">
-                    <h2>Contracts</h2>
-                    <div class="sub">Create and store Culture Gourmet catering agreements.</div>
-
-                    <div class="two-column">
-                        <div class="panel">
-                            <div class="panel-title-row">
-                                <div class="panel-title">Create Contract</div>
-                            </div>
-
-                            <div class="field">
-                                <label for="contract-client-name">Client Name</label>
-                                <input id="contract-client-name" type="text" placeholder="Adeel Jabbar" />
-                            </div>
-                            <div class="field">
-                                <label for="contract-client-email">Client Email</label>
-                                <input id="contract-client-email" type="email" placeholder="client@example.com" />
-                            </div>
-                            <div class="field">
-                                <label for="contract-event-date">Event Date</label>
-                                <input id="contract-event-date" type="date" />
-                            </div>
-                            <div class="field">
-                                <label for="contract-event-location">Event Location</label>
-                                <input id="contract-event-location" type="text" placeholder="Venue / Address" />
-                            </div>
-                            <div class="field">
-                                <label for="contract-guest-count">Guest Count</label>
-                                <input id="contract-guest-count" type="number" min="1" placeholder="e.g. 80" />
-                            </div>
-                            <div class="field">
-                                <label>Event Start / End Time</label>
-                                <div style="display:flex;gap:6px;">
-                                    <input id="contract-start-time" type="time" />
-                                    <input id="contract-end-time" type="time" />
-                                </div>
-                            </div>
-
-                            <button id="contract-send-btn" class="btn-primary" type="button">Create Contract</button>
-                            <div id="contract-send-message" class="success-text"></div>
-                        </div>
-
-                        <div class="panel">
-                            <div class="panel-title-row">
-                                <div>
-                                    <div class="panel-title">Live Contract Preview</div>
-                                    <div class="panel-sub">Updates as you type client details.</div>
-                                </div>
-                            </div>
-                            <div id="contract-preview" class="contract-preview"></div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-text text-primary me-2"></i>Contracts</h2>
+                            <p class="text-muted mb-0">Create and manage Culture Gourmet catering agreements</p>
                         </div>
                     </div>
 
-                    <div class="panel" style="margin-top:18px;">
-                        <div class="panel-title-row">
-                            <div class="panel-title">Contracts (from contracts.txt)</div>
+                    <div class="accordion" id="contractsAccordion">
+                        <!-- Create Contract -->
+                        <div class="accordion-item border-0 shadow-sm mb-3">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#createContract">
+                                    <i class="bi bi-plus-circle me-2"></i>Create New Contract
+                                </button>
+                            </h2>
+                            <div id="createContract" class="accordion-collapse collapse" data-bs-parent="#contractsAccordion">
+                                <div class="accordion-body">
+                                    <div class="row">
+                                        <div class="col-lg-5">
+                                            <div class="mb-3">
+                                                <label for="contract-client-select" class="form-label fw-semibold">Select Client</label>
+                                                <select id="contract-client-select" class="form-select">
+                                                    <option value="">-- Choose a Client --</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contract-contact-select" class="form-label fw-semibold">Select Contact</label>
+                                                <select id="contract-contact-select" class="form-select" disabled>
+                                                    <option value="">-- Choose a Contact --</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contract-client-name" class="form-label fw-semibold">Contact Name</label>
+                                                <input id="contract-client-name" type="text" class="form-control bg-light" placeholder="Auto-filled from contact" readonly />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contract-client-email" class="form-label fw-semibold">Contact Email</label>
+                                                <input id="contract-client-email" type="email" class="form-control bg-light" placeholder="Auto-filled from contact" readonly />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contract-event-location" class="form-label fw-semibold">Event Location</label>
+                                                <input id="contract-event-location" type="text" class="form-control" placeholder="Venue / Address (auto-filled or edit)" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contract-event-date" class="form-label fw-semibold">Event Date</label>
+                                                <input id="contract-event-date" type="date" class="form-control" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="contract-guest-count" class="form-label fw-semibold">Guest Count</label>
+                                                <input id="contract-guest-count" type="number" min="1" class="form-control" placeholder="e.g. 80" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold">Event Start / End Time</label>
+                                                <div class="d-flex gap-2">
+                                                    <input id="contract-start-time" type="time" class="form-control" />
+                                                    <input id="contract-end-time" type="time" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <button id="contract-send-btn" class="btn btn-primary w-100" type="button">Create Contract</button>
+                                            <div id="contract-send-message" class="text-success small mt-2"></div>
+                                        </div>
+                                        <div class="col-lg-7">
+                                            <label class="form-label fw-semibold">Live Contract Preview</label>
+                                            <p class="text-muted small">Updates as you type client details.</p>
+                                            <div id="contract-preview" class="bg-light rounded p-3 border" style="white-space: pre-wrap; font-size: 13px; max-height: 400px; overflow-y: auto;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Client</th>
-                                    <th>Event Date</th>
-                                    <th>Status</th>
-                                    <th>Doc</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contracts-table-body">
-                                <tr>
-                                    <td colspan="5" style="text-align:center;color:#9ca3af;">
-                                        Contracts will appear here after you create them.
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                        <!-- View Contracts -->
+                        <div class="accordion-item border-0 shadow-sm">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#viewContracts">
+                                    <i class="bi bi-list-ul me-2"></i>View Contracts
+                                </button>
+                            </h2>
+                            <div id="viewContracts" class="accordion-collapse collapse show" data-bs-parent="#contractsAccordion">
+                                <div class="accordion-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="border-0 py-3 ps-4">Client</th>
+                                                    <th class="border-0 py-3">Event Date</th>
+                                                    <th class="border-0 py-3">Status</th>
+                                                    <th class="border-0 py-3">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="contracts-table-body">
+                                                <tr>
+                                                    <td colspan="4" class="text-center py-5 text-muted">
+                                                        No contracts found. Create your first contract to get started.
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                <!-- ADMIN (local-only) -->
+                <!-- ADMIN -->
                 <section id="admin-section" class="hidden">
-                    <h2>Admin Settings</h2>
-                    <div class="sub">Local settings (not stored server-side for now).</div>
-
-                    <div class="panel">
-                        <div class="panel-title-row">
-                            <div class="panel-title">Company Profile</div>
-                        </div>
-                        <div class="field">
-                            <label for="admin-company-name">Company Name</label>
-                            <input id="admin-company-name" type="text" value="Culture Gourmet" />
-                        </div>
-                        <div class="field">
-                            <label for="admin-company-address">Address</label>
-                            <textarea id="admin-company-address" rows="3"></textarea>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1"><i class="bi bi-gear text-primary me-2"></i>Admin Settings</h2>
+                            <p class="text-muted mb-0">Configure company profile and system preferences</p>
                         </div>
                     </div>
 
-                    <div class="panel">
-                        <div class="panel-title-row">
-                            <div class="panel-title">SMTP Email Settings</div>
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title mb-0 fw-semibold">
+                                        <i class="bi bi-building me-2 text-primary"></i>Company Profile
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="admin-company-name" class="form-label fw-semibold">Company Name</label>
+                                        <input id="admin-company-name" type="text" class="form-control" value="Culture Gourmet" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="admin-company-address" class="form-label fw-semibold">Business Address</label>
+                                        <textarea id="admin-company-address" rows="4" class="form-control" placeholder="Enter your business address..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label for="smtp-host">SMTP Host</label>
-                            <input id="smtp-host" type="text" placeholder="smtp.gmail.com" />
+
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title mb-0 fw-semibold">
+                                        <i class="bi bi-envelope-at me-2 text-primary"></i>SMTP Email Settings
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="smtp-host" class="form-label fw-semibold">SMTP Host</label>
+                                        <input id="smtp-host" type="text" class="form-control" placeholder="smtp.gmail.com" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="smtp-port" class="form-label fw-semibold">SMTP Port</label>
+                                        <input id="smtp-port" type="number" class="form-control" placeholder="587" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="smtp-user" class="form-label fw-semibold">SMTP User (Email)</label>
+                                        <input id="smtp-user" type="text" class="form-control" placeholder="you@gmail.com" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="smtp-pass" class="form-label fw-semibold">SMTP Password</label>
+                                        <input id="smtp-pass" type="password" class="form-control" placeholder="App Password" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="smtp-from" class="form-label fw-semibold">From Email (Optional)</label>
+                                        <input id="smtp-from" type="text" class="form-control" placeholder="Culture Gourmet <you@gmail.com>" />
+                                    </div>
+                                    <button id="btn-save-smtp" class="btn btn-primary w-100" type="button">
+                                        <i class="bi bi-check-circle me-1"></i>Save SMTP Settings
+                                    </button>
+                                    <div id="smtp-msg" class="mt-2"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="field">
-                            <label for="smtp-port">SMTP Port</label>
-                            <input id="smtp-port" type="number" placeholder="587" />
-                        </div>
-                        <div class="field">
-                            <label for="smtp-user">SMTP User (Email)</label>
-                            <input id="smtp-user" type="text" placeholder="you@gmail.com" />
-                        </div>
-                        <div class="field">
-                            <label for="smtp-pass">SMTP Password (App Password)</label>
-                            <input id="smtp-pass" type="password" placeholder="****" />
-                        </div>
-                        <div class="field">
-                            <label for="smtp-from">From Email (Optional)</label>
-                            <input id="smtp-from" type="text" placeholder="Culture Gourmet <you@gmail.com>" />
-                        </div>
-                        <button id="btn-save-smtp" class="btn-primary" type="button">Save SMTP Settings</button>
-                        <div id="smtp-msg" class="success-text" style="margin-top:8px;"></div>
                     </div>
                 </section>
-            </section>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- UI COMPONENTS -->
-    <div id="toast-container" class="toast-container"></div>
-
-    <div id="confirm-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div id="confirm-title" class="modal-title">Confirm Action</div>
-            <div id="confirm-text" class="modal-text">Are you sure you want to proceed?</div>
-            <div class="modal-actions">
-                <button id="confirm-no" class="btn-sm" style="padding: 8px 16px; font-size:13px;">Cancel</button>
-                <button id="confirm-yes" class="btn-primary"
-                    style="width:auto; margin:0; padding: 8px 20px; font-size:13px;">Confirm</button>
+    <!-- Client Form Modal -->
+    <div class="modal fade" id="clientFormModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i><span class="client-form-title">New Client</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label for="client-name-input" class="form-label fw-semibold">Client Name *</label>
+                        <input id="client-name-input" type="text" class="form-control" placeholder="Enter client or company name" required>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-semibold mb-0"><i class="bi bi-people me-2 text-primary"></i>Contact Information</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addContactField()">
+                            <i class="bi bi-plus me-1"></i>Add Contact
+                        </button>
+                    </div>
+                    <div id="contacts-container"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="client-save-btn" type="button" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i>Save Client
+                    </button>
+                </div>
+                <div id="client-form-msg" class="px-3 pb-3"></div>
             </div>
         </div>
     </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal fade" id="confirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirm-title">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirm-text">Are you sure you want to proceed?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="confirm-no">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-yes">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contract Preview Modal -->
+    <div class="modal fade" id="contractPreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-earmark-text me-2"></i>Draft Contract Preview
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Please review the contract details below before confirming.
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person me-2"></i>Client Details</h6>
+                                    <p class="mb-1"><strong>Client:</strong> <span id="preview-client-name">-</span></p>
+                                    <p class="mb-1"><strong>Contact:</strong> <span id="preview-contact-name">-</span></p>
+                                    <p class="mb-0"><strong>Email:</strong> <span id="preview-contact-email">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-calendar-event me-2"></i>Event Details</h6>
+                                    <p class="mb-1"><strong>Date:</strong> <span id="preview-event-date">-</span></p>
+                                    <p class="mb-1"><strong>Location:</strong> <span id="preview-event-location">-</span></p>
+                                    <p class="mb-1"><strong>Guests:</strong> <span id="preview-guest-count">-</span></p>
+                                    <p class="mb-0"><strong>Time:</strong> <span id="preview-event-time">-</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-file-text me-2"></i>Full Contract</h6>
+                    <div id="modal-contract-preview" class="bg-light rounded p-3 border" style="white-space: pre-wrap; font-size: 13px; max-height: 400px; overflow-y: auto;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </button>
+                    <button type="button" class="btn btn-primary" id="confirm-create-btn">
+                        <i class="bi bi-file-earmark-plus me-1"></i>Create
+                    </button>
+                    <button type="button" class="btn btn-success" id="confirm-send-contract-btn">
+                        <i class="bi bi-send me-1"></i>Create & Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Bootstrap JS - MUST be before our custom script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <script>
         // ---------- UI Helpers ----------
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-
-            container.appendChild(toast);
-
-            // Auto remove
-            setTimeout(() => {
-                toast.style.animation = 'fadeOut 0.3s ease-in forwards';
-                toast.addEventListener('animationend', () => toast.remove());
-            }, 4000);
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast show align-items-center text-bg-${type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'primary'} border-0`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            container.appendChild(toastEl);
+            setTimeout(() => toastEl.remove(), 4000);
         }
 
+        let confirmResolve = null;
+        let confirmModal = null;
+        
         function showConfirm(message, title = "Confirm Action") {
             return new Promise((resolve) => {
-                const overlay = document.getElementById('confirm-modal');
-                const titleEl = document.getElementById('confirm-title');
-                const textEl = document.getElementById('confirm-text');
-                const btnYes = document.getElementById('confirm-yes');
-                const btnNo = document.getElementById('confirm-no');
-
-                titleEl.textContent = title;
-                textEl.textContent = message;
-                overlay.classList.add('open');
-
-                // Remove previous listeners to avoid stacking
-                const newBtnYes = btnYes.cloneNode(true);
-                const newBtnNo = btnNo.cloneNode(true);
-                btnYes.parentNode.replaceChild(newBtnYes, btnYes);
-                btnNo.parentNode.replaceChild(newBtnNo, btnNo);
-
-                const close = (val) => {
-                    overlay.classList.remove('open');
-                    resolve(val);
-                };
-
-                newBtnYes.addEventListener('click', () => close(true));
-                newBtnNo.addEventListener('click', () => close(false));
+                if (!confirmModal) {
+                    confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                }
+                confirmResolve = resolve;
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-text').textContent = message;
+                confirmModal.show();
             });
         }
 
-        // ---------- simple login ----------
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('confirm-yes').addEventListener('click', () => {
+                if (confirmModal) confirmModal.hide();
+                if (confirmResolve) confirmResolve(true);
+            });
+
+            document.getElementById('confirm-no').addEventListener('click', () => {
+                if (confirmModal) confirmModal.hide();
+                if (confirmResolve) confirmResolve(false);
+            });
+
+            document.getElementById('confirmModal').addEventListener('hidden.bs.modal', () => {
+                if (confirmResolve) confirmResolve(false);
+            });
+        });
+
+        // ---------- Simple Login ----------
         const LOGIN_USER = "admin";
         const LOGIN_PASS = "Abc123***";
 
@@ -868,13 +590,15 @@
             loginSection.classList.add("hidden");
             appSection.classList.remove("hidden");
             loadInitialData();
+            window.location.hash = '';
+            activateSection('home-section');
         }
+
         function showLogin() {
             appSection.classList.add("hidden");
             loginSection.classList.remove("hidden");
+            window.location.hash = 'login';
         }
-
-
 
         loginBtn.addEventListener("click", () => {
             const u = userIdInput.value.trim();
@@ -893,35 +617,54 @@
             showLogin();
         });
 
-        // ---------- navigation ----------
+        // ---------- Navigation ----------
         const sections = {
             "home-section": document.getElementById("home-section"),
             "clients-section": document.getElementById("clients-section"),
             "contracts-section": document.getElementById("contracts-section"),
             "admin-section": document.getElementById("admin-section"),
         };
-        const navItems = document.querySelectorAll(".nav-item");
+        const navItems = document.querySelectorAll(".nav-link[data-section]");
 
         function activateSection(id) {
+            window.location.hash = id;
             Object.keys(sections).forEach((key) => {
                 sections[key].classList.toggle("hidden", key !== id);
             });
             navItems.forEach((item) => {
-                item.classList.toggle(
-                    "active",
-                    item.getAttribute("data-section") === id
-                );
+                item.classList.toggle("active", item.getAttribute("data-section") === id);
             });
         }
 
         navItems.forEach((item) => {
-            item.addEventListener("click", () => {
+            item.addEventListener("click", (e) => {
+                e.preventDefault();
                 const id = item.getAttribute("data-section");
                 if (id) activateSection(id);
             });
         });
 
-        // ---------- API helper ----------
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.slice(1);
+            const isAuthenticated = localStorage.getItem("cg_auth") === "true";
+            if (hash === 'login') showLogin();
+            else if (hash && sections[hash] && isAuthenticated) activateSection(hash);
+            else if (!isAuthenticated) showLogin();
+        });
+
+        window.addEventListener('load', () => {
+            // Initialize client elements and modals after DOM is ready
+            initializeClientElements();
+            
+            const hash = window.location.hash.slice(1);
+            const isAuthenticated = localStorage.getItem("cg_auth") === "true";
+            if (hash === 'login' || !isAuthenticated) showLogin();
+            else if (hash && sections[hash] && isAuthenticated) { showApp(); activateSection(hash); }
+            else if (isAuthenticated) showApp();
+            else showLogin();
+        });
+
+        // ---------- API Helper ----------
         const API_URL = "/webhook/theCultureGourmetContract";
 
         async function callCG(payload) {
@@ -936,179 +679,236 @@
 
         // ---------- Clients ----------
         let clients = [];
-        const clientsTableBody = document.getElementById("clients-table-body");
-        const clientsCountBadge = document.getElementById("clients-count-badge");
-        const btnAddClient = document.getElementById("btn-add-client");
-        const clientFormPanel = document.getElementById("client-form-panel");
-        const clientNameInput = document.getElementById("client-name-input");
-        const clientEmailInput = document.getElementById("client-email-input");
-        const clientPhoneInput = document.getElementById("client-phone-input");
-        const clientContactsInput = document.getElementById("client-contacts-input");
-        const clientSaveBtn = document.getElementById("client-save-btn");
-        const clientCancelBtn = document.getElementById("client-cancel-btn");
-        const clientFormMsg = document.getElementById("client-form-msg");
+        let editingClientId = null;
+        let clientsTableBody, clientsCountBadge, btnAddClient, clientNameInput, clientSaveBtn, clientFormMsg, contactsContainer, clientFormModal;
+        let contactCount = 0;
+
+        function initializeClientElements() {
+            clientsTableBody = document.getElementById("clients-table-body");
+            clientsCountBadge = document.getElementById("clients-count-badge");
+            btnAddClient = document.getElementById("btn-add-client");
+            clientNameInput = document.getElementById("client-name-input");
+            clientSaveBtn = document.getElementById("client-save-btn");
+            clientFormMsg = document.getElementById("client-form-msg");
+            contactsContainer = document.getElementById("contacts-container");
+            clientFormModal = new bootstrap.Modal(document.getElementById('clientFormModal'));
+            
+            btnAddClient.addEventListener("click", () => {
+                editingClientId = null;
+                clientNameInput.value = "";
+                clientFormMsg.textContent = "";
+                clearContactFields();
+                addContactField();
+                document.querySelector('.client-form-title').textContent = "New Client";
+                clientFormModal.show();
+            });
+
+            clientSaveBtn.addEventListener("click", saveClient);
+        }
+
+        function addContactField(contactData = null) {
+            contactCount++;
+            const contactId = `contact-${contactCount}`;
+            const contactItem = document.createElement('div');
+            contactItem.className = 'card bg-light border-0 mb-3 position-relative';
+            contactItem.id = contactId;
+            contactItem.innerHTML = `
+                <div class="card-body p-3">
+                    <button type="button" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-2" onclick="removeContactField('${contactId}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Contact Person</label>
+                            <input type="text" class="form-control" id="${contactId}-person" value="${contactData?.person || ''}" placeholder="Full name">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Contact Email</label>
+                            <input type="email" class="form-control" id="${contactId}-email" value="${contactData?.email || ''}" placeholder="email@domain.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Contact Phone</label>
+                            <input type="text" class="form-control" id="${contactId}-phone" value="${contactData?.phone || ''}" placeholder="(555) 123-4567">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Contact Address</label>
+                            <input type="text" class="form-control" id="${contactId}-address" value="${contactData?.address || ''}" placeholder="Street address">
+                        </div>
+                    </div>
+                </div>
+            `;
+            contactsContainer.appendChild(contactItem);
+            return contactId;
+        }
+
+        function removeContactField(contactId) {
+            const contactItem = document.getElementById(contactId);
+            if (contactItem) contactItem.remove();
+        }
+
+        function clearContactFields() {
+            contactsContainer.innerHTML = '';
+            contactCount = 0;
+        }
+
+        function getContactData() {
+            const contacts = [];
+            const contactItems = contactsContainer.querySelectorAll('.card');
+            contactItems.forEach(item => {
+                const id = item.id;
+                const person = document.getElementById(`${id}-person`)?.value || '';
+                const email = document.getElementById(`${id}-email`)?.value || '';
+                const phone = document.getElementById(`${id}-phone`)?.value || '';
+                const address = document.getElementById(`${id}-address`)?.value || '';
+                if (person || email || phone || address) {
+                    contacts.push({ person, email, phone, address });
+                }
+            });
+            return contacts;
+        }
 
         function renderClients() {
             clientsTableBody.innerHTML = "";
             if (!clients.length) {
-                clientsTableBody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;color:#9ca3af;">No clients yet. Click "Add Client" to create one.</td></tr>';
+                clientsTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class="bi bi-people d-block mb-2" style="font-size: 2rem;"></i>
+                            No clients yet. Click "Add New Client" to create your first client.
+                        </td>
+                    </tr>`;
             } else {
                 clients.forEach((c) => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
-            <td>${c.name}</td>
-            <td>${c.email}</td>
-            <td>${c.phone || ""}</td>
-            <td>${c.contactsCount || 0}</td>
-            <td>
-                <button class="btn-sm" data-edit-client-id="${c.id}">Edit</button>
-                <button class="btn-sm" style="margin-left:4px; border-color: #fecaca; background: #fef2f2; color: #b91c1c;" data-delete-client-id="${c.id}">Delete</button>
-            </td>
-          `;
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person text-white"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">${c.name}</div>
+                                    <small class="text-muted">ID: ${c.id}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${c.contacts?.[0]?.email || '<span class="text-muted">No email</span>'}</td>
+                        <td>${c.contacts?.[0]?.phone || '<span class="text-muted">No phone</span>'}</td>
+                        <td class="text-center"><span class="badge bg-primary rounded-pill">${c.contacts?.length || 0}</span></td>
+                        <td class="text-center">
+                            <button class="btn btn-outline-primary btn-sm me-1" data-edit-client-id="${c.id}"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-outline-danger btn-sm" data-delete-client-id="${c.id}"><i class="bi bi-trash"></i></button>
+                        </td>
+                    `;
                     clientsTableBody.appendChild(tr);
                 });
 
-                // Attach event listeners
                 document.querySelectorAll("[data-edit-client-id]").forEach((btn) => {
-                    btn.addEventListener("click", () => {
-                        const id = btn.getAttribute("data-edit-client-id");
-                        handleEditClient(id);
-                    });
+                    btn.addEventListener("click", () => handleEditClient(btn.getAttribute("data-edit-client-id")));
                 });
 
                 document.querySelectorAll("[data-delete-client-id]").forEach((btn) => {
-                    btn.addEventListener("click", () => {
-                        const id = btn.getAttribute("data-delete-client-id");
-                        handleDeleteClient(id);
-                    });
+                    btn.addEventListener("click", () => handleDeleteClient(btn.getAttribute("data-delete-client-id")));
                 });
             }
             clientsCountBadge.textContent = String(clients.length);
+            
+            // Also update the client dropdown in contracts section (if function exists)
+            if (typeof populateClientDropdown === 'function') {
+                populateClientDropdown();
+            }
         }
 
-        btnAddClient.addEventListener("click", () => {
-            clientNameInput.value = "";
-            clientEmailInput.value = "";
-            clientPhoneInput.value = "";
-            clientContactsInput.value = "";
-            clientFormMsg.textContent = "";
-            clientFormPanel.classList.remove("hidden");
-        });
-
-        clientCancelBtn.addEventListener("click", () => {
-            clientFormPanel.classList.add("hidden");
-        });
-
-        clientSaveBtn.addEventListener("click", async () => {
-            const name = clientNameInput.value.trim();
-            const email = clientEmailInput.value.trim();
-            const phone = clientPhoneInput.value.trim();
-            const contactsRaw = clientContactsInput.value.trim();
-            if (!name || !email) {
-                showToast("Client name and email are required.", "error");
-                return;
+        // Search functionality
+        function initializeClientSearch() {
+            const searchInput = document.querySelector('#clients-section .form-control[placeholder="Search clients..."]');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const tableRows = document.querySelectorAll('#clients-table-body tr');
+                    tableRows.forEach((row) => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
             }
+        }
 
-            const editingId = clientFormPanel.dataset.editingId;
+        async function saveClient() {
+            const name = clientNameInput.value.trim();
+            const contacts = getContactData();
+            
+            if (!name) { showToast("Client name is required.", "error"); return; }
+            if (contacts.length === 0) { showToast("At least one contact is required.", "error"); return; }
+            const hasValidContact = contacts.some(c => c.person.trim() !== '');
+            if (!hasValidContact) { showToast("At least one contact person name is required.", "error"); return; }
 
             try {
-                if (editingId) {
-                    // Update existing client
-                    const resp = await callCG({
-                        action: "updateClient",
-                        clientId: editingId,
-                        name,
-                        email,
-                        phone,
-                        contactsRaw,
-                    });
-                    if (!resp.success) {
+                if (editingClientId) {
+                    const resp = await callCG({ action: "updateClient", clientId: editingClientId, name, contacts });
+                    if (resp.success) {
+                        const idx = clients.findIndex(c => c.id === editingClientId);
+                        if (idx !== -1) clients[idx] = resp.client;
+                        showToast("Client updated successfully!", "success");
+                    } else {
                         showToast(resp.message || "Error updating client.", "error");
-                        return;
                     }
-                    const idx = clients.findIndex((c) => c.id === editingId);
-                    if (idx !== -1) {
-                        clients[idx] = resp.client;
-                    }
-                    showToast("Client updated successfully.", "success");
-                    delete clientFormPanel.dataset.editingId;
-                    clientSaveBtn.textContent = "Save Client";
                 } else {
-                    // Create new client
-                    const resp = await callCG({
-                        action: "createClient",
-                        name,
-                        email,
-                        phone,
-                        contactsRaw,
-                    });
-                    if (!resp.success) {
-                        showToast(resp.message || "Error saving client.", "error");
-                        return;
+                    const resp = await callCG({ action: "createClient", name, contacts });
+                    if (resp.success) {
+                        clients.push(resp.client);
+                        showToast("Client created successfully!", "success");
+                    } else {
+                        showToast(resp.message || "Error creating client.", "error");
                     }
-                    clientFormMsg.textContent = "Client saved.";
-                    clients.push(resp.client);
-                    showToast("Client created successfully.", "success");
                 }
                 renderClients();
-                setTimeout(() => {
-                    clientFormPanel.classList.add("hidden");
-                }, 700);
+                clientFormModal.hide();
+                clearContactFields();
+                editingClientId = null;
             } catch (err) {
                 console.error(err);
-                showToast("Error contacting server.", "error");
+                showToast("Error saving client.", "error");
             }
-        });
+        }
 
         async function handleEditClient(clientId) {
             const client = clients.find((c) => c.id === clientId);
             if (!client) return;
-
-            // Populate the form with existing data
+            editingClientId = clientId;
             clientNameInput.value = client.name || "";
-            clientEmailInput.value = client.email || "";
-            clientPhoneInput.value = client.phone || "";
-            clientContactsInput.value = (client.contacts || []).join("\n");
             clientFormMsg.textContent = "";
-            clientFormPanel.classList.remove("hidden");
-
-            // Store the client ID for update
-            clientFormPanel.dataset.editingId = clientId;
-            clientSaveBtn.textContent = "Update Client";
+            clearContactFields();
+            if (client.contacts && Array.isArray(client.contacts)) {
+                client.contacts.forEach(contact => addContactField(contact));
+            } else {
+                addContactField();
+            }
+            document.querySelector('.client-form-title').textContent = "Edit Client";
+            clientFormModal.show();
         }
 
         async function handleDeleteClient(clientId) {
             if (!await showConfirm("Are you sure you want to delete this client?", "Delete Client")) return;
-
             try {
-                const resp = await callCG({
-                    action: "deleteClient",
-                    clientId,
-                });
-
-                if (!resp.success) {
-                    showToast(resp.message || "Error deleting client.", "error");
-                    return;
-                }
-
-                const idx = clients.findIndex((c) => c.id === clientId);
-                if (idx !== -1) {
-                    clients.splice(idx, 1);
-                }
-
+                const resp = await callCG({ action: "deleteClient", clientId });
+                if (!resp.success) { showToast(resp.message || "Error deleting client.", "error"); return; }
+                clients = clients.filter((c) => c.id !== clientId);
                 renderClients();
-                showToast("Client deleted successfully.", "success");
+                showToast("Client deleted successfully!", "success");
             } catch (err) {
                 console.error(err);
-                showToast("Error contacting server.", "error");
+                showToast("Error deleting client.", "error");
             }
         }
 
         // ---------- Contracts ----------
         let contracts = [];
+        let selectedClientId = null;
         const contractsTableBody = document.getElementById("contracts-table-body");
         const contractsCountBadge = document.getElementById("contracts-count-badge");
+        const contractClientSelect = document.getElementById("contract-client-select");
+        const contractContactSelect = document.getElementById("contract-contact-select");
         const contractClientName = document.getElementById("contract-client-name");
         const contractClientEmail = document.getElementById("contract-client-email");
         const contractEventDate = document.getElementById("contract-event-date");
@@ -1120,6 +920,74 @@
         const contractSendBtn = document.getElementById("contract-send-btn");
         const contractSendMessage = document.getElementById("contract-send-message");
 
+        // Populate client dropdown
+        function populateClientDropdown() {
+            contractClientSelect.innerHTML = '<option value="">-- Choose a Client --</option>';
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                contractClientSelect.appendChild(option);
+            });
+        }
+
+        // Populate contact dropdown based on selected client
+        function populateContactDropdown(clientId) {
+            contractContactSelect.innerHTML = '<option value="">-- Choose a Contact --</option>';
+            const client = clients.find(c => c.id === clientId);
+            if (client && client.contacts && client.contacts.length > 0) {
+                contractContactSelect.disabled = false;
+                client.contacts.forEach((contact, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = contact.person || contact.email || `Contact ${index + 1}`;
+                    contractContactSelect.appendChild(option);
+                });
+            } else {
+                contractContactSelect.disabled = true;
+            }
+        }
+
+        // Handle client selection
+        contractClientSelect.addEventListener('change', () => {
+            const clientId = contractClientSelect.value;
+            selectedClientId = clientId;
+            
+            // Reset contact fields
+            contractContactSelect.value = "";
+            contractClientName.value = "";
+            contractClientEmail.value = "";
+            contractEventLocation.value = "";
+            
+            if (clientId) {
+                populateContactDropdown(clientId);
+            } else {
+                contractContactSelect.innerHTML = '<option value="">-- Choose a Contact --</option>';
+                contractContactSelect.disabled = true;
+            }
+            
+            updateContractPreview();
+        });
+
+        // Handle contact selection - auto-fill fields
+        contractContactSelect.addEventListener('change', () => {
+            const contactIndex = contractContactSelect.value;
+            const client = clients.find(c => c.id === selectedClientId);
+            
+            if (client && contactIndex !== "" && client.contacts[contactIndex]) {
+                const contact = client.contacts[contactIndex];
+                contractClientName.value = contact.person || "";
+                contractClientEmail.value = contact.email || "";
+                contractEventLocation.value = contact.address || "";
+            } else {
+                contractClientName.value = "";
+                contractClientEmail.value = "";
+                contractEventLocation.value = "";
+            }
+            
+            updateContractPreview();
+        });
+
         function fmtEventTime() {
             const s = contractStartTime.value;
             const e = contractEndTime.value;
@@ -1127,6 +995,7 @@
             if (s && e) return `${s} – ${e}`;
             return s || e;
         }
+        
         function fmtEventDate() {
             return contractEventDate.value || "____________________________";
         }
@@ -1142,7 +1011,7 @@
 CULTURE GOURMET – CATERING AGREEMENT
 (One-Page Contract)
 
-This Catering Agreement (“Agreement”) is entered into between Culture Gourmet (“Caterer”) and the undersigned ${clientName} (“Client”) for catering services on the date listed below.
+This Catering Agreement ("Agreement") is entered into between Culture Gourmet ("Caterer") and the undersigned ${clientName} ("Client") for catering services on the date listed below.
 
 1. EVENT DETAILS
 Client Name: ${clientName}
@@ -1196,15 +1065,7 @@ Date: ____________________
             contractPreview.textContent = txt.trim();
         }
 
-        [
-            contractClientName,
-            contractClientEmail,
-            contractEventDate,
-            contractEventLocation,
-            contractGuestCount,
-            contractStartTime,
-            contractEndTime,
-        ].forEach((el) => {
+        [contractClientName, contractClientEmail, contractEventDate, contractEventLocation, contractGuestCount, contractStartTime, contractEndTime].forEach((el) => {
             el.addEventListener("input", updateContractPreview);
             el.addEventListener("change", updateContractPreview);
         });
@@ -1212,244 +1073,105 @@ Date: ____________________
         function renderContracts() {
             contractsTableBody.innerHTML = "";
             if (!contracts.length) {
-                contractsTableBody.innerHTML =
-                    '<tr><td colspan="5" style="text-align:center;color:#9ca3af;">Contracts will appear here after you create them.</td></tr>';
+                contractsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">No contracts found. Create your first contract to get started.</td></tr>';
             } else {
                 contracts.forEach((c) => {
                     const tr = document.createElement("tr");
-
-                    // treat missing status as Draft
-                    const status = c.status || "Draft";
-
-                    const actions = [];
-
-                    // DRAFT → Send + Edit + Delete
-                    if (status === "Draft") {
-                        actions.push(
-                            `<button class="btn-sm" data-send-id="${c.id}">Send</button>`
-                        );
-                        actions.push(
-                            `<button class="btn-sm" data-edit-id="${c.id}">Edit</button>`
-                        );
-                        actions.push(
-                            `<button class="btn-sm btn-danger" data-delete-id="${c.id}">Delete</button>`
-                        );
-                    } else {
-                        // non-draft → Resend + status change + Delete
-                        actions.push(
-                            `<button class="btn-sm" data-resend-id="${c.id}">Resend</button>`
-                        );
-
-                        if (status === "Sent") {
-                            actions.push(
-                                `<button class="btn-sm" data-status-id="${c.id}" data-status="Under Review">Mark Under Review</button>`
-                            );
-                        }
-                        if (status === "Sent" || status === "Under Review") {
-                            actions.push(
-                                `<button class="btn-sm" data-status-id="${c.id}" data-status="Signed">Mark Signed</button>`
-                            );
-                        }
-
-                        actions.push(
-                            `<button class="btn-sm btn-danger" data-delete-id="${c.id}">Delete</button>`
-                        );
-                    }
+                    const statusMap = { 'draft': 'Draft', 'send': 'Sent', 'under-review': 'Under Review', 'reviewed': 'Reviewed', 'signed': 'Signed' };
+                    const status = c.status || 'draft';
+                    const statusText = statusMap[status] || status;
+                    const badgeClass = status === 'signed' ? 'bg-success' : status === 'under-review' ? 'bg-warning' : status === 'send' ? 'bg-info' : 'bg-secondary';
 
                     tr.innerHTML = `
-        <td>${c.clientName || ""}</td>
-        <td>${c.eventDate || ""}</td>
-        <td><span class="badge-soft">${status}</span></td>
-        <td>${c.fileUrl
-                            ? `<a href="${c.fileUrl}" target="_blank">Open</a>`
-                            : "—"
-                        }</td>
-        <td>${actions.join(" ")}</td>
-      `;
-
+                        <td class="ps-4">${c.clientName || "—"}</td>
+                        <td>${c.eventDate ? new Date(c.eventDate).toLocaleDateString() : "—"}</td>
+                        <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm me-1" data-edit-id="${c.id}">Edit</button>
+                            <button class="btn btn-outline-info btn-sm me-1" data-resend-id="${c.id}">Resend</button>
+                            <button class="btn btn-outline-danger btn-sm me-1" data-delete-id="${c.id}">Delete</button>
+                            <a href="theCultureGourmetContractAdmin.html?contractId=${c.id}" class="btn btn-outline-success btn-sm">Open</a>
+                        </td>
+                    `;
                     contractsTableBody.appendChild(tr);
                 });
             }
 
-            // update dashboard counters as before
             contractsCountBadge.textContent = String(contracts.length);
             updateMetrics();
             renderRecentActivity();
 
-            // wire buttons after DOM is created
-
-            // Send (for Draft)
-            document.querySelectorAll("[data-send-id]").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const id = btn.getAttribute("data-send-id");
-                    sendContract(id);
-                });
+            document.querySelectorAll("[data-edit-id]").forEach(btn => {
+                btn.addEventListener("click", (e) => { e.preventDefault(); handleEditContract(btn.getAttribute("data-edit-id")); });
             });
 
-            // Resend (for non-Draft)
-            document.querySelectorAll("[data-resend-id]").forEach((btn) => {
-                btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-resend-id]").forEach(btn => {
+                btn.addEventListener("click", async (e) => {
+                    e.preventDefault();
                     const id = btn.getAttribute("data-resend-id");
-                    sendContract(id); // same handler = resend
+                    if (await showConfirm("Resend this contract to the client?", "Confirm Resend")) await sendContract(id);
                 });
             });
 
-            // Status change (Under Review / Signed)
-            document.querySelectorAll("[data-status-id]").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const id = btn.getAttribute("data-status-id");
-                    const status = btn.getAttribute("data-status");
-                    updateContractStatus(id, status);
-                });
-            });
-
-            // Edit
-            document.querySelectorAll("[data-edit-id]").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const id = btn.getAttribute("data-edit-id");
-                    handleEditContract(id);
-                });
-            });
-
-            // Delete
-            document.querySelectorAll("[data-delete-id]").forEach((btn) => {
-                btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-delete-id]").forEach(btn => {
+                btn.addEventListener("click", async (e) => {
+                    e.preventDefault();
                     const id = btn.getAttribute("data-delete-id");
-                    handleDeleteContract(id);
+                    if (await showConfirm("Are you sure you want to delete this contract?", "Confirm Delete")) await handleDeleteContract(id);
                 });
             });
         }
-
-
 
         async function sendContract(contractId) {
             const contract = contracts.find((c) => c.id === contractId);
             if (!contract) return;
-
             if (!await showConfirm(`Send contract to ${contract.clientEmail}?`, "Send Contract")) return;
 
             try {
-                const resp = await callCG({
-                    action: "sendContract",
-                    contractId,
-                });
-                if (!resp.success) {
-                    showToast(resp.message || "Error sending contract.", "error");
-                    return;
-                }
-
-                // update local contracts array
+                const resp = await callCG({ action: "sendContract", contractId });
+                if (!resp.success) { showToast(resp.message || "Error sending contract.", "error"); return; }
                 const idx = contracts.findIndex((c) => c.id === contractId);
-                if (idx !== -1) {
-                    contracts[idx] = resp.contract;
-                }
-
+                if (idx !== -1) contracts[idx] = resp.contract;
                 renderContracts();
 
                 if (resp.emailSent) {
-                    showToast("✅ Email sent successfully via SMTP!", "success");
+                    showToast("Email sent successfully via SMTP!", "success");
                 } else {
-                    // Fallback to mailto if SMTP failed or not configured
                     const fullLink = window.location.origin + (resp.contract.fileUrl || "");
                     const subject = "Culture Gourmet Catering Agreement";
-                    const body =
-                        `Hi ${resp.contract.clientName},\n\n` +
-                        `Here is your catering agreement:\n${fullLink}\n\n` +
-                        `Thank you,\nCulture Gourmet`;
-
-                    if (resp.emailError) {
-                        console.warn("SMTP Error:", resp.emailError);
-                        showToast("⚠️ SMTP failed. Opening default mail client instead.", "warning");
-                    } else {
-                        showToast("ℹ️ SMTP not configured. Opening default mail client.", "info");
-                    }
-
-                    window.open(
-                        `mailto:${encodeURIComponent(
-                            resp.contract.clientEmail
-                        )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
-                        "_blank"
-                    );
+                    const body = `Hi ${resp.contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`;
+                    if (resp.emailError) showToast("SMTP failed. Opening default mail client instead.", "warning");
+                    else showToast("SMTP not configured. Opening default mail client.", "info");
+                    window.open(`mailto:${encodeURIComponent(resp.contract.clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank");
                 }
-
             } catch (err) {
                 console.error(err);
                 showToast("Error contacting server.", "error");
             }
         }
 
-
-        async function updateContractStatus(contractId, status) {
-            if (!await showConfirm(`Mark this contract as "${status}"?`, "Update Status")) return;
-
-            try {
-                const resp = await callCG({
-                    action: "updateContractStatus",
-                    contractId,
-                    status,
-                });
-
-                if (!resp.success) {
-                    showToast(resp.message || "Error updating status.", "error");
-                    return;
-                }
-
-                const idx = contracts.findIndex((c) => c.id === contractId);
-                if (idx !== -1) {
-                    contracts[idx] = resp.contract;
-                }
-
-                renderContracts();
-                showToast(`Status updated to ${status}`, "success");
-            } catch (err) {
-                console.error(err);
-                showToast("Error contacting server.", "error");
-            }
-        }
         async function handleEditContract(contractId) {
             const contract = contracts.find((c) => c.id === contractId);
             if (!contract) return;
 
             const clientName = prompt("Client Name", contract.clientName || "");
             if (clientName === null) return;
-
             const clientEmail = prompt("Client Email", contract.clientEmail || "");
             if (clientEmail === null) return;
-
             const eventDate = prompt("Event Date", contract.eventDate || "");
             if (eventDate === null) return;
-
             const eventLocation = prompt("Event Location", contract.eventLocation || "");
             if (eventLocation === null) return;
-
             const guestCount = prompt("Guest Count", contract.guestCount || "");
             if (guestCount === null) return;
-
             const eventTime = prompt("Event Start/End Time", contract.eventTime || "");
             if (eventTime === null) return;
 
             try {
-                const resp = await callCG({
-                    action: "updateContractFields",
-                    contractId,
-                    clientName,
-                    clientEmail,
-                    eventDate,
-                    eventLocation,
-                    guestCount,
-                    eventTime,
-                });
-
-                if (!resp.success) {
-                    alert(resp.message || "Error updating contract.");
-                    return;
-                }
-
+                const resp = await callCG({ action: "updateContractFields", contractId, clientName, clientEmail, eventDate, eventLocation, guestCount, eventTime });
+                if (!resp.success) { alert(resp.message || "Error updating contract."); return; }
                 const idx = contracts.findIndex((c) => c.id === contractId);
-                if (idx !== -1) {
-                    contracts[idx] = resp.contract;
-                }
-
+                if (idx !== -1) contracts[idx] = resp.contract;
                 renderContracts();
             } catch (err) {
                 console.error(err);
@@ -1458,25 +1180,11 @@ Date: ____________________
         }
 
         async function handleDeleteContract(contractId) {
-            if (!await showConfirm("Are you sure you want to delete this contract?", "Delete Contract")) return;
-
             try {
-                const resp = await callCG({
-                    action: "deleteContract",
-                    contractId,
-                });
-
-                if (!resp.success) {
-                    showToast(resp.message || "Error deleting contract.", "error");
-                    return;
-                }
-
-                // remove from local array
+                const resp = await callCG({ action: "deleteContract", contractId });
+                if (!resp.success) { showToast(resp.message || "Error deleting contract.", "error"); return; }
                 const idx = contracts.findIndex((c) => c.id === contractId);
-                if (idx !== -1) {
-                    contracts.splice(idx, 1);
-                }
-
+                if (idx !== -1) contracts.splice(idx, 1);
                 renderContracts();
                 showToast("Contract deleted.", "success");
             } catch (err) {
@@ -1485,41 +1193,154 @@ Date: ____________________
             }
         }
 
+        // Contract Preview Modal elements
+        const contractPreviewModal = new bootstrap.Modal(document.getElementById("contractPreviewModal"));
+        const confirmCreateBtn = document.getElementById("confirm-create-btn");
+        const confirmSendContractBtn = document.getElementById("confirm-send-contract-btn");
+        const modalContractPreview = document.getElementById("modal-contract-preview");
 
-        contractSendBtn.addEventListener("click", async () => {
+        // Show preview modal when clicking Create Contract
+        contractSendBtn.addEventListener("click", () => {
             const clientName = contractClientName.value.trim();
             const clientEmail = contractClientEmail.value.trim();
-            if (!clientName || !clientEmail) {
-                contractSendMessage.textContent = "Client name and email are required.";
-                return;
+            if (!clientName || !clientEmail) { 
+                contractSendMessage.textContent = "Client name and email are required."; 
+                return; 
             }
             contractSendMessage.textContent = "";
+            
+            // Populate preview modal fields
+            const selectedClient = clients.find(c => c.id === selectedClientId);
+            document.getElementById("preview-client-name").textContent = selectedClient ? selectedClient.name : clientName;
+            document.getElementById("preview-contact-name").textContent = clientName || "-";
+            document.getElementById("preview-contact-email").textContent = clientEmail || "-";
+            document.getElementById("preview-event-date").textContent = contractEventDate.value || "-";
+            document.getElementById("preview-event-location").textContent = contractEventLocation.value || "-";
+            document.getElementById("preview-guest-count").textContent = contractGuestCount.value || "-";
+            document.getElementById("preview-event-time").textContent = fmtEventTime().replace("____________________________", "-");
+            
+            // Copy contract text to modal
+            modalContractPreview.textContent = contractPreview.textContent;
+            
+            // Show the modal
+            contractPreviewModal.show();
+        });
+
+        // Helper function to reset form after contract creation
+        function resetContractForm() {
+            contractClientSelect.value = "";
+            contractContactSelect.value = "";
+            contractContactSelect.innerHTML = '<option value="">-- Choose a Contact --</option>';
+            contractContactSelect.disabled = true;
+            contractClientName.value = "";
+            contractClientEmail.value = "";
+            contractEventDate.value = "";
+            contractEventLocation.value = "";
+            contractGuestCount.value = "";
+            contractStartTime.value = "";
+            contractEndTime.value = "";
+            selectedClientId = null;
+            updateContractPreview();
+        }
+
+        // Create Contract only (no send)
+        confirmCreateBtn.addEventListener("click", async () => {
+            const clientName = contractClientName.value.trim();
+            const clientEmail = contractClientEmail.value.trim();
+            
+            confirmCreateBtn.disabled = true;
+            confirmSendContractBtn.disabled = true;
+            confirmCreateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Creating...';
+            
             try {
-                const resp = await callCG({
-                    action: "createContract",
-                    clientName,
-                    clientEmail,
-                    eventDate: contractEventDate.value,
-                    eventLocation: contractEventLocation.value,
-                    guestCount: contractGuestCount.value,
-                    eventTime: fmtEventTime(),
+                const resp = await callCG({ 
+                    action: "createContract", 
+                    clientName, 
+                    clientEmail, 
+                    eventDate: contractEventDate.value, 
+                    eventLocation: contractEventLocation.value, 
+                    guestCount: contractGuestCount.value, 
+                    eventTime: fmtEventTime() 
                 });
-                if (!resp.success) {
-                    contractSendMessage.textContent =
-                        resp.message || "Error creating contract.";
-                    return;
+                
+                if (!resp.success) { 
+                    contractSendMessage.textContent = resp.message || "Error creating contract."; 
+                    return; 
                 }
+                
                 contracts.push(resp.contract);
                 renderContracts();
-                contractSendMessage.textContent =
-                    "Contract created (Draft). Click Send in the table to email it.";
+                contractPreviewModal.hide();
+                showToast("Contract created successfully!", "success");
+                resetContractForm();
+                
             } catch (err) {
                 console.error(err);
                 contractSendMessage.textContent = "Error contacting server.";
+            } finally {
+                confirmCreateBtn.disabled = false;
+                confirmSendContractBtn.disabled = false;
+                confirmCreateBtn.innerHTML = '<i class="bi bi-file-earmark-plus me-1"></i>Create';
             }
         });
 
-        // ---------- Dashboard metrics & activity ----------
+        // Create & Send Contract
+        confirmSendContractBtn.addEventListener("click", async () => {
+            const clientName = contractClientName.value.trim();
+            const clientEmail = contractClientEmail.value.trim();
+            
+            confirmCreateBtn.disabled = true;
+            confirmSendContractBtn.disabled = true;
+            confirmSendContractBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Creating & Sending...';
+            
+            try {
+                // First create the contract
+                const resp = await callCG({ 
+                    action: "createContract", 
+                    clientName, 
+                    clientEmail, 
+                    eventDate: contractEventDate.value, 
+                    eventLocation: contractEventLocation.value, 
+                    guestCount: contractGuestCount.value, 
+                    eventTime: fmtEventTime() 
+                });
+                
+                if (!resp.success) { 
+                    contractSendMessage.textContent = resp.message || "Error creating contract."; 
+                    return; 
+                }
+                
+                contracts.push(resp.contract);
+                
+                // Now send the contract automatically
+                const sendResp = await callCG({ action: "sendContract", contractId: resp.contract.id });
+                
+                if (sendResp.success) {
+                    // Update contract status locally
+                    const idx = contracts.findIndex(c => c.id === resp.contract.id);
+                    if (idx !== -1) {
+                        contracts[idx].status = "send";
+                    }
+                    showToast(`Contract created and sent to ${clientEmail}!`, "success");
+                } else {
+                    showToast("Contract created but failed to send: " + (sendResp.message || "Unknown error"), "warning");
+                }
+                
+                renderContracts();
+                contractPreviewModal.hide();
+                resetContractForm();
+                
+            } catch (err) {
+                console.error(err);
+                contractSendMessage.textContent = "Error contacting server.";
+            } finally {
+                confirmCreateBtn.disabled = false;
+                confirmSendContractBtn.disabled = false;
+                confirmSendContractBtn.innerHTML = '<i class="bi bi-send me-1"></i>Create & Send';
+            }
+        });
+
+        // ---------- Dashboard Metrics & Activity ----------
         const metricTotal = document.getElementById("metric-total");
         const metricSent = document.getElementById("metric-sent");
         const metricUnderReview = document.getElementById("metric-under-review");
@@ -1531,7 +1352,6 @@ Date: ____________________
             const sent = contracts.filter((c) => c.status === "Sent").length;
             const signed = contracts.filter((c) => c.status === "Signed").length;
             const under = contracts.filter((c) => c.status === "Under Review").length;
-
             metricTotal.textContent = total;
             metricSent.textContent = sent;
             metricSigned.textContent = signed;
@@ -1541,37 +1361,25 @@ Date: ____________________
         function renderRecentActivity() {
             recentActivityBody.innerHTML = "";
             if (!contracts.length) {
-                recentActivityBody.innerHTML =
-                    '<tr><td colspan="4" style="text-align:center;color:#9ca3af;">Activity will appear once you create contracts.</td></tr>';
+                recentActivityBody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">Activity will appear once you create contracts.</td></tr>';
                 return;
             }
             const items = [];
             contracts.forEach((c) => {
                 (c.timeline || []).forEach((ev) => {
-                    items.push({
-                        clientName: c.clientName,
-                        status: c.status,
-                        label: ev.label || "Event",
-                        at: ev.at || c.createdAt,
-                    });
+                    items.push({ clientName: c.clientName, status: c.status, label: ev.label || "Event", at: ev.at || c.createdAt });
                 });
             });
             items.sort((a, b) => (a.at || "").localeCompare(b.at || ""));
             const last = items.slice(-5).reverse();
-
             last.forEach((ev) => {
                 const tr = document.createElement("tr");
-                tr.innerHTML = `
-          <td>${ev.clientName}</td>
-          <td>${ev.label}</td>
-          <td>${ev.at || ""}</td>
-          <td><span class="badge-soft">${ev.status || ""}</span></td>
-        `;
+                tr.innerHTML = `<td class="ps-4">${ev.clientName}</td><td>${ev.label}</td><td>${ev.at || ""}</td><td class="text-center"><span class="badge bg-secondary">${ev.status || ""}</span></td>`;
                 recentActivityBody.appendChild(tr);
             });
         }
 
-        // ---------- initial load after login ----------
+        // ---------- Initial Load ----------
         async function loadInitialData() {
             try {
                 const [clientsResp, contractsResp] = await Promise.all([
@@ -1586,8 +1394,8 @@ Date: ____________________
             } catch (err) {
                 console.error("Error loading initial data", err);
             }
-
             loadSmtpSettings();
+            initializeClientSearch();
         }
 
         // ---------- SMTP Settings ----------
@@ -1619,34 +1427,19 @@ Date: ____________________
             btnSaveSmtp.disabled = true;
             smtpMsg.textContent = "Saving...";
             try {
-                const resp = await callCG({
-                    action: "saveSettings",
-                    smtpHost: smtpHostInput.value.trim(),
-                    smtpPort: smtpPortInput.value.trim(),
-                    smtpUser: smtpUserInput.value.trim(),
-                    smtpPass: smtpPassInput.value.trim(),
-                    smtpFrom: smtpFromInput.value.trim(),
-                });
-                if (resp.success) {
-                    smtpMsg.textContent = "✅ Settings saved.";
-                } else {
-                    smtpMsg.textContent = "❌ Error saving settings.";
-                }
+                const resp = await callCG({ action: "saveSettings", smtpHost: smtpHostInput.value.trim(), smtpPort: smtpPortInput.value.trim(), smtpUser: smtpUserInput.value.trim(), smtpPass: smtpPassInput.value.trim(), smtpFrom: smtpFromInput.value.trim() });
+                if (resp.success) smtpMsg.innerHTML = '<span class="text-success">✅ Settings saved.</span>';
+                else smtpMsg.innerHTML = '<span class="text-danger">❌ Error saving settings.</span>';
             } catch (e) {
                 console.error(e);
-                smtpMsg.textContent = "❌ Network error.";
+                smtpMsg.innerHTML = '<span class="text-danger">❌ Network error.</span>';
             } finally {
                 btnSaveSmtp.disabled = false;
             }
         });
 
-        // initialize preview for first load (before login)
+        // Initialize preview
         updateContractPreview();
-
-        // Check for persisted session (moved to bottom to ensure all consts are init)
-        if (localStorage.getItem("cg_auth") === "true") {
-            showApp();
-        }
     </script>
 </body>
 

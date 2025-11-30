@@ -174,22 +174,25 @@ async function listContracts() {
 }
 
 async function createClient(payload) {
-    const { name, email, phone, contactsRaw } = payload;
+    const { name, contacts } = payload;
     const clients = readJsonSafe(clientsFile);
 
     const id = makeId();
-    const contactsArr = (contactsRaw || "")
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(Boolean);
+    
+    // Handle the new contacts array format
+    const contactsArray = contacts || [];
+    
+    // For backward compatibility, set primary email/phone from first contact
+    const primaryEmail = contactsArray.length > 0 ? (contactsArray[0].email || "") : "";
+    const primaryPhone = contactsArray.length > 0 ? (contactsArray[0].phone || "") : "";
 
     const client = {
         id,
         name: name || "",
-        email: email || "",
-        phone: phone || "",
-        contacts: contactsArr,
-        contactsCount: contactsArr.length,
+        email: primaryEmail,
+        phone: primaryPhone,
+        contacts: contactsArray,
+        contactsCount: contactsArray.length,
         createdAt: nowIso(),
     };
 
@@ -205,7 +208,7 @@ async function listClients() {
 }
 
 async function updateClient(payload) {
-    const { clientId, name, email, phone, contactsRaw } = payload;
+    const { clientId, name, contacts } = payload;
     const clients = readJsonSafe(clientsFile);
     const idx = clients.findIndex((c) => c.id === clientId);
 
@@ -216,15 +219,18 @@ async function updateClient(payload) {
     const client = clients[idx];
 
     if (name !== undefined) client.name = name;
-    if (email !== undefined) client.email = email;
-    if (phone !== undefined) client.phone = phone;
-    if (contactsRaw !== undefined) {
-        const contactsArr = contactsRaw
-            .split("\n")
-            .map((l) => l.trim())
-            .filter(Boolean);
-        client.contacts = contactsArr;
-        client.contactsCount = contactsArr.length;
+    
+    // Handle the new contacts array format
+    if (contacts !== undefined) {
+        client.contacts = contacts;
+        client.contactsCount = contacts.length;
+        
+        // For backward compatibility, also set the first contact as primary email/phone
+        if (contacts.length > 0) {
+            const primaryContact = contacts[0];
+            client.email = primaryContact.email || "";
+            client.phone = primaryContact.phone || "";
+        }
     }
 
     client.updatedAt = nowIso();
