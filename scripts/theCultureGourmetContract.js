@@ -2,7 +2,6 @@
 // MongoDB version - Culture Gourmet Contract Management
 
 import { MongoClient } from "mongodb";
-import nodemailer from "nodemailer";
 import { Resend } from "resend";
 
 // MongoDB Connection
@@ -60,12 +59,15 @@ function makeId() {
 }
 
 // Build the human-readable contract text
-function buildContractText(c) {
+function buildContractText(c, companySettings = {}) {
+    const companyName = companySettings.companyName || "Culture Gourmet";
+    const repName = companySettings.repName || "";
+    
     return `
-CULTURE GOURMET – CATERING AGREEMENT
+${companyName.toUpperCase()} – CATERING AGREEMENT
 (One-Page Contract)
 
-This Catering Agreement ("Agreement") is entered into between Culture Gourmet ("Caterer") and the undersigned ${c.clientName || "Client"} ("Client") for catering services on the date listed below.
+This Catering Agreement ("Agreement") is entered into between ${companyName} ("Caterer") and the undersigned ${c.clientName || "Client"} ("Client") for catering services on the date listed below.
 
 1. EVENT DETAILS
 Client Name: ${c.clientName || "____________________________"}
@@ -75,7 +77,7 @@ Guest Count: ${c.guestCount || "____________________________"}
 Event Start/End Time: ${c.eventTime || "____________________________"}
 
 2. SERVICE AREA
-Culture Gourmet provides catering services locally within the DMV and nationwide, subject to travel fees.
+${companyName} provides catering services locally within the DMV and nationwide, subject to travel fees.
 
 3. DEPOSIT & BOOKING POLICY
 - A 50% deposit is required to secure the event date.
@@ -99,14 +101,20 @@ If the Client cancels for any reason:
 
 7. ALCOHOL SERVICE (If Applicable)
 - Alcohol service is provided only to guests 21+.
-- Culture Gourmet is not responsible for guest behavior related to alcohol.
+- ${companyName} is not responsible for guest behavior related to alcohol.
 - Client agrees to maintain compliance with all state and local alcohol laws.
 
 8. LIABILITY & DAMAGES
-Client is responsible for any damages to equipment, rentals, or property caused by guests. Culture Gourmet is not liable for circumstances outside of its control, including venue limitations, acts of nature, or client-provided items.
+Client is responsible for any damages to equipment, rentals, or property caused by guests. ${companyName} is not liable for circumstances outside of its control, including venue limitations, acts of nature, or client-provided items.
 
 9. AGREEMENT & SIGNATURES
 By signing below, the Client acknowledges and agrees to all terms outlined.
+
+${companyName} Representative: ${repName || "____________________________"}
+${companyName} Signature: ____________________________
+
+Client Name: ${c.clientName || "____________________________"}
+Client Signature: ____________________________
   `.trim();
 }
 
@@ -124,6 +132,10 @@ async function createContract(payload) {
         eventTime,
     } = payload;
 
+    // Get company settings for contract text
+    const companySettingsResult = await getCompanySettings();
+    const companySettings = companySettingsResult.settings || {};
+
     const id = makeId();
     const contract = {
         id,
@@ -137,12 +149,16 @@ async function createContract(payload) {
         fileUrl: "",
         createdAt: nowIso(),
         updatedAt: nowIso(),
+        // Store company settings snapshot with contract
+        companyName: companySettings.companyName || "Culture Gourmet",
+        repName: companySettings.repName || "",
+        repSignature: companySettings.repSignature || "",
         timeline: [
             { at: nowIso(), type: "created", note: "Contract created" },
         ],
     };
 
-    contract.contractText = buildContractText(contract);
+    contract.contractText = buildContractText(contract, companySettings);
 
     await collection.insertOne(contract);
     
@@ -168,6 +184,45 @@ async function getContract(payload) {
     }
 
     return { success: true, contract };
+}
+
+// Mark contract as viewed (Under Review) when client opens the link
+async function markAsViewed(payload) {
+    const { contractId } = payload;
+    const collection = await getContractsCollection();
+    const contract = await collection.findOne({ id: contractId });
+
+    if (!contract) {
+        return { success: false, message: "Contract not found" };
+    }
+
+    // Only mark as viewed if status is "Sent" (not already viewed or signed)
+    if (contract.status === "Sent") {
+        const timeline = contract.timeline || [];
+        timeline.push({
+            at: nowIso(),
+            type: "viewed",
+            label: "Under Review",
+            note: "Client opened the contract"
+        });
+
+        await collection.updateOne(
+            { id: contractId },
+            {
+                $set: {
+                    status: "Under Review",
+                    viewedAt: nowIso(),
+                    updatedAt: nowIso(),
+                    timeline: timeline
+                }
+            }
+        );
+
+        const updatedContract = await collection.findOne({ id: contractId });
+        return { success: true, contract: updatedContract };
+    }
+
+    return { success: true, contract, message: "Already viewed or signed" };
 }
 
 async function updateContractFields(payload) {
@@ -389,11 +444,6 @@ function getDefaultSettings() {
     const defaults = {
         resendApiKey: process.env.CG_RESEND_API_KEY || "",
         resendFromEmail: process.env.CG_RESEND_FROM_EMAIL || "onboarding@resend.dev",
-        smtpHost: process.env.CG_SMTP_HOST || "",
-        smtpPort: process.env.CG_SMTP_PORT || "587",
-        smtpUser: process.env.CG_SMTP_USER || "",
-        smtpPass: process.env.CG_SMTP_PASS || "",
-        smtpFrom: process.env.CG_SMTP_FROM || ""
     };
     console.log('[CG] Environment check - CG_RESEND_API_KEY:', process.env.CG_RESEND_API_KEY ? 'SET' : 'NOT SET');
     return defaults;
@@ -407,34 +457,64 @@ async function getSettings() {
     const settings = {
         resendApiKey: defaults.resendApiKey || dbSettings.resendApiKey,
         resendFromEmail: defaults.resendFromEmail || dbSettings.resendFromEmail,
-        smtpHost: defaults.smtpHost || dbSettings.smtpHost,
-        smtpPort: defaults.smtpPort || dbSettings.smtpPort,
-        smtpUser: defaults.smtpUser || dbSettings.smtpUser,
-        smtpPass: defaults.smtpPass || dbSettings.smtpPass,
-        smtpFrom: defaults.smtpFrom || dbSettings.smtpFrom
+        
     };
     
     return { success: true, settings };
 }
 
 async function saveSettings(payload) {
-    const { resendApiKey, resendFromEmail, smtpHost, smtpPort, smtpUser, smtpPass, smtpFrom } = payload;
+    const { resendApiKey, resendFromEmail } = payload;
     const collection = await getSettingsCollection();
     
     const settings = { 
         type: "email",
         resendApiKey, 
-        resendFromEmail, 
-        smtpHost, 
-        smtpPort, 
-        smtpUser, 
-        smtpPass, 
-        smtpFrom,
+        resendFromEmail,
         updatedAt: nowIso()
     };
     
     await collection.updateOne(
         { type: "email" },
+        { $set: settings },
+        { upsert: true }
+    );
+    
+    return { success: true, settings };
+}
+
+// ---------- Company Settings ----------
+
+async function getCompanySettings() {
+    const collection = await getSettingsCollection();
+    const dbSettings = await collection.findOne({ type: "company" }) || {};
+    
+    return { 
+        success: true, 
+        settings: {
+            companyName: dbSettings.companyName || "Culture Gourmet",
+            companyAddress: dbSettings.companyAddress || "",
+            repName: dbSettings.repName || "",
+            repSignature: dbSettings.repSignature || ""
+        }
+    };
+}
+
+async function saveCompanySettings(payload) {
+    const { companyName, companyAddress, repName, repSignature } = payload;
+    const collection = await getSettingsCollection();
+    
+    const settings = { 
+        type: "company",
+        companyName: companyName || "Culture Gourmet",
+        companyAddress: companyAddress || "",
+        repName: repName || "",
+        repSignature: repSignature || "",
+        updatedAt: nowIso()
+    };
+    
+    await collection.updateOne(
+        { type: "company" },
         { $set: settings },
         { upsert: true }
     );
@@ -452,11 +532,7 @@ async function getEmailSettings() {
     return {
         resendApiKey: defaults.resendApiKey || dbSettings.resendApiKey,
         resendFromEmail: defaults.resendFromEmail || dbSettings.resendFromEmail,
-        smtpHost: defaults.smtpHost || dbSettings.smtpHost,
-        smtpPort: defaults.smtpPort || dbSettings.smtpPort,
-        smtpUser: defaults.smtpUser || dbSettings.smtpUser,
-        smtpPass: defaults.smtpPass || dbSettings.smtpPass,
-        smtpFrom: defaults.smtpFrom || dbSettings.smtpFrom
+        
     };
 }
 
@@ -475,7 +551,7 @@ async function sendContract(payload) {
 
         const settings = await getEmailSettings();
         console.log('[CG] Using Resend from email:', settings.resendFromEmail);
-        console.log('[CG] Using settings - Resend:', settings.resendApiKey ? 'configured' : 'not configured', ', SMTP:', settings.smtpHost ? 'configured' : 'not configured');
+        console.log('[CG] Using settings - Resend:', settings.resendApiKey ? 'configured' : 'not configured');
         
         let emailSent = false;
         let emailError = null;
@@ -483,7 +559,7 @@ async function sendContract(payload) {
         const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
         console.log('[CG] Contract Link being sent:', fullLink);
 
-        const fromName = settings.smtpFrom || "Culture Gourmet";
+        const fromName = "Culture Gourmet";
 
         // Beautiful HTML email template
         const emailHtml = `
@@ -616,58 +692,6 @@ Elevating Your Events with Exceptional Cuisine`;
             }
         }
 
-        // Method 2: Fall back to SMTP
-        if (settings.smtpHost && settings.smtpUser && settings.smtpPass && !emailSent) {
-            const portsToTry = [
-                parseInt(settings.smtpPort || "587"),
-                2525, 587, 465
-            ];
-            const uniquePorts = [...new Set(portsToTry)];
-
-            const fromAddress = settings.smtpFrom
-                ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
-                : settings.smtpUser;
-
-            for (const port of uniquePorts) {
-                if (emailSent) break;
-                
-                try {
-                    console.log(`[CG] Trying SMTP on port ${port}...`);
-                    const transporter = nodemailer.createTransport({
-                        host: settings.smtpHost,
-                        port: port,
-                        secure: port === 465,
-                        connectionTimeout: 10000,
-                        greetingTimeout: 10000,
-                        auth: {
-                            user: settings.smtpUser,
-                            pass: settings.smtpPass,
-                        },
-                    });
-
-                    console.log('[CG] From:', fromAddress);
-                    console.log('[CG] To:', contract.clientEmail);
-
-                    await transporter.sendMail({
-                        from: fromAddress,
-                        to: contract.clientEmail,
-                        subject: "🍽️ Your Culture Gourmet Catering Agreement",
-                        text: emailText,
-                        html: emailHtml,
-                    });
-                    emailSent = true;
-                    console.log(`[CG] Email sent successfully via SMTP on port ${port}!`);
-                } catch (err) {
-                    console.error(`[CG] SMTP Error on port ${port}:`, err.message);
-                    emailError = err.message;
-                }
-            }
-            
-            if (!emailSent) {
-                console.error("[CG] All SMTP ports failed. Last error:", emailError);
-            }
-        }
-
         // Update contract in MongoDB
         const timelineEntry = {
             at: nowIso(),
@@ -719,7 +743,7 @@ async function sendSignedCopy(payload) {
 
         const settings = await getEmailSettings();
 
-        const fromName = settings.smtpFrom || "Culture Gourmet";
+        const fromName = "Culture Gourmet";
         const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
         const signedDate = new Date(contract.signedAt || contract.updatedAt);
         const formattedDate = signedDate.toLocaleDateString('en-US', {
@@ -890,50 +914,8 @@ Elevating Your Events with Exceptional Cuisine`;
             }
         }
 
-        // Fallback to SMTP
-        if (!emailSent && settings.smtpHost && settings.smtpUser && settings.smtpPass) {
-            const portsToTry = [parseInt(settings.smtpPort || "587"), 2525, 587, 465];
-            const uniquePorts = [...new Set(portsToTry)];
-
-            const fromAddress = settings.smtpFrom
-                ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
-                : settings.smtpUser;
-
-            for (const port of uniquePorts) {
-                if (emailSent) break;
-                
-                try {
-                    console.log(`[CG] Trying SMTP on port ${port} for signed copy...`);
-                    const transporter = nodemailer.createTransport({
-                        host: settings.smtpHost,
-                        port: port,
-                        secure: port === 465,
-                        connectionTimeout: 10000,
-                        greetingTimeout: 10000,
-                        auth: {
-                            user: settings.smtpUser,
-                            pass: settings.smtpPass,
-                        },
-                    });
-
-                    await transporter.sendMail({
-                        from: fromAddress,
-                        to: contract.clientEmail,
-                        subject: "✅ Your Signed Culture Gourmet Contract",
-                        text: emailText,
-                        html: emailHtml,
-                    });
-                    emailSent = true;
-                    console.log(`[CG] Signed copy sent via SMTP on port ${port}!`);
-                } catch (err) {
-                    console.error(`[CG] SMTP Error on port ${port}:`, err.message);
-                    emailError = err.message;
-                }
-            }
-        }
-
         if (!emailSent) {
-            return { success: false, message: `Failed to send email: ${emailError || 'No email provider configured'}` };
+            return { success: false, message: `Failed to send email: ${emailError || 'Resend API not configured'}` };
         }
 
         return { success: true, message: `Signed contract sent to ${contract.clientEmail}` };
@@ -975,8 +957,14 @@ export default async function theCultureGourmetContract(payload = {}) {
                 return await getSettings();
             case "saveSettings":
                 return await saveSettings(payload);
+            case "getCompanySettings":
+                return await getCompanySettings();
+            case "saveCompanySettings":
+                return await saveCompanySettings(payload);
             case "getContract":
                 return await getContract(payload);
+            case "markAsViewed":
+                return await markAsViewed(payload);
             case "signContract":
                 return await signContract(payload);
             case "sendSignedCopy":

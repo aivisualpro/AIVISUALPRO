@@ -902,15 +902,18 @@
                     <div class="contract-signatures-wrapper" id="contract-signatures-wrapper" style="display: none;">
                         <!-- Culture Gourmet Section -->
                         <div class="signature-section-block company">
-                            <h4><i class="bi bi-building"></i> Culture Gourmet</h4>
+                            <h4><i class="bi bi-building"></i> <span id="company-name-display">Culture Gourmet</span></h4>
                             <div class="signature-row">
                                 <div class="signature-col">
-                                    <label>Culture Gourmet Rep</label>
-                                    <div class="signature-value">Culture Gourmet Team</div>
+                                    <label><span id="company-name-label">Culture Gourmet</span> Rep</label>
+                                    <div class="signature-value" id="rep-name-display">Culture Gourmet Team</div>
                                 </div>
                                 <div class="signature-col">
                                     <label>Signature</label>
-                                    <div class="signature-value">Culture Gourmet</div>
+                                    <div class="signature-value" id="rep-sig-display">
+                                        <img id="rep-sig-img" src="" alt="Company Signature" style="display: none; max-height: 60px;" />
+                                        <span id="rep-sig-text">Culture Gourmet</span>
+                                    </div>
                                     <div class="signature-timestamp">
                                         <i class="bi bi-calendar-check"></i>
                                         <span id="company-sig-date">-</span>
@@ -1187,12 +1190,26 @@
             }
 
             try {
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "getContract", contractId })
-                });
-                const data = await res.json();
+                // Fetch contract and company settings in parallel
+                const [contractRes, settingsRes] = await Promise.all([
+                    fetch(API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "getContract", contractId })
+                    }),
+                    fetch(API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "getCompanySettings" })
+                    })
+                ]);
+                
+                const data = await contractRes.json();
+                const settingsData = await settingsRes.json();
+                
+                // Store company settings for use in signature display
+                const companySettings = settingsData.success ? settingsData.result : {};
+                console.log("Company settings loaded:", companySettings);
 
                 if (!data.success || !data.result || !data.result.contract) {
                     loadingEl.innerHTML = `
@@ -1205,10 +1222,24 @@
                 }
 
                 const c = data.result.contract;
+                
+                // Use company settings for rep name and signature (override contract values)
+                c.repName = companySettings.repName || c.repName || "Culture Gourmet Team";
+                c.repSignature = companySettings.repSignature || c.repSignature || "";
+                c.companyName = companySettings.companyName || c.companyName || "Culture Gourmet";
                 currentContract = c;
                 loadingEl.style.display = "none";
                 contentEl.style.display = "block";
                 resizeCanvas();
+
+                // Mark contract as viewed (Under Review) if not already signed
+                if (c.status !== "Signed" && c.status !== "Under Review") {
+                    fetch(API_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "markAsViewed", contractId })
+                    }).catch(err => console.log("Could not mark as viewed:", err));
+                }
 
                 // Clean contract text
                 let cleanedText = c.contractText || "";
@@ -1302,6 +1333,22 @@
 
             // Show signature sections
             contractSigWrapper.style.display = "block";
+            
+            // Populate company info from contract
+            const companyName = c.companyName || "Culture Gourmet";
+            document.getElementById("company-name-display").textContent = companyName;
+            document.getElementById("company-name-label").textContent = companyName;
+            document.getElementById("rep-name-display").textContent = c.repName || "Culture Gourmet Team";
+            
+            // Show company signature image if available
+            if (c.repSignature && c.repSignature.startsWith("data:image")) {
+                document.getElementById("rep-sig-img").src = c.repSignature;
+                document.getElementById("rep-sig-img").style.display = "block";
+                document.getElementById("rep-sig-text").style.display = "none";
+            } else {
+                document.getElementById("rep-sig-text").textContent = companyName;
+            }
+            
             document.getElementById("company-sig-date").textContent = formatDateTime(signedDate);
             document.getElementById("client-name-display").textContent = c.clientName || "Client";
             

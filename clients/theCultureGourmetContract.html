@@ -3,17 +3,177 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Culture Gourmet Portal</title>
+    <title>Culture Gourmet Contracts</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
     <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
         .hidden { display: none !important; }
-        .sidebar { min-height: 100vh; }
+        .sidebar { height: 100vh; overflow-y: auto; }
         .nav-link.active { background-color: var(--bs-primary); color: white !important; }
         .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        
+        /* App layout - full viewport */
+        #app-section {
+            height: 100vh;
+            overflow: hidden;
+        }
+        #app-section > .d-flex {
+            height: 100%;
+        }
+        #app-section main {
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Section containers */
+        #app-section section {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        /* Scrollable table containers */
+        .table-scroll-container {
+            flex: 1;
+            min-height: 0;
+            max-height: 500px;
+            overflow-y: auto;
+            position: relative;
+        }
+        /* Larger height for clients table */
+        .table-scroll-container.clients-table {
+            max-height: 600px ;
+        }
+        .table-scroll-container table {
+            margin-bottom: 0;
+        }
+        .table-scroll-container thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #f8f9fa;
+        }
+        
+        /* Pagination styling */
+        .table-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .table-pagination .pagination {
+            margin: 0;
+        }
+        .table-pagination .page-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
+        /* Settings tabs styling */
+        #settingsTabs .nav-link {
+            border-radius: 8px;
+            padding: 10px 20px;
+            color: #6c757d;
+            font-weight: 500;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        #settingsTabs .nav-link:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        #settingsTabs .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+        }
+        #settingsTabs .nav-item {
+            margin-right: 8px;
+        }
+        
+        /* Form control focus styling */
+        .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+        
+        /* Enhanced Accordion Styling */
+        .accordion-item {
+            border-radius: 16px !important;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .accordion-button {
+            font-weight: 600;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        .accordion-button:not(.collapsed) {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .accordion-button:not(.collapsed)::after {
+            filter: brightness(0) invert(1);
+        }
+        .accordion-button:focus {
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+        .accordion-body {
+            padding: 24px;
+        }
+        
+        /* Search Wrapper */
+        .search-wrapper {
+            position: relative;
+        }
+        .search-wrapper .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            z-index: 5;
+        }
+        
+        /* Table vertical alignment */
+        .table td, .table th {
+            vertical-align: middle;
+        }
+        .table td {
+            color: #6c757d;
+        }
+        
+        /* Card with table - flex layout */
+        .card.table-card {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            max-height: calc(100vh - 250px);
+        }
+        /* Larger card for clients section */
+        .card.table-card.clients-card {
+            max-height: calc(100vh - 100px) !important;
+        }
+        .card.table-card .card-body {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            padding: 0;
+        }
     </style>
 </head>
 
@@ -45,8 +205,8 @@
             <aside class="sidebar bg-white border-end p-3" style="width: 250px;">
                 <div class="d-flex flex-column h-100">
                     <div>
-                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Portal</h6>
-                        <nav class="nav flex-column gap-1">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">The Cultural Gourmet</h6>
+                        <nav class="nav flex-column gap-2">
                             <a class="nav-link rounded text-secondary d-flex justify-content-between align-items-center active" href="#" data-section="home-section" id="nav-home">
                                 <span>Home</span>
                             </a>
@@ -64,25 +224,20 @@
                         </nav>
                     </div>
                     <div class="mt-auto pt-4 border-top">
-                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Account</h6>
-                        <div class="mb-2">
-                            <span class="badge bg-primary-subtle text-primary">admin</span>
-                        </div>
                         <button id="btn-logout" class="btn btn-outline-danger btn-sm w-100">
-                            <i class="bi bi-box-arrow-right me-1"></i>Log out
+                            <i class="bi bi-box-arrow-right me-1"></i>Admin Log Out
                         </button>
                     </div>
                 </div>
             </aside>
 
             <!-- Main Content -->
-            <main class="flex-grow-1 p-4" style="min-height: 100vh;">
+            <main class="flex-grow-1 p-4">
                 <!-- HOME -->
                 <section id="home-section">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h2 class="fw-bold mb-1"><i class="bi bi-speedometer2 text-primary me-2"></i>Dashboard</h2>
-                            <p class="text-muted mb-0">Overview of your Culture Gourmet contracts and business metrics</p>
                         </div>
                         <button class="btn btn-outline-primary" type="button">
                             <i class="bi bi-arrow-clockwise me-2"></i>Refresh Data
@@ -153,9 +308,9 @@
                     </div>
 
                     <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white py-3">
+                        <div class="card-header bg-white py-3 border-0">
                             <h5 class="card-title mb-0 fw-semibold">
-                                <i class="bi bi-clock-history me-2 text-primary"></i>Recent Activity
+                                <i class="bi bi-clock-history me-2" style="color: #667eea;"></i>Recent Activity
                             </h5>
                         </div>
                         <div class="card-body p-0">
@@ -186,31 +341,23 @@
                 <!-- CLIENTS -->
                 <section id="clients-section" class="hidden">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h2 class="fw-bold mb-1"><i class="bi bi-people-fill text-primary me-2"></i>Clients</h2>
-                            <p class="text-muted mb-0">Manage your client database and contact information</p>
+                        <div class="page-header">
+                            <h2 class="fw-bold mb-1"><i class="bi bi-people-fill me-2" style="color: #667eea;"></i>Clients</h2>
                         </div>
-                        <button id="btn-add-client" class="btn btn-primary" type="button">
-                            <i class="bi bi-plus-circle me-2"></i>Add New Client
-                        </button>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="search-wrapper">
+                                <i class="bi bi-search search-icon"></i>
+                                <input type="text" class="form-control search-input" placeholder="Search clients..." style="width: 250px; padding-left: 40px !important;">
+                            </div>
+                            <button id="btn-add-client" class="btn btn-primary" type="button">
+                                <i class="bi bi-plus-circle me-2"></i>Add New Client
+                            </button>
+                        </div>
                     </div>
                     
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white py-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0 fw-semibold">
-                                    <i class="bi bi-table me-2 text-primary"></i>All Clients
-                                </h5>
-                                <div class="input-group" style="width: 250px;">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="bi bi-search text-muted"></i>
-                                    </span>
-                                    <input type="text" class="form-control border-start-0 bg-light" placeholder="Search clients...">
-                                </div>
-                            </div>
-                        </div>
+                    <div class="card border-0 shadow-sm table-card clients-card">
                         <div class="card-body p-0">
-                            <div class="table-responsive">
+                            <div class="table-scroll-container clients-table">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
@@ -231,22 +378,30 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="table-pagination" id="clients-pagination">
+                                <span class="page-info">Showing <span id="clients-page-start">0</span>-<span id="clients-page-end">0</span> of <span id="clients-total">0</span> clients</span>
+                                <nav>
+                                    <ul class="pagination pagination-sm mb-0">
+                                        <li class="page-item" id="clients-prev-page"><a class="page-link" href="#">&laquo; Prev</a></li>
+                                        <li class="page-item" id="clients-next-page"><a class="page-link" href="#">Next &raquo;</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- CONTRACTS -->
                 <section id="contracts-section" class="hidden">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-text text-primary me-2"></i>Contracts</h2>
-                            <p class="text-muted mb-0">Create and manage Culture Gourmet catering agreements</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="page-header">
+                            <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-text-fill me-2" style="color: #667eea;"></i>Contracts</h2>
                         </div>
                     </div>
 
                     <div class="accordion" id="contractsAccordion">
                         <!-- Create Contract -->
-                        <div class="accordion-item border-0 shadow-sm mb-3">
+                        <div class="accordion-item border-0 shadow-sm mb-1">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#createContract">
                                     <i class="bi bi-plus-circle me-2"></i>Create New Contract
@@ -257,37 +412,37 @@
                                     <div class="row">
                                         <div class="col-lg-5">
                                             <div class="mb-3">
-                                                <label for="contract-client-select" class="form-label fw-semibold">Select Client</label>
+                                                <label class="form-label fw-semibold">Contract Details Form</label>
                                                 <select id="contract-client-select" class="form-select">
                                                     <option value="">-- Choose a Client --</option>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="contract-contact-select" class="form-label fw-semibold">Select Contact</label>
                                                 <select id="contract-contact-select" class="form-select" disabled>
                                                     <option value="">-- Choose a Contact --</option>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="contract-client-name" class="form-label fw-semibold">Contact Name</label>
-                                                <input id="contract-client-name" type="text" class="form-control bg-light" placeholder="Auto-filled from contact" readonly />
+                                                <input id="contract-client-name" type="text" class="form-control bg-light" placeholder="Auto-filled Contact Name" readonly />
                                             </div>
                                             <div class="mb-3">
-                                                <label for="contract-client-email" class="form-label fw-semibold">Contact Email</label>
-                                                <input id="contract-client-email" type="email" class="form-control bg-light" placeholder="Auto-filled from contact" readonly />
+                                                <input id="contract-client-email" type="email" class="form-control bg-light" placeholder="Auto-filled Contact Email" readonly />
                                             </div>
                                             <div class="mb-3">
                                                 <label for="contract-event-location" class="form-label fw-semibold">Event Location</label>
                                                 <input id="contract-event-location" type="text" class="form-control" placeholder="Venue / Address (auto-filled or edit)" />
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="contract-event-date" class="form-label fw-semibold">Event Date</label>
-                                                <input id="contract-event-date" type="date" class="form-control" />
+                                            <div class="row mb-3">
+                                                <div class="col-6">
+                                                    <label for="contract-guest-count" class="form-label fw-semibold">Guest Count</label>
+                                                    <input id="contract-guest-count" type="number" min="1" class="form-control" placeholder="e.g. 80" />
+                                                </div>
+                                                <div class="col-6">
+                                                    <label for="contract-event-date" class="form-label fw-semibold">Event Date</label>
+                                                    <input id="contract-event-date" type="date" class="form-control" />
+                                                </div>
                                             </div>
-                                            <div class="mb-3">
-                                                <label for="contract-guest-count" class="form-label fw-semibold">Guest Count</label>
-                                                <input id="contract-guest-count" type="number" min="1" class="form-control" placeholder="e.g. 80" />
-                                            </div>
+                                            
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold">Event Start / End Time</label>
                                                 <div class="d-flex gap-2">
@@ -300,8 +455,7 @@
                                         </div>
                                         <div class="col-lg-7">
                                             <label class="form-label fw-semibold">Live Contract Preview</label>
-                                            <p class="text-muted small">Updates as you type client details.</p>
-                                            <div id="contract-preview" class="bg-light rounded p-3 border" style="white-space: pre-wrap; font-size: 13px; max-height: 400px; overflow-y: auto;"></div>
+                                            <div id="contract-preview" class="bg-light rounded p-3 border" style="white-space: pre-wrap; font-size: 13px; max-height: 510px; overflow-y: auto;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -317,24 +471,34 @@
                             </h2>
                             <div id="viewContracts" class="accordion-collapse collapse show" data-bs-parent="#contractsAccordion">
                                 <div class="accordion-body p-0">
-                                    <div class="table-responsive">
+                                    <div class="table-scroll-container">
                                         <table class="table table-hover mb-0">
                                             <thead class="table-light">
                                                 <tr>
                                                     <th class="border-0 py-3 ps-4">Client</th>
                                                     <th class="border-0 py-3">Event Date</th>
                                                     <th class="border-0 py-3">Status</th>
+                                                    <th class="border-0 py-3">Created At</th>
                                                     <th class="border-0 py-3">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="contracts-table-body">
                                                 <tr>
-                                                    <td colspan="4" class="text-center py-5 text-muted">
+                                                    <td colspan="5" class="text-center py-5 text-muted">
                                                         No contracts found. Create your first contract to get started.
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div class="table-pagination" id="contracts-pagination">
+                                        <span class="page-info">Showing <span id="contracts-page-start">0</span>-<span id="contracts-page-end">0</span> of <span id="contracts-total">0</span> contracts</span>
+                                        <nav>
+                                            <ul class="pagination pagination-sm mb-0">
+                                                <li class="page-item" id="contracts-prev-page"><a class="page-link" href="#">&laquo; Prev</a></li>
+                                                <li class="page-item" id="contracts-next-page"><a class="page-link" href="#">Next &raquo;</a></li>
+                                            </ul>
+                                        </nav>
                                     </div>
                                 </div>
                             </div>
@@ -344,86 +508,140 @@
 
                 <!-- ADMIN -->
                 <section id="admin-section" class="hidden">
+                    <!-- Simple Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div>
-                            <h2 class="fw-bold mb-1"><i class="bi bi-gear text-primary me-2"></i>Admin Settings</h2>
-                            <p class="text-muted mb-0">Configure company profile and system preferences</p>
+                        <div class="page-header">
+                            <h2 class="fw-bold mb-1"><i class="bi bi-gear-fill me-2" style="color: #667eea;"></i>Settings</h2>
+                            <p class="text-muted mb-0">Manage your company profile and email configuration</p>
                         </div>
                     </div>
 
-                    <div class="row g-4">
-                        <div class="col-lg-6">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-white py-3">
-                                    <h5 class="card-title mb-0 fw-semibold">
-                                        <i class="bi bi-building me-2 text-primary"></i>Company Profile
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="admin-company-name" class="form-label fw-semibold">Company Name</label>
-                                        <input id="admin-company-name" type="text" class="form-control" value="Culture Gourmet" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="admin-company-address" class="form-label fw-semibold">Business Address</label>
-                                        <textarea id="admin-company-address" rows="4" class="form-control" placeholder="Enter your business address..."></textarea>
+                    <!-- Settings Tabs -->
+                    <ul class="nav nav-pills mb-4" id="settingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="company-tab" data-bs-toggle="pill" data-bs-target="#company-pane" type="button" role="tab">
+                                <i class="bi bi-building me-2"></i>Company
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="signature-tab" data-bs-toggle="pill" data-bs-target="#signature-pane" type="button" role="tab">
+                                <i class="bi bi-pen me-2"></i>Signature
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="email-tab" data-bs-toggle="pill" data-bs-target="#email-pane" type="button" role="tab">
+                                <i class="bi bi-envelope me-2"></i>Email
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Company Tab -->
+                        <div class="tab-pane fade show active" id="company-pane" role="tabpanel">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="mb-4">
+                                                <label for="admin-company-name" class="form-label fw-semibold">Company Name</label>
+                                                <input id="admin-company-name" type="text" class="form-control form-control-lg" value="Culture Gourmet" />
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="admin-company-address" class="form-label fw-semibold">Business Address</label>
+                                                <textarea id="admin-company-address" rows="3" class="form-control" placeholder="Enter your business address..."></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="bg-light rounded-3 p-4 text-center h-100 d-flex flex-column justify-content-center">
+                                                <i class="bi bi-building text-primary" style="font-size: 3rem;"></i>
+                                                <p class="text-muted small mt-2 mb-0">Your company info appears on all contracts</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-header bg-white py-3">
-                                    <h5 class="card-title mb-0 fw-semibold">
-                                        <i class="bi bi-envelope-at me-2 text-primary"></i>Email Settings
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Resend API (Recommended for Cloud) -->
-                                    <div class="alert alert-info mb-3">
-                                        <i class="bi bi-info-circle me-1"></i>
-                                        <strong>Resend API</strong> is recommended for cloud hosting (Render, Vercel, etc.)
+                        <!-- Signature Tab -->
+                        <div class="tab-pane fade" id="signature-pane" role="tabpanel">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="admin-rep-name" class="form-label fw-semibold">Representative Name</label>
+                                                <input id="admin-rep-name" type="text" class="form-control" placeholder="e.g. John Smith" />
+                                                <small class="text-muted">Name that appears on contracts</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Digital Signature</label>
+                                            <!-- Signature Preview -->
+                                            <div id="admin-signature-preview" class="border rounded bg-white p-3 text-center position-relative" style="min-height: 100px; display: none;">
+                                                <img id="admin-signature-img" src="" alt="Signature" style="max-height: 70px;" />
+                                                <button type="button" class="btn btn-sm btn-link position-absolute text-primary" style="top: 5px; right: 5px;" onclick="editAdminSignature()">
+                                                    <i class="bi bi-pencil-square"></i> Change
+                                                </button>
+                                            </div>
+                                            <!-- Signature Canvas -->
+                                            <div id="admin-signature-canvas-wrapper" class="border rounded bg-white position-relative" style="min-height: 100px;">
+                                                <canvas id="admin-signature-canvas" style="width: 100%; height: 100px; cursor: crosshair;"></canvas>
+                                                <button type="button" class="btn btn-sm btn-link position-absolute text-secondary" style="top: 5px; right: 5px;" onclick="clearAdminSignature()">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+                                            </div>
+                                            <small class="text-muted">Draw your signature using mouse or touch</small>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="resend-api-key" class="form-label fw-semibold">Resend API Key</label>
-                                        <input id="resend-api-key" type="password" class="form-control" placeholder="re_xxxxxxxxx" />
-                                        <small class="text-muted">Get your API key from <a href="https://resend.com" target="_blank">resend.com</a></small>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="resend-from-email" class="form-label fw-semibold">Resend From Email</label>
-                                        <input id="resend-from-email" type="text" class="form-control" placeholder="onboarding@resend.dev" />
-                                        <small class="text-muted">Use your verified domain or onboarding@resend.dev for testing</small>
-                                    </div>
-                                    <hr class="my-3">
-                                    <p class="text-muted small mb-2"><i class="bi bi-info-circle me-1"></i>SMTP is used as fallback (works on localhost)</p>
-                                    <div class="mb-3">
-                                        <label for="smtp-host" class="form-label fw-semibold">SMTP Host</label>
-                                        <input id="smtp-host" type="text" class="form-control" placeholder="smtp.gmail.com" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="smtp-port" class="form-label fw-semibold">SMTP Port</label>
-                                        <input id="smtp-port" type="number" class="form-control" placeholder="587" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="smtp-user" class="form-label fw-semibold">SMTP User (Email)</label>
-                                        <input id="smtp-user" type="text" class="form-control" placeholder="you@gmail.com" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="smtp-pass" class="form-label fw-semibold">SMTP Password</label>
-                                        <input id="smtp-pass" type="password" class="form-control" placeholder="App Password" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="smtp-from" class="form-label fw-semibold">From Name (Optional)</label>
-                                        <input id="smtp-from" type="text" class="form-control" placeholder="Culture Gourmet" />
-                                    </div>
-                                    <button id="btn-save-smtp" class="btn btn-primary w-100" type="button">
-                                        <i class="bi bi-check-circle me-1"></i>Save Email Settings
-                                    </button>
-                                    <div id="smtp-msg" class="mt-2"></div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Email Tab -->
+                        <div class="tab-pane fade" id="email-pane" role="tabpanel">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <img src="https://resend.com/static/brand/resend-icon-black.svg" alt="Resend" style="height: 24px;" class="me-2" onerror="this.style.display='none'">
+                                                <span class="fw-semibold">Resend API</span>
+                                                <span class="badge bg-success ms-2">Active</span>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="resend-api-key" class="form-label fw-semibold">API Key</label>
+                                                <div class="input-group">
+                                                    <input id="resend-api-key" type="password" class="form-control" placeholder="re_xxxxxxxxx" />
+                                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('resend-api-key')">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">Get your key from <a href="https://resend.com" target="_blank">resend.com</a></small>
+                                            </div>
+                                            <div class="mb-0">
+                                                <label for="resend-from-email" class="form-label fw-semibold">From Email</label>
+                                                <input id="resend-from-email" type="email" class="form-control" placeholder="contracts@yourdomain.com" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="bg-light rounded-3 p-4 text-center h-100 d-flex flex-column justify-content-center">
+                                                <i class="bi bi-envelope-check text-success" style="font-size: 3rem;"></i>
+                                                <p class="text-muted small mt-2 mb-0">Used to send contracts to clients</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button (Always visible) -->
+                    <div class="mt-4">
+                        <button id="btn-save-company" class="btn btn-primary px-4 py-2 me-2" type="button">
+                            <i class="bi bi-check-circle me-2"></i>Save All Settings
+                        </button>
+                        <span id="company-msg" class="ms-2"></span>
                     </div>
                 </section>
             </main>
@@ -433,12 +651,12 @@
     <!-- Client Form Modal -->
     <div class="modal fade" id="clientFormModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
+            <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                     <h5 class="modal-title"><i class="bi bi-person-plus me-2"></i><span class="client-form-title">New Client</span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <div class="mb-4">
                         <label for="client-name-input" class="form-label fw-semibold">Client Name *</label>
                         <input id="client-name-input" type="text" class="form-control" placeholder="Enter client or company name" required>
@@ -484,8 +702,8 @@
     <!-- Contract Preview Modal -->
     <div class="modal fade" id="contractPreviewModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
+            <div class="modal-content" style="border-radius: 20px; overflow: hidden;">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
                     <h5 class="modal-title">
                         <i class="bi bi-file-earmark-text me-2"></i>Draft Contract Preview
                     </h5>
@@ -708,6 +926,10 @@
         let editingClientId = null;
         let clientsTableBody, clientsCountBadge, btnAddClient, clientNameInput, clientSaveBtn, clientFormMsg, contactsContainer, clientFormModal;
         let contactCount = 0;
+        
+        // Pagination state for clients
+        let clientsCurrentPage = 1;
+        const clientsPerPage = 10;
 
         function initializeClientElements() {
             clientsTableBody = document.getElementById("clients-table-body");
@@ -718,6 +940,23 @@
             clientFormMsg = document.getElementById("client-form-msg");
             contactsContainer = document.getElementById("contacts-container");
             clientFormModal = new bootstrap.Modal(document.getElementById('clientFormModal'));
+            
+            // Initialize pagination listeners
+            document.getElementById('clients-prev-page')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (clientsCurrentPage > 1) {
+                    clientsCurrentPage--;
+                    renderClients();
+                }
+            });
+            document.getElementById('clients-next-page')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                const totalPages = Math.ceil(clients.length / clientsPerPage);
+                if (clientsCurrentPage < totalPages) {
+                    clientsCurrentPage++;
+                    renderClients();
+                }
+            });
             
             btnAddClient.addEventListener("click", () => {
                 editingClientId = null;
@@ -730,6 +969,16 @@
             });
 
             clientSaveBtn.addEventListener("click", saveClient);
+        }
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+            } else {
+                input.type = 'password';
+            }
         }
 
         function addContactField(contactData = null) {
@@ -795,6 +1044,17 @@
 
         function renderClients() {
             clientsTableBody.innerHTML = "";
+            
+            const totalClients = clients.length;
+            const totalPages = Math.ceil(totalClients / clientsPerPage);
+            
+            // Ensure current page is valid
+            if (clientsCurrentPage > totalPages) clientsCurrentPage = Math.max(1, totalPages);
+            
+            const startIndex = (clientsCurrentPage - 1) * clientsPerPage;
+            const endIndex = Math.min(startIndex + clientsPerPage, totalClients);
+            const paginatedClients = clients.slice(startIndex, endIndex);
+            
             if (!clients.length) {
                 clientsTableBody.innerHTML = `
                     <tr>
@@ -804,7 +1064,7 @@
                         </td>
                     </tr>`;
             } else {
-                clients.forEach((c) => {
+                paginatedClients.forEach((c) => {
                     const tr = document.createElement("tr");
                     tr.innerHTML = `
                         <td class="ps-4">
@@ -814,7 +1074,6 @@
                                 </div>
                                 <div>
                                     <div class="fw-semibold">${c.name}</div>
-                                    <small class="text-muted">ID: ${c.id}</small>
                                 </div>
                             </div>
                         </td>
@@ -837,6 +1096,18 @@
                     btn.addEventListener("click", () => handleDeleteClient(btn.getAttribute("data-delete-client-id")));
                 });
             }
+            
+            // Update pagination info
+            document.getElementById('clients-page-start').textContent = totalClients > 0 ? startIndex + 1 : 0;
+            document.getElementById('clients-page-end').textContent = endIndex;
+            document.getElementById('clients-total').textContent = totalClients;
+            
+            // Update pagination buttons state
+            const prevBtn = document.getElementById('clients-prev-page');
+            const nextBtn = document.getElementById('clients-next-page');
+            if (prevBtn) prevBtn.classList.toggle('disabled', clientsCurrentPage <= 1);
+            if (nextBtn) nextBtn.classList.toggle('disabled', clientsCurrentPage >= totalPages);
+            
             clientsCountBadge.textContent = String(clients.length);
             
             // Also update the client dropdown in contracts section (if function exists)
@@ -931,6 +1202,12 @@
         // ---------- Contracts ----------
         let contracts = [];
         let selectedClientId = null;
+        let editingContractId = null; // Track if we're editing a contract
+        
+        // Pagination state for contracts
+        let contractsCurrentPage = 1;
+        const contractsPerPage = 10;
+        
         const contractsTableBody = document.getElementById("contracts-table-body");
         const contractsCountBadge = document.getElementById("contracts-count-badge");
         const contractClientSelect = document.getElementById("contract-client-select");
@@ -940,6 +1217,23 @@
         const contractEventDate = document.getElementById("contract-event-date");
         const contractEventLocation = document.getElementById("contract-event-location");
         const contractGuestCount = document.getElementById("contract-guest-count");
+        
+        // Initialize contracts pagination listeners
+        document.getElementById('contracts-prev-page')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (contractsCurrentPage > 1) {
+                contractsCurrentPage--;
+                renderContracts();
+            }
+        });
+        document.getElementById('contracts-next-page')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            const totalPages = Math.ceil(contracts.length / contractsPerPage);
+            if (contractsCurrentPage < totalPages) {
+                contractsCurrentPage++;
+                renderContracts();
+            }
+        });
         const contractStartTime = document.getElementById("contract-start-time");
         const contractEndTime = document.getElementById("contract-end-time");
         const contractPreview = document.getElementById("contract-preview");
@@ -1098,20 +1392,49 @@ Date: ____________________
 
         function renderContracts() {
             contractsTableBody.innerHTML = "";
+            
+            // Sort contracts by createdAt (newest first)
+            const sortedContracts = [...contracts].sort((a, b) => {
+                const dateA = new Date(a.createdAt || 0);
+                const dateB = new Date(b.createdAt || 0);
+                return dateB - dateA; // Descending order (newest first)
+            });
+            
+            const totalContracts = sortedContracts.length;
+            const totalPages = Math.ceil(totalContracts / contractsPerPage);
+            
+            // Ensure current page is valid
+            if (contractsCurrentPage > totalPages) contractsCurrentPage = Math.max(1, totalPages);
+            
+            const startIndex = (contractsCurrentPage - 1) * contractsPerPage;
+            const endIndex = Math.min(startIndex + contractsPerPage, totalContracts);
+            const paginatedContracts = sortedContracts.slice(startIndex, endIndex);
+            
             if (!contracts.length) {
-                contractsTableBody.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-muted">No contracts found. Create your first contract to get started.</td></tr>';
+                contractsTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">No contracts found. Create your first contract to get started.</td></tr>';
             } else {
-                contracts.forEach((c) => {
+                paginatedContracts.forEach((c) => {
                     const tr = document.createElement("tr");
-                    const statusMap = { 'draft': 'Draft', 'send': 'Sent', 'under-review': 'Under Review', 'reviewed': 'Reviewed', 'signed': 'Signed' };
-                    const status = c.status || 'draft';
+                    const statusMap = { 'Draft': 'Draft', 'Sent': 'Sent', 'Under Review': 'Under Review', 'Signed': 'Signed' };
+                    const status = c.status || 'Draft';
                     const statusText = statusMap[status] || status;
-                    const badgeClass = status === 'signed' ? 'bg-success' : status === 'under-review' ? 'bg-warning' : status === 'send' ? 'bg-info' : 'bg-secondary';
+                    const badgeClass = status === 'Signed' ? 'bg-success' : status === 'Under Review' ? 'bg-warning text-dark' : status === 'Sent' ? 'bg-info' : 'bg-secondary';
+                    
+                    // Format created at timestamp
+                    const createdAt = c.createdAt ? new Date(c.createdAt).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    }) : '—';
 
                     tr.innerHTML = `
                         <td class="ps-4">${c.clientName || "—"}</td>
                         <td>${c.eventDate ? new Date(c.eventDate).toLocaleDateString() : "—"}</td>
                         <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                        <td><small class="text-muted">${createdAt}</small></td>
                         <td>
                             <button class="btn btn-outline-primary btn-sm me-1" data-edit-id="${c.id}">Edit</button>
                             <button class="btn btn-outline-info btn-sm me-1" data-resend-id="${c.id}">Resend</button>
@@ -1122,6 +1445,17 @@ Date: ____________________
                     contractsTableBody.appendChild(tr);
                 });
             }
+            
+            // Update pagination info
+            document.getElementById('contracts-page-start').textContent = totalContracts > 0 ? startIndex + 1 : 0;
+            document.getElementById('contracts-page-end').textContent = endIndex;
+            document.getElementById('contracts-total').textContent = totalContracts;
+            
+            // Update pagination buttons state
+            const prevBtn = document.getElementById('contracts-prev-page');
+            const nextBtn = document.getElementById('contracts-next-page');
+            if (prevBtn) prevBtn.classList.toggle('disabled', contractsCurrentPage <= 1);
+            if (nextBtn) nextBtn.classList.toggle('disabled', contractsCurrentPage >= totalPages);
 
             contractsCountBadge.textContent = String(contracts.length);
             updateMetrics();
@@ -1178,14 +1512,14 @@ Date: ____________________
                     console.log(`[${new Date().toLocaleString()}] Email sent successfully to ${contract.clientEmail}`);
                     showToast(`Email sent successfully to ${contract.clientEmail}!`, "success");
                 } else {
-                    console.warn(`[${new Date().toLocaleString()}] SMTP not used. Error: ${resp.emailError || 'Not configured'}`);
+                    console.warn(`[${new Date().toLocaleString()}] Email not sent. Error: ${resp.emailError || 'Not configured'}`);
                     const fullLink = "https://backend.aivisualpro.com" + (resp.contract.fileUrl || "");
                     const subject = "Culture Gourmet Catering Agreement";
                     const body = `Hi ${resp.contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`;
                     if (resp.emailError) {
-                        showToast(`SMTP failed: ${resp.emailError}. Opening mail client.`, "warning");
+                        showToast(`Email failed: ${resp.emailError}. Opening mail client.`, "warning");
                     } else {
-                        showToast("SMTP not configured. Opening default mail client.", "info");
+                        showToast("Email not configured. Opening default mail client.", "info");
                     }
                     window.open(`mailto:${encodeURIComponent(resp.contract.clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank");
                 }
@@ -1202,35 +1536,115 @@ Date: ____________________
                 return;
             }
 
-            const clientName = prompt("Client Name", contract.clientName || "");
-            if (clientName === null) return;
-            const clientEmail = prompt("Client Email", contract.clientEmail || "");
-            if (clientEmail === null) return;
-            const eventDate = prompt("Event Date", contract.eventDate || "");
-            if (eventDate === null) return;
-            const eventLocation = prompt("Event Location", contract.eventLocation || "");
-            if (eventLocation === null) return;
-            const guestCount = prompt("Guest Count", contract.guestCount || "");
-            if (guestCount === null) return;
-            const eventTime = prompt("Event Start/End Time", contract.eventTime || "");
-            if (eventTime === null) return;
-
-            try {
-                console.log("[Edit] Sending update for contract:", contractId);
-                const resp = await callCG({ action: "updateContractFields", contractId, clientName, clientEmail, eventDate, eventLocation, guestCount, eventTime });
-                console.log("[Edit] Response:", resp);
-                if (!resp.success) { 
-                    showToast(resp.message || "Error updating contract.", "error"); 
-                    return; 
+            // Set edit mode
+            editingContractId = contractId;
+            
+            // Populate form fields with contract data
+            contractClientName.value = contract.clientName || "";
+            contractClientEmail.value = contract.clientEmail || "";
+            contractEventDate.value = contract.eventDate || "";
+            contractEventLocation.value = contract.eventLocation || "";
+            contractGuestCount.value = contract.guestCount || "";
+            
+            // Parse event time (format: "4:00 PM – 8:00 PM")
+            if (contract.eventTime && contract.eventTime.includes("–")) {
+                const times = contract.eventTime.split("–").map(t => t.trim());
+                if (times.length === 2) {
+                    contractStartTime.value = convertTo24Hour(times[0]);
+                    contractEndTime.value = convertTo24Hour(times[1]);
                 }
-                const idx = contracts.findIndex((c) => c.id === contractId);
-                if (idx !== -1) contracts[idx] = resp.contract;
-                renderContracts();
-                showToast("Contract updated successfully!", "success");
-            } catch (err) {
-                console.error("[Edit] Error:", err);
-                showToast("Error contacting server.", "error");
+            } else {
+                contractStartTime.value = "";
+                contractEndTime.value = "";
             }
+            
+            // Make fields editable in edit mode
+            contractClientName.readOnly = false;
+            contractClientEmail.readOnly = false;
+            contractClientName.classList.remove('bg-light');
+            contractClientEmail.classList.remove('bg-light');
+            
+            // Hide client/contact selects in edit mode
+            contractClientSelect.closest('.mb-3').style.display = 'none';
+            contractContactSelect.closest('.mb-3').style.display = 'none';
+            
+            // Update button text
+            contractSendBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Update Contract';
+            contractSendBtn.classList.remove('btn-primary');
+            contractSendBtn.classList.add('btn-warning');
+            
+            // Add cancel button if not exists
+            if (!document.getElementById('cancel-edit-btn')) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'cancel-edit-btn';
+                cancelBtn.className = 'btn btn-outline-secondary w-100 mt-2';
+                cancelBtn.type = 'button';
+                cancelBtn.innerHTML = '<i class="bi bi-x-circle me-1"></i>Cancel Edit';
+                cancelBtn.addEventListener('click', cancelEditMode);
+                contractSendBtn.parentNode.insertBefore(cancelBtn, contractSendMessage);
+            }
+            
+            // Open the Create Contract accordion
+            const createContractAccordion = document.getElementById('createContract');
+            const bsCollapse = new bootstrap.Collapse(createContractAccordion, { show: true });
+            
+            // Update preview
+            updateContractPreview();
+            
+            // Scroll to form
+            createContractAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            showToast("Editing contract - update the fields and click Update Contract", "info");
+        }
+        
+        // Helper function to convert 12-hour time to 24-hour format
+        function convertTo24Hour(time12h) {
+            if (!time12h) return "";
+            const match = time12h.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (!match) return "";
+            let hours = parseInt(match[1]);
+            const minutes = match[2];
+            const period = match[3].toUpperCase();
+            
+            if (period === 'PM' && hours !== 12) hours += 12;
+            if (period === 'AM' && hours === 12) hours = 0;
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes}`;
+        }
+        
+        // Cancel edit mode and reset form
+        function cancelEditMode() {
+            editingContractId = null;
+            
+            // Reset form
+            resetContractForm();
+            
+            // Restore readonly state
+            contractClientName.readOnly = true;
+            contractClientEmail.readOnly = true;
+            contractClientName.classList.add('bg-light');
+            contractClientEmail.classList.add('bg-light');
+            
+            // Show client/contact selects
+            contractClientSelect.closest('.mb-3').style.display = '';
+            contractContactSelect.closest('.mb-3').style.display = '';
+            
+            // Restore button
+            contractSendBtn.innerHTML = 'Create Contract';
+            contractSendBtn.classList.remove('btn-warning');
+            contractSendBtn.classList.add('btn-primary');
+            
+            // Remove cancel button
+            const cancelBtn = document.getElementById('cancel-edit-btn');
+            if (cancelBtn) cancelBtn.remove();
+            
+            // Close accordion and open view contracts
+            const createContractAccordion = document.getElementById('createContract');
+            const viewContractsAccordion = document.getElementById('viewContracts');
+            new bootstrap.Collapse(createContractAccordion, { hide: true });
+            new bootstrap.Collapse(viewContractsAccordion, { show: true });
+            
+            showToast("Edit cancelled", "info");
         }
 
         async function handleDeleteContract(contractId) {
@@ -1258,8 +1672,8 @@ Date: ____________________
         const confirmSendContractBtn = document.getElementById("confirm-send-contract-btn");
         const modalContractPreview = document.getElementById("modal-contract-preview");
 
-        // Show preview modal when clicking Create Contract
-        contractSendBtn.addEventListener("click", () => {
+        // Show preview modal when clicking Create Contract (or handle Update in edit mode)
+        contractSendBtn.addEventListener("click", async () => {
             const clientName = contractClientName.value.trim();
             const clientEmail = contractClientEmail.value.trim();
             if (!clientName || !clientEmail) { 
@@ -1268,6 +1682,49 @@ Date: ____________________
             }
             contractSendMessage.textContent = "";
             
+            // If in edit mode, update the contract directly
+            if (editingContractId) {
+                contractSendBtn.disabled = true;
+                contractSendBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Updating...';
+                
+                try {
+                    const resp = await callCG({ 
+                        action: "updateContractFields", 
+                        contractId: editingContractId,
+                        clientName, 
+                        clientEmail, 
+                        eventDate: contractEventDate.value, 
+                        eventLocation: contractEventLocation.value, 
+                        guestCount: contractGuestCount.value, 
+                        eventTime: fmtEventTime() 
+                    });
+                    
+                    if (!resp.success) { 
+                        showToast(resp.message || "Error updating contract.", "error"); 
+                        return; 
+                    }
+                    
+                    // Update local contracts array
+                    const idx = contracts.findIndex((c) => c.id === editingContractId);
+                    if (idx !== -1) contracts[idx] = resp.contract;
+                    
+                    renderContracts();
+                    showToast("Contract updated successfully!", "success");
+                    
+                    // Exit edit mode
+                    cancelEditMode();
+                    
+                } catch (err) {
+                    console.error("[Edit] Error:", err);
+                    showToast("Error contacting server.", "error");
+                } finally {
+                    contractSendBtn.disabled = false;
+                    contractSendBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i>Update Contract';
+                }
+                return;
+            }
+            
+            // Normal create mode - show preview modal
             // Populate preview modal fields
             const selectedClient = clients.find(c => c.id === selectedClientId);
             document.getElementById("preview-client-name").textContent = selectedClient ? selectedClient.name : clientName;
@@ -1299,6 +1756,7 @@ Date: ____________________
             contractStartTime.value = "";
             contractEndTime.value = "";
             selectedClientId = null;
+            editingContractId = null;
             updateContractPreview();
         }
 
@@ -1453,60 +1911,252 @@ Date: ____________________
             } catch (err) {
                 console.error("Error loading initial data", err);
             }
-            loadSmtpSettings();
+            loadEmailSettings();
+            loadCompanySettings();
             initializeClientSearch();
         }
 
-        // ---------- Email Settings ----------
+        // ---------- Email Settings (Resend API) ----------
         const resendApiKeyInput = document.getElementById("resend-api-key");
         const resendFromEmailInput = document.getElementById("resend-from-email");
-        const smtpHostInput = document.getElementById("smtp-host");
-        const smtpPortInput = document.getElementById("smtp-port");
-        const smtpUserInput = document.getElementById("smtp-user");
-        const smtpPassInput = document.getElementById("smtp-pass");
-        const smtpFromInput = document.getElementById("smtp-from");
-        const btnSaveSmtp = document.getElementById("btn-save-smtp");
-        const smtpMsg = document.getElementById("smtp-msg");
 
-        async function loadSmtpSettings() {
+        async function loadEmailSettings() {
             try {
                 const resp = await callCG({ action: "getSettings" });
                 if (resp.success && resp.settings) {
                     const s = resp.settings;
                     resendApiKeyInput.value = s.resendApiKey || "";
                     resendFromEmailInput.value = s.resendFromEmail || "";
-                    smtpHostInput.value = s.smtpHost || "";
-                    smtpPortInput.value = s.smtpPort || "";
-                    smtpUserInput.value = s.smtpUser || "";
-                    smtpPassInput.value = s.smtpPass || "";
-                    smtpFromInput.value = s.smtpFrom || "";
                 }
             } catch (e) {
                 console.error("Error loading settings", e);
             }
         }
 
-        btnSaveSmtp.addEventListener("click", async () => {
-            btnSaveSmtp.disabled = true;
-            smtpMsg.textContent = "Saving...";
+        // ========== Company Settings (Rep Name & Signature) ==========
+        const adminCompanyNameInput = document.getElementById("admin-company-name");
+        const adminCompanyAddressInput = document.getElementById("admin-company-address");
+        const adminRepNameInput = document.getElementById("admin-rep-name");
+        const adminSignatureCanvas = document.getElementById("admin-signature-canvas");
+        const adminSignaturePreview = document.getElementById("admin-signature-preview");
+        const adminSignatureCanvasWrapper = document.getElementById("admin-signature-canvas-wrapper");
+        const adminSignatureImg = document.getElementById("admin-signature-img");
+        const btnSaveCompany = document.getElementById("btn-save-company");
+        const companyMsg = document.getElementById("company-msg");
+
+        let adminSignatureCtx = null;
+        let adminIsDrawing = false;
+        let adminSignatureData = "";
+        let adminCanvasInitialized = false;
+
+        function initAdminSignatureCanvas() {
+            if (!adminSignatureCanvas || adminCanvasInitialized) return;
+            
+            adminSignatureCtx = adminSignatureCanvas.getContext("2d");
+            
+            // Set canvas size based on container
+            const wrapper = adminSignatureCanvasWrapper;
+            const width = wrapper.clientWidth - 32; // padding
+            adminSignatureCanvas.width = width > 0 ? width : 300;
+            adminSignatureCanvas.height = 100;
+            
+            // Fill with white background
+            adminSignatureCtx.fillStyle = "white";
+            adminSignatureCtx.fillRect(0, 0, adminSignatureCanvas.width, adminSignatureCanvas.height);
+            
+            adminSignatureCtx.strokeStyle = "#1a1a2e";
+            adminSignatureCtx.lineWidth = 2;
+            adminSignatureCtx.lineCap = "round";
+            adminSignatureCtx.lineJoin = "round";
+
+            // Mouse events
+            adminSignatureCanvas.addEventListener("mousedown", (e) => {
+                adminIsDrawing = true;
+                adminSignatureCtx.beginPath();
+                const rect = adminSignatureCanvas.getBoundingClientRect();
+                adminSignatureCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            adminSignatureCanvas.addEventListener("mousemove", (e) => {
+                if (!adminIsDrawing) return;
+                const rect = adminSignatureCanvas.getBoundingClientRect();
+                adminSignatureCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                adminSignatureCtx.stroke();
+            });
+
+            adminSignatureCanvas.addEventListener("mouseup", () => {
+                adminIsDrawing = false;
+                adminSignatureData = adminSignatureCanvas.toDataURL("image/png");
+            });
+
+            adminSignatureCanvas.addEventListener("mouseleave", () => {
+                if (adminIsDrawing) {
+                    adminIsDrawing = false;
+                    adminSignatureData = adminSignatureCanvas.toDataURL("image/png");
+                }
+            });
+
+            // Touch events
+            adminSignatureCanvas.addEventListener("touchstart", (e) => {
+                e.preventDefault();
+                adminIsDrawing = true;
+                const touch = e.touches[0];
+                const rect = adminSignatureCanvas.getBoundingClientRect();
+                adminSignatureCtx.beginPath();
+                adminSignatureCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+            });
+
+            adminSignatureCanvas.addEventListener("touchmove", (e) => {
+                e.preventDefault();
+                if (!adminIsDrawing) return;
+                const touch = e.touches[0];
+                const rect = adminSignatureCanvas.getBoundingClientRect();
+                adminSignatureCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+                adminSignatureCtx.stroke();
+            });
+
+            adminSignatureCanvas.addEventListener("touchend", () => {
+                adminIsDrawing = false;
+                adminSignatureData = adminSignatureCanvas.toDataURL("image/png");
+            });
+            
+            adminCanvasInitialized = true;
+        }
+
+        function clearAdminSignature() {
+            if (adminSignatureCtx) {
+                adminSignatureCtx.fillStyle = "white";
+                adminSignatureCtx.fillRect(0, 0, adminSignatureCanvas.width, adminSignatureCanvas.height);
+                adminSignatureData = "";
+            }
+        }
+        
+        function editAdminSignature() {
+            // Hide preview, show canvas
+            adminSignaturePreview.style.display = "none";
+            adminSignatureCanvasWrapper.style.display = "block";
+            clearAdminSignature();
+        }
+
+        async function loadCompanySettings() {
+            console.log("[loadCompanySettings] Called...");
+            try {
+                const resp = await callCG({ action: "getCompanySettings" });
+                console.log("[loadCompanySettings] Response:", resp);
+                if (resp.success && resp.settings) {
+                    const s = resp.settings;
+                    console.log("[loadCompanySettings] Settings found:", s);
+                    adminCompanyNameInput.value = s.companyName || "Culture Gourmet";
+                    adminCompanyAddressInput.value = s.companyAddress || "";
+                    adminRepNameInput.value = s.repName || "";
+                    
+                    // Show existing signature or canvas
+                    if (s.repSignature && s.repSignature.startsWith('data:image')) {
+                        adminSignatureData = s.repSignature;
+                        adminSignatureImg.src = s.repSignature;
+                        adminSignaturePreview.style.display = "block";
+                        adminSignatureCanvasWrapper.style.display = "none";
+                        console.log("[loadCompanySettings] Signature loaded");
+                    } else {
+                        adminSignaturePreview.style.display = "none";
+                        adminSignatureCanvasWrapper.style.display = "block";
+                        console.log("[loadCompanySettings] No signature found");
+                    }
+                    
+                    // Update display
+                    const displayEl = document.getElementById("admin-company-display");
+                    if (displayEl) displayEl.textContent = s.companyName || "Culture Gourmet";
+                } else {
+                    console.log("[loadCompanySettings] No settings in response:", resp);
+                }
+            } catch (e) {
+                console.error("[loadCompanySettings] Error:", e);
+            }
+        }
+
+        btnSaveCompany.addEventListener("click", async () => {
+            btnSaveCompany.disabled = true;
+            companyMsg.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i>Saving all settings...</span>';
+            
+            let hasError = false;
+            
+            // Save Company Settings
+            try {
+                const resp = await callCG({ 
+                    action: "saveCompanySettings", 
+                    companyName: adminCompanyNameInput.value.trim(),
+                    companyAddress: adminCompanyAddressInput.value.trim(),
+                    repName: adminRepNameInput.value.trim(),
+                    repSignature: adminSignatureData
+                });
+                if (resp.success) {
+                    const displayEl = document.getElementById("admin-company-display");
+                    if (displayEl) displayEl.textContent = adminCompanyNameInput.value.trim() || "Culture Gourmet";
+                    
+                    // Show signature preview after saving
+                    if (adminSignatureData && adminSignatureData.startsWith('data:image')) {
+                        adminSignatureImg.src = adminSignatureData;
+                        adminSignaturePreview.style.display = "block";
+                        adminSignatureCanvasWrapper.style.display = "none";
+                    }
+                } else {
+                    hasError = true;
+                }
+            } catch (e) {
+                console.error(e);
+                hasError = true;
+            }
+            
+            // Save Email Settings
             try {
                 const resp = await callCG({ 
                     action: "saveSettings", 
                     resendApiKey: resendApiKeyInput.value.trim(),
-                    resendFromEmail: resendFromEmailInput.value.trim(),
-                    smtpHost: smtpHostInput.value.trim(), 
-                    smtpPort: smtpPortInput.value.trim(), 
-                    smtpUser: smtpUserInput.value.trim(), 
-                    smtpPass: smtpPassInput.value.trim(), 
-                    smtpFrom: smtpFromInput.value.trim() 
+                    resendFromEmail: resendFromEmailInput.value.trim()
                 });
-                if (resp.success) smtpMsg.innerHTML = '<span class="text-success">✅ Settings saved.</span>';
-                else smtpMsg.innerHTML = '<span class="text-danger">❌ Error saving settings.</span>';
+                if (!resp.success) hasError = true;
             } catch (e) {
                 console.error(e);
-                smtpMsg.innerHTML = '<span class="text-danger">❌ Network error.</span>';
-            } finally {
-                btnSaveSmtp.disabled = false;
+                hasError = true;
+            }
+            
+            if (hasError) {
+                companyMsg.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Error saving some settings</span>';
+            } else {
+                companyMsg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>All settings saved successfully!</span>';
+            }
+            
+            btnSaveCompany.disabled = false;
+            
+            // Clear message after 3 seconds
+            setTimeout(() => {
+                companyMsg.innerHTML = '';
+            }, 3000);
+        });
+
+        // Initialize signature canvas when admin section is shown
+        document.querySelector('[data-section="admin-section"]').addEventListener("click", () => {
+            setTimeout(() => {
+                loadCompanySettings();
+                loadEmailSettings();
+            }, 100);
+        });
+        
+        // Initialize signature canvas when signature tab is clicked
+        document.getElementById("signature-tab").addEventListener("shown.bs.tab", () => {
+            setTimeout(() => {
+                initAdminSignatureCanvas();
+            }, 100);
+        });
+        
+        // Also load company settings on page load if admin section is visible
+        window.addEventListener('load', () => {
+            const hash = window.location.hash.slice(1);
+            if (hash === 'admin-section') {
+                setTimeout(() => {
+                    loadCompanySettings();
+                    loadEmailSettings();
+                }, 200);
             }
         });
 

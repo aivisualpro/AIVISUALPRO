@@ -1,535 +1,445 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>View Contract - Culture Gourmet</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <title>Contract Details - Culture Gourmet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f1f5f9;
-            color: #0f172a;
-            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: #ffffff;
-            padding: 20px 30px;
+        .main-card {
+            margin: 1rem;
             border-radius: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
+        .header-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
         }
-
-        .btn-back {
-            padding: 8px 16px;
-            background: #e5e7eb;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
         }
-
-        .btn-back:hover {
-            background: #d1d5db;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 20px;
-        }
-
-        .contract-panel,
-        .timeline-panel {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .panel-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #111827;
-        }
-
-        .contract-text {
-            white-space: pre-wrap;
-            font-family: "Georgia", serif;
-            line-height: 1.7;
-            font-size: 15px;
-            color: #374151;
-            background: #fafafa;
-            padding: 24px;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-        }
-
-        .timeline-item {
-            border-left: 3px solid #16a34a;
-            padding-left: 16px;
-            margin-bottom: 20px;
+        .timeline {
             position: relative;
+            padding-left: 30px;
         }
-
-        .timeline-item::before {
+        .timeline::before {
             content: '';
             position: absolute;
-            left: -7px;
-            top: 5px;
-            width: 11px;
-            height: 11px;
-            background: #16a34a;
-            border-radius: 50%;
-            border: 2px solid #fff;
-        }
-
-        .timeline-time {
-            font-size: 12px;
-            color: #6b7280;
-            margin-bottom: 4px;
-        }
-
-        .timeline-status {
-            font-weight: 600;
-            font-size: 14px;
-            color: #111827;
-            margin-bottom: 2px;
-        }
-
-        .timeline-note {
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .status-send {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-under-review {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-reviewed {
-            background: #dbeaff;
-            color: #1e40af;
-        }
-
-        .status-signed {
-            background: #dcfce7;
-            color: #166534;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-edit {
-            background: #f3f4f6;
-            color: #374151;
-        }
-        
-        .btn-edit:hover {
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
             background: #e5e7eb;
         }
-        
-        .btn-resend {
-            background: #dbeafe;
-            color: #1e40af;
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
         }
-        
-        .btn-resend:hover {
-            background: #bfdbfe;
+        .timeline-item:last-child {
+            padding-bottom: 0;
         }
-        
-        .btn-delete {
-            background: #fee2e2;
-            color: #b91c1c;
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #22c55e;
+            border: 2px solid white;
+            box-shadow: 0 0 0 3px #dcfce7;
         }
-        
-        .btn-delete:hover {
-            background: #fecaca;
+        .timeline-dot.pending {
+            background: #94a3b8;
+            box-shadow: 0 0 0 3px #f1f5f9;
         }
-        
-        .btn-open {
-            background: #d1fae5;
-            color: #065f46;
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #22c55e;
+            font-weight: 500;
         }
-        
-        .btn-open:hover {
-            background: #a7f3d0;
+        .timeline-title {
+            font-weight: 600;
+            color: #1f2937;
         }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
+        .timeline-note {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .info-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .contract-text {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            white-space: pre-wrap;
+            font-family: Georgia, serif;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .signature-section {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #86efac;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .signature-img {
+            max-width: 200px;
+            max-height: 80px;
+            border-bottom: 2px solid #1a1a2e;
+        }
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: #22c55e;
+        }
+        .live-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .refresh-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Contract Details</h1>
-            <button class="btn-back" onclick="window.location.href='/theCultureGourmetContract.html#contracts-section'">← Back to
-                Contracts</button>
-        </div>
+    <div class="container-fluid py-4">
+        <!-- Back Button -->
+        <a href="theCultureGourmetContract.html#contracts-section" class="btn btn-light mb-3">
+            <i class="bi bi-arrow-left me-2"></i>Back to Contracts
+        </a>
 
-        <div id="loading" style="text-align:center;padding:3rem;background:#fff;border-radius:16px;">Loading contract...
-        </div>
-
-        <div id="content" class="main-grid" style="display:none;">
-            <div class="contract-panel">
-                <div class="panel-title">Contract Document</div>
-                <div id="status-badge" class="status-badge"></div>
-                <div class="contract-text" id="contract-text"></div>
-                <div class="action-buttons" id="action-buttons">
-                    <button class="action-btn btn-edit" onclick="handleEdit()">Edit</button>
-                    <button class="action-btn btn-resend" onclick="handleResend()">Resend</button>
-                    <button class="action-btn btn-delete" onclick="handleDelete()">Delete</button>
-                    <button class="action-btn btn-open" onclick="window.open(contractData?.viewLink || '#', '_blank')">Open</button>
+        <!-- Main Card -->
+        <div class="card main-card border-0" id="main-content" style="display: none;">
+            <!-- Header -->
+            <div class="header-section">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                    <div>
+                        <h4 class="mb-1" id="client-name">Loading...</h4>
+                        <p class="mb-0 opacity-75" id="contract-id">Contract ID: ---</p>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge status-badge bg-secondary" id="status-badge">Loading</span>
+                        <div class="live-indicator mt-2">
+                            <span class="dot"></span>
+                            <span>Live Updates</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="timeline-panel">
-                <div class="panel-title">Timeline</div>
-                <div id="timeline-container"></div>
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- Left Column - Contract Info -->
+                    <div class="col-12 col-lg-8 col-xl-9" style="flex: 0 0 70%; max-width: 70%;">
+                        <!-- Event Details -->
+                        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-calendar-event me-2"></i>Event Details</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <div class="info-card">
+                                    <div class="info-label">Event Date</div>
+                                    <div class="info-value" id="event-date">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-card">
+                                    <div class="info-label">Event Time</div>
+                                    <div class="info-value" id="event-time">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-card">
+                                    <div class="info-label">Guest Count</div>
+                                    <div class="info-value" id="guest-count">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="info-card">
+                                    <div class="info-label">Client Email</div>
+                                    <div class="info-value" id="client-email">-</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <div class="info-label">Location</div>
+                                    <div class="info-value" id="event-location">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contract Text -->
+                        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-file-text me-2"></i>Contract Text</h6>
+                        <div class="contract-text" id="contract-text">Loading...</div>
+
+                        <!-- Signature Section (if signed) -->
+                        <div class="signature-section mt-4" id="signature-section" style="display: none;">
+                            <h6 class="fw-bold text-success mb-3"><i class="bi bi-check-circle me-2"></i>Signed & Executed</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-label">Signed By</div>
+                                    <div class="info-value" id="signer-name">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-label">Signed On</div>
+                                    <div class="info-value" id="signed-date">-</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="info-label">Signature</div>
+                                <img id="signature-img" class="signature-img mt-1" src="" alt="Signature">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Timeline -->
+                    <div class="col-12 col-lg-4 col-xl-3" style="flex: 0 0 30%; max-width: 30%;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold text-primary mb-0"><i class="bi bi-clock-history me-2"></i>Timeline</h6>
+                            <button class="btn btn-sm btn-outline-primary" id="refresh-btn" title="Refresh">
+                                <i class="bi bi-arrow-clockwise" id="refresh-icon"></i>
+                            </button>
+                        </div>
+                        <div class="timeline" id="timeline">
+                            <div class="text-muted">Loading timeline...</div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-5">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-white mt-3">Loading contract details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="text-center py-5" style="display: none;">
+            <i class="bi bi-exclamation-triangle text-white" style="font-size: 3rem;"></i>
+            <p class="text-white mt-3" id="error-message">Contract not found.</p>
+            <a href="theCultureGourmetContract.html" class="btn btn-light">Go Back</a>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const contractId = params.get("contractId");
         const API_URL = "/webhook/theCultureGourmetContract";
 
-        let contractData = null;
-        
-        function updateStatusBadge(status) {
-            const badge = document.getElementById('status-badge');
-            if (!badge) return;
-            
-            badge.className = 'status-badge';
-            badge.textContent = status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-            
-            // Remove all status classes
-            ['send', 'under-review', 'reviewed', 'signed'].forEach(cls => {
-                badge.classList.remove(`status-${cls}`);
+        let currentContract = null;
+        let refreshInterval = null;
+
+        const mainContent = document.getElementById("main-content");
+        const loadingState = document.getElementById("loading-state");
+        const errorState = document.getElementById("error-state");
+        const errorMessage = document.getElementById("error-message");
+
+        const clientNameEl = document.getElementById("client-name");
+        const contractIdEl = document.getElementById("contract-id");
+        const statusBadge = document.getElementById("status-badge");
+        const eventDateEl = document.getElementById("event-date");
+        const eventTimeEl = document.getElementById("event-time");
+        const eventLocationEl = document.getElementById("event-location");
+        const guestCountEl = document.getElementById("guest-count");
+        const clientEmailEl = document.getElementById("client-email");
+        const contractTextEl = document.getElementById("contract-text");
+        const timelineEl = document.getElementById("timeline");
+        const signatureSection = document.getElementById("signature-section");
+        const signerNameEl = document.getElementById("signer-name");
+        const signedDateEl = document.getElementById("signed-date");
+        const signatureImg = document.getElementById("signature-img");
+        const refreshBtn = document.getElementById("refresh-btn");
+        const refreshIcon = document.getElementById("refresh-icon");
+
+        function formatDateTime(isoString) {
+            if (!isoString) return "-";
+            const d = new Date(isoString);
+            return d.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
             });
-            
-            // Add the current status class
-            badge.classList.add(`status-${status.toLowerCase()}`);
         }
-        
-        function renderTimeline(history = []) {
-            const container = document.getElementById('timeline-container');
-            if (!container) {
-                console.error("Timeline container not found");
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case "Signed": return "bg-success";
+                case "Under Review": return "bg-warning text-dark";
+                case "Sent": return "bg-info";
+                default: return "bg-secondary";
+            }
+        }
+
+        function renderTimeline(timeline) {
+            if (!timeline || timeline.length === 0) {
+                timelineEl.innerHTML = '<div class="text-muted">No activity yet.</div>';
                 return;
             }
 
-            try {
-                if (!Array.isArray(history)) {
-                    console.warn("History is not an array:", history);
-                    history = [];
+            // Sort timeline by date (newest first)
+            const sorted = [...timeline].sort((a, b) => new Date(b.at) - new Date(a.at));
+
+            timelineEl.innerHTML = sorted.map((item, index) => `
+                <div class="timeline-item">
+                    <div class="timeline-dot ${index === 0 ? '' : 'pending'}"></div>
+                    <div class="timeline-date">${formatDateTime(item.at)}</div>
+                    <div class="timeline-title">${item.label || item.type || 'Event'}</div>
+                    <div class="timeline-note">${item.note || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderContract(contract) {
+            currentContract = contract;
+
+            clientNameEl.textContent = contract.clientName || "Unknown Client";
+            contractIdEl.textContent = `Contract ID: ${contract.id}`;
+            
+            statusBadge.textContent = contract.status || "Draft";
+            statusBadge.className = `badge status-badge ${getStatusBadgeClass(contract.status)}`;
+
+            eventDateEl.textContent = contract.eventDate || "-";
+            eventTimeEl.textContent = contract.eventTime || "-";
+            eventLocationEl.textContent = contract.eventLocation || "-";
+            guestCountEl.textContent = contract.guestCount || "-";
+            clientEmailEl.textContent = contract.clientEmail || "-";
+
+            // Clean contract text
+            let cleanedText = contract.contractText || "";
+            const sigIndex = cleanedText.indexOf("9. AGREEMENT & SIGNATURES");
+            if (sigIndex !== -1) {
+                const bySigningMatch = cleanedText.indexOf("By signing below");
+                if (bySigningMatch !== -1) {
+                    const endOfLine = cleanedText.indexOf("\n", bySigningMatch);
+                    if (endOfLine !== -1) {
+                        cleanedText = cleanedText.substring(0, endOfLine).trim();
+                    }
                 }
+            }
+            contractTextEl.textContent = cleanedText;
 
-                // Sort by timestamp, newest first
-                const sortedHistory = [...history].sort((a, b) => {
-                    const timeA = (a.timestamp || a.at) ? new Date(a.timestamp || a.at).getTime() : 0;
-                    const timeB = (b.timestamp || b.at) ? new Date(b.timestamp || b.at).getTime() : 0;
-                    return timeB - timeA; // Newest first
+            // Render timeline
+            renderTimeline(contract.timeline);
+
+            // Show signature section if signed
+            if (contract.status === "Signed" && contract.clientSignature) {
+                signatureSection.style.display = "block";
+                signerNameEl.textContent = contract.signerName || contract.clientName || "-";
+                signedDateEl.textContent = formatDateTime(contract.signedAt);
+                signatureImg.src = contract.clientSignature;
+            } else {
+                signatureSection.style.display = "none";
+            }
+        }
+
+        async function loadContract(showSpinner = true) {
+            if (!contractId) {
+                loadingState.style.display = "none";
+                errorState.style.display = "block";
+                errorMessage.textContent = "No contract ID provided.";
+                return;
+            }
+
+            if (showSpinner) {
+                refreshIcon.classList.add("refresh-spin");
+            }
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "getContract", contractId })
                 });
+                const data = await res.json();
 
-                if (sortedHistory.length === 0) {
-                    container.innerHTML = '<div class="timeline-item"><div class="timeline-note">No activity yet</div></div>';
+                if (!data.success || !data.result?.contract) {
+                    loadingState.style.display = "none";
+                    errorState.style.display = "block";
+                    errorMessage.textContent = data.message || "Contract not found.";
                     return;
                 }
 
-                container.innerHTML = sortedHistory.map(item => {
-                    if (!item) return '';
-                    
-                    const time = item.timestamp || item.at;
-                    const status = (item.status || item.type || 'event').toString();
-                    const note = (item.note || '').toString();
-                    
-                    return `
-                        <div class="timeline-item">
-                            ${time ? `<div class="timeline-time">${formatTime(time)}</div>` : ''}
-                            <div class="timeline-status">${status.split('-').map(word => 
-                                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-                            ).join(' ')}</div>
-                            ${note ? `<div class="timeline-note">${note}</div>` : ''}
-                        </div>
-                    `;
-                }).join('');
+                loadingState.style.display = "none";
+                mainContent.style.display = "block";
+                renderContract(data.result.contract);
 
-            } catch (error) {
-                console.error("Error rendering timeline:", error);
-                container.innerHTML = `
-                    <div class="timeline-item">
-                        <div class="timeline-status">Error</div>
-                        <div class="timeline-note">Could not load timeline. ${error.message}</div>
-                    </div>
-                `;
-            }
-        }
-        
-        async function handleEdit() {
-            if (!contractData) return;
-            window.location.href = `theCultureGourmetContract.html?edit=${contractData.id}`;
-        }
-        
-        async function handleResend() {
-            if (!contractData) return;
-            try {
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        action: "updateContractStatus",
-                        contractId: contractData.id,
-                        status: "send",
-                        note: "Contract resent to client"
-                    })
-                });
-                
-                if (res.ok) {
-                    showToast('Contract resent successfully', 'success');
-                    await loadContract();
-                } else {
-                    throw new Error('Failed to resend contract');
-                }
-            } catch (error) {
-                console.error('Error resending contract:', error);
-                showToast('Failed to resend contract', 'error');
-            }
-        }
-        
-        async function handleDelete() {
-            if (!contractData || !confirm('Are you sure you want to delete this contract? This action cannot be undone.')) {
-                return;
-            }
-            
-            try {
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        action: "deleteContract",
-                        contractId: contractData.id
-                    })
-                });
-                
-                if (res.ok) {
-                    showToast('Contract deleted successfully', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'theCultureGourmetContract.html';
-                    }, 1500);
-                } else {
-                    throw new Error('Failed to delete contract');
-                }
-            } catch (error) {
-                console.error('Error deleting contract:', error);
-                showToast('Failed to delete contract', 'error');
-            }
-        }
-        
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('show');
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    setTimeout(() => {
-                        document.body.removeChild(toast);
-                    }, 300);
-                }, 3000);
-            }, 100);
-        }
-        
-        async function loadContract() {
-            const loadingEl = document.getElementById('loading');
-            const contentEl = document.getElementById('content');
-            
-            if (!contractId) {
-                loadingEl.textContent = "Error: No contract ID provided.";
-                return;
-            }
-
-            try {
-                console.log("Loading contract with ID:", contractId);
-                loadingEl.textContent = "Loading contract data...";
-                
-                // Show loading state
-                contentEl.style.display = "none";
-                loadingEl.style.display = "block";
-
-                // Make sure we're not loading from cache
-                const response = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { 
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "Cache-Control": "no-cache",
-                        "Pragma": "no-cache"
-                    },
-                    body: JSON.stringify({ 
-                        action: "listContracts",
-                        timestamp: Date.now() // Add timestamp to prevent caching
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                console.log("API Response:", result);
-
-                // Find the specific contract
-                let contract;
-                if (result.contracts && Array.isArray(result.contracts)) {
-                    contract = result.contracts.find(c => c.id === contractId);
-                } else if (result.result && result.result.contracts && Array.isArray(result.result.contracts)) {
-                    contract = result.result.contracts.find(c => c.id === contractId);
-                }
-
-                if (!contract) {
-                    // If contract not found, show available contracts for debugging
-                    const allContracts = result.contracts || result.result?.contracts || [];
-                    console.error("Available contracts:", allContracts);
-                    throw new Error(`Contract with ID '${contractId}' not found. Available IDs: ${allContracts.map(c => c.id).join(', ')}`);
-                }
-
-                console.log("Found contract:", contract);
-
-                // Update UI with contract data
-                document.getElementById('contract-text').textContent = 
-                    contract.contractText || contract.text || "No contract text available.";
-
-                // Update status badge
-                updateStatusBadge(contract.status || 'draft');
-
-                // Update timeline
-                const timeline = contract.timeline || contract.history || [];
-                console.log("Timeline data:", timeline);
-                renderTimeline(timeline);
-
-                // Show content
-                loadingEl.style.display = "none";
-                contentEl.style.display = "grid";
-
-            } catch (error) {
-                console.error("Error loading contract:", error);
-                loadingEl.innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: #b91c1c;">
-                        <p>Error loading contract: ${error.message || 'Unknown error'}</p>
-                        <p>Contract ID: ${contractId}</p>
-                        <p>API URL: ${API_URL}</p>
-                        <button onclick="window.location.reload()" 
-                                style="margin-top: 10px; padding: 8px 16px; 
-                                       background: #e5e7eb; border: none; 
-                                       border-radius: 6px; cursor: pointer;">
-                            Try Again
-                        </button>
-                        <button onclick="window.location.href='theCultureGourmetContract.html'" 
-                                style="margin-top: 10px; margin-left: 10px; padding: 8px 16px; 
-                                       background: #dbeafe; border: none; 
-                                       border-radius: 6px; cursor: pointer;">
-                            Back to Contracts
-                        </button>
-                    </div>
-                `;
-                loadingEl.style.display = "block";
-                contentEl.style.display = "none";
+            } catch (err) {
+                console.error("Error loading contract:", err);
+                loadingState.style.display = "none";
+                errorState.style.display = "block";
+                errorMessage.textContent = "Error loading contract. Please try again.";
+            } finally {
+                refreshIcon.classList.remove("refresh-spin");
             }
         }
 
-        function formatTime(isoString) {
-            if (!isoString) return '';
-            const date = new Date(isoString);
-            return date.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+        // Manual refresh
+        refreshBtn.addEventListener("click", () => loadContract(true));
+
+        // Auto-refresh every 5 seconds for live updates
+        function startAutoRefresh() {
+            refreshInterval = setInterval(() => {
+                loadContract(false);
+            }, 5000);
         }
 
-        function capitalize(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        // Ensure the page loads properly
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("Page loaded, contractId:", contractId);
-            if (contractId) {
-                loadContract();
+        // Stop auto-refresh when page is hidden
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                if (refreshInterval) clearInterval(refreshInterval);
+            } else {
+                loadContract(false);
+                startAutoRefresh();
             }
         });
 
-        // Also call loadContract immediately in case DOMContentLoaded already fired
-        if (document.readyState === 'loading') {
-            // Still loading, wait for DOMContentLoaded
-        } else {
-            // Already loaded, call immediately
-            console.log("Document already loaded, contractId:", contractId);
-            if (contractId) {
-                loadContract();
-            }
-        }
+        // Initial load
+        loadContract(true);
+        startAutoRefresh();
     </script>
 </body>
-
 </html>
