@@ -5,15 +5,21 @@
     "email": "adeelkhipk@gmail.com",
     "phone": "03453116588",
     "contactsRaw": "asdasda",
-    "contactsCount": 1,
+    "contactsCount": 2,
     "createdAt": "2025-11-29T23:58:04.139Z",
-    "updatedAt": "2025-11-30T02:11:01.224Z",
+    "updatedAt": "2025-11-30T05:48:48.460Z",
     "contacts": [
       {
         "person": "Adeel Jabbar",
         "email": "adeelkhipk@gmail.com",
         "phone": "03453116588",
         "address": "A2-38 Sheraton Square, University Road, Mosmiyat, Karachi"
+      },
+      {
+        "person": "Aiza Adeel",
+        "email": "aiza@gmail.com",
+        "phone": "2312312312",
+        "address": "A2-14 Sheraton Square University road"
       }
     ]
   },
