@@ -301,6 +301,8 @@ async function sendContract(payload) {
 
             const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
 
+            console.log('[CG] Contract Link being sent:', fullLink);
+
             const fromAddress = settings.smtpFrom
                 ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
                 : settings.smtpUser;
