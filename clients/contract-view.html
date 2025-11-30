@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Culture Gourmet – Sign Contract</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 2rem 1rem;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #111827;
+        }
+
+        .sub-header {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .contract-body {
+            white-space: pre-wrap;
+            font-family: "Georgia", serif;
+            line-height: 1.6;
+            font-size: 1rem;
+            color: #374151;
+            background: #fafafa;
+            padding: 2rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .signature-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .signature-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: #111827;
+        }
+
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.35rem;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        .canvas-wrapper {
+            border: 1px dashed #9ca3af;
+            background: #ffffff;
+            border-radius: 0.375rem;
+            cursor: crosshair;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 200px;
+        }
+
+        .clear-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #047857;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-msg {
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            color: #059669;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        .signed-badge {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+
+            .signature-section,
+            .actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div id="loading" style="text-align:center;padding:2rem;">Loading contract...</div>
+
+        <div id="content" style="display:none;">
+            <h1>Catering Agreement</h1>
+            <div class="sub-header">Culture Gourmet</div>
+
+            <div id="signed-status" style="text-align:center;display:none;">
+                <div class="signed-badge">✓ Signed on <span id="signed-date"></span></div>
+            </div>
+
+            <div class="contract-body" id="contract-text"></div>
+
+            <div id="sign-form" class="signature-section">
+                <div class="signature-title">Sign Contract</div>
+                <p style="font-size:0.9rem;color:#6b7280;margin-bottom:1rem;">
+                    Please review the agreement above. By signing below, you agree to all terms and conditions.
+                </p>
+
+                <div class="field">
+                    <label>Full Name</label>
+                    <input type="text" id="signer-name" placeholder="e.g. Adeel Jabbar" />
+                </div>
+
+                <div class="field">
+                    <label>Signature</label>
+                    <div class="canvas-wrapper">
+                        <canvas id="sig-canvas"></canvas>
+                        <button type="button" class="clear-btn" id="clear-sig">Clear</button>
+                    </div>
+                    <div style="font-size:0.75rem;color:#9ca3af;margin-top:4px;">Draw your signature above</div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn" id="btn-submit">Sign & Accept</button>
+                </div>
+                <div id="msg" class="status-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const contractId = params.get("contractId");
+        const API_URL = "/webhook/theCultureGourmetContract";
+
+        const loadingEl = document.getElementById("loading");
+        const contentEl = document.getElementById("content");
+        const contractTextEl = document.getElementById("contract-text");
+        const signForm = document.getElementById("sign-form");
+        const signedStatus = document.getElementById("signed-status");
+        const signedDateEl = document.getElementById("signed-date");
+        const signerNameInput = document.getElementById("signer-name");
+        const msgEl = document.getElementById("msg");
+        const btnSubmit = document.getElementById("btn-submit");
+
+        // Canvas setup
+        const canvas = document.getElementById("sig-canvas");
+        const ctx = canvas.getContext("2d");
+        let isDrawing = false;
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = 200;
+            ctx.lineWidth = 2;
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#000";
+        }
+        window.addEventListener("resize", resizeCanvas);
+        // initial resize called after show
+
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDraw(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+        }
+
+        canvas.addEventListener("mousedown", startDraw);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", stopDraw);
+        canvas.addEventListener("mouseout", stopDraw);
+
+        canvas.addEventListener("touchstart", startDraw);
+        canvas.addEventListener("touchmove", draw);
+        canvas.addEventListener("touchend", stopDraw);
+
+        document.getElementById("clear-sig").addEventListener("click", () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        async function loadContract() {
+            if (!contractId) {
+                loadingEl.textContent = "Error: No contract ID provided.";
+                return;
+            }
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "getContract", contractId })
+                });
+                const data = await res.json();
+
+                if (!data.success || !data.result || !data.result.contract) {
+                    loadingEl.textContent = "Contract not found.";
+                    return;
+                }
+
+                const c = data.result.contract;
+                loadingEl.style.display = "none";
+                contentEl.style.display = "block";
+                resizeCanvas();
+
+                contractTextEl.textContent = c.contractText;
+                signerNameInput.value = c.clientName || "";
+
+                if (c.status === "Signed") {
+                    signForm.style.display = "none";
+                    signedStatus.style.display = "block";
+                    signedDateEl.textContent = new Date(c.signedAt || c.updatedAt).toLocaleDateString();
+                    // append signature if available (simple text or image)
+                    if (c.clientSignature && c.clientSignature.startsWith("data:image")) {
+                        const img = document.createElement("img");
+                        img.src = c.clientSignature;
+                        img.style.maxWidth = "200px";
+                        img.style.display = "block";
+                        img.style.marginTop = "1rem";
+                        contractTextEl.appendChild(document.createElement("br"));
+                        contractTextEl.appendChild(document.createElement("br"));
+                        const sigLabel = document.createElement("div");
+                        sigLabel.textContent = "Signed:";
+                        contractTextEl.appendChild(sigLabel);
+                        contractTextEl.appendChild(img);
+                    }
+                }
+
+            } catch (e) {
+                console.error(e);
+                loadingEl.textContent = "Error loading contract.";
+            }
+        }
+
+        btnSubmit.addEventListener("click", async () => {
+            const name = signerNameInput.value.trim();
+            if (!name) {
+                msgEl.textContent = "Please enter your full name.";
+                msgEl.className = "status-msg error";
+                return;
+            }
+
+            // check if canvas is empty (simple check)
+            const blank = document.createElement("canvas");
+            blank.width = canvas.width;
+            blank.height = canvas.height;
+            if (canvas.toDataURL() === blank.toDataURL()) {
+                if (!confirm("No signature drawn. Sign with just your name?")) return;
+            }
+
+            btnSubmit.disabled = true;
+            msgEl.textContent = "Signing...";
+            msgEl.className = "status-msg";
+
+            const signatureData = canvas.toDataURL(); // base64 png
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "signContract",
+                        contractId,
+                        clientName: name,
+                        clientSignature: signatureData
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    msgEl.textContent = "Successfully signed!";
+                    msgEl.className = "status-msg success";
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    msgEl.textContent = "Error signing contract.";
+                    msgEl.className = "status-msg error";
+                    btnSubmit.disabled = false;
+                }
+            } catch (e) {
+                console.error(e);
+                msgEl.textContent = "Network error.";
+                msgEl.className = "status-msg error";
+                btnSubmit.disabled = false;
+            }
+        });
+
+        loadContract();
+    </script>
+</body>
+
+</html>

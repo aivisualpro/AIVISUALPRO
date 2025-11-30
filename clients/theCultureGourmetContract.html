@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Culture Gourmet Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .center-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 30px 26px 26px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .heading-xl {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+            color: #0f172a;
+        }
+
+        .text-muted {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 18px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #111827;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            padding: 9px 11px;
+            font-size: 14px;
+            outline: none;
+            background: #f9fafb;
+            transition: border-color .15s, box-shadow .15s, background .15s;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.25);
+            background: #ffffff;
+        }
+
+        .btn-primary {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            background: #16a34a;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 0;
+            margin-top: 4px;
+            box-shadow: 0 16px 40px rgba(22, 163, 74, 0.4);
+            transition: transform .08s, box-shadow .08s, background .12s;
+        }
+
+        .btn-primary:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 20px 48px rgba(21, 128, 61, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 12px 32px rgba(21, 128, 61, 0.4);
+        }
+
+        .error-text {
+            font-size: 13px;
+            color: #b91c1c;
+            margin-top: 8px;
+            min-height: 18px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* APP LAYOUT */
+        .app-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 22px;
+            background: #020617;
+            color: #e5e7eb;
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+        }
+
+        .app-header-title {
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            font-size: 18px;
+        }
+
+        .pill {
+            background: rgba(148, 163, 184, 0.25);
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .btn-ghost {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: transparent;
+            color: #e5e7eb;
+            font-size: 12px;
+            padding: 4px 10px;
+        }
+
+        .app-main {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sidebar {
+            width: 210px;
+            background: #020617;
+            padding: 16px 12px;
+            color: #cbd5f5;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .nav-item {
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span.label {
+            display: inline-block;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #ffffff;
+            box-shadow: 0 10px 30px rgba(22, 163, 74, 0.7);
+        }
+
+        .nav-badge {
+            font-size: 11px;
+            background: rgba(15, 23, 42, 0.35);
+            border-radius: 999px;
+            padding: 2px 6px;
+        }
+
+        .content {
+            flex: 1;
+            padding: 22px;
+            overflow-y: auto;
+        }
+
+        .content h2 {
+            margin: 0 0 4px;
+            font-size: 22px;
+        }
+
+        .content .sub {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 18px;
+        }
+
+        .grid-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .metric-card {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 12px 14px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 2px;
+        }
+
+        .metric-value {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .metric-tag {
+            font-size: 11px;
+            margin-top: 4px;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #ecfdf3;
+            color: #166534;
+        }
+
+        .panel {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 14px 16px 16px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 18px;
+        }
+
+        .panel-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .panel-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .panel-sub {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th,
+        td {
+            padding: 8px 9px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        thead {
+            background: #f3f4f6;
+        }
+
+        th {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-soft {
+            display: inline-block;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .btn-sm {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+        }
+
+        .btn-sm.danger {
+            border-color: #fecaca;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1.2fr 1.7fr;
+            gap: 16px;
+        }
+
+        @media (max-width:900px) {
+            .app-main {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: flex;
+                overflow-x: auto;
+            }
+
+            .content {
+                padding: 16px;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .contract-preview {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.55;
+        }
+
+        /* TOASTS */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #fff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            min-width: 300px;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            pointer-events: auto;
+        }
+
+        .toast.success {
+            border-left-color: #22c55e;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.open .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+
+        .modal-text {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- LOGIN -->
+    <div id="login-section" class="center-wrapper">
+        <div class="card">
+            <div class="heading-xl">Culture Gourmet Portal</div>
+            <div class="text-muted">
+                Login to manage clients and catering contracts.
+            </div>
+            <div class="field">
+                <label for="cg-user-id">User ID</label>
+                <input id="cg-user-id" type="text" placeholder="****" />
+            </div>
+            <div class="field">
+                <label for="cg-user-pass">Password</label>
+                <input id="cg-user-pass" type="password" placeholder="****" />
+            </div>
+            <button id="cg-login-btn" class="btn-primary" type="button">Login</button>
+            <div id="cg-login-error" class="error-text"></div>
+
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-section" class="app-shell hidden">
+        <header class="app-header">
+            <div class="app-header-title">Culture Gourmet Contracts</div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="pill">admin</div>
+                <button id="btn-logout" class="btn-ghost" type="button">Log out</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+            <aside class="sidebar">
+                <div style="width:100%;">
+                    <div class="sidebar-title">Portal</div>
+                    <div class="nav-item active" data-section="home-section" id="nav-home">
+                        <span class="label">Home</span>
+                    </div>
+                    <div class="nav-item" data-section="clients-section" id="nav-clients">
+                        <span class="label">Clients</span>
+                        <span class="nav-badge" id="clients-count-badge">0</span>
+                    </div>
+                    <div class="nav-item" data-section="contracts-section" id="nav-contracts">
+                        <span class="label">Contracts</span>
+                        <span class="nav-badge" id="contracts-count-badge">0</span>
+                    </div>
+                    <div class="nav-item" data-section="admin-section" id="nav-admin">
+                        <span class="label">Admin</span>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="content">
+                <!-- HOME -->
+                <section id="home-section">
+                    <h2>Dashboard</h2>
+                    <div class="sub">Overview of your Culture Gourmet contracts.</div>
+
+                    <div class="grid-metrics">
+                        <div class="metric-card">
+                            <div class="metric-label">Total Contracts</div>
+                            <div class="metric-value" id="metric-total">0</div>
+                            <div class="metric-tag">All statuses</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Sent</div>
+                            <div class="metric-value" id="metric-sent">0</div>
+                            <div class="metric-tag">Awaiting open</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Under Review</div>
+                            <div class="metric-value" id="metric-under-review">0</div>
+                            <div class="metric-tag">Opened, not signed</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Signed</div>
+                            <div class="metric-value" id="metric-signed">0</div>
+                            <div class="metric-tag">Fully executed</div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-title-row">
+                            <div>
+                                <div class="panel-title">Recent activity</div>
+                                <div class="panel-sub">Last few contract events.</div>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Event</th>
+                                    <th>When</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-activity-body">
+                                <tr>
+                                    <td colspan="4" style="text-align:center;color:#9ca3af;">
+                                        Activity will appear once you create contracts.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- CLIENTS -->
+                <section id="clients-section" class="hidden">
+                    <h2>Clients</h2>
+                    <div class="sub">Manage client records (file-based storage).</div>
+
+                    <div class="panel">
+                        <div class="panel-title-row">
+                            <div>
+                                <div class="panel-title">Client List</div>
+                                <div class="panel-sub">Stored in Database/CultureGourmet/clients.txt</div>
+                            </div>
+                            <button id="btn-add-client" class="btn-sm" type="button">+ Add Client</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Contacts</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-table-body">
+                                <tr>
+                                    <td colspan="5" style="text-align:center;color:#9ca3af;">
+                                        No clients yet. Click “Add Client” to create one.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="client-form-panel" class="panel hidden">
+                        <div class="panel-title-row">
+                            <div class="panel-title">New Client</div>
+                        </div>
+                        <div class="field">
+                            <label for="client-name-input">Client Name</label>
+                            <input id="client-name-input" type="text" />
+                        </div>
+                        <div class="field">
+                            <label for="client-email-input">Primary Email</label>
+                            <input id="client-email-input" type="email" />
+                        </div>
+                        <div class="field">
+                            <label for="client-phone-input">Primary Phone</label>
+                            <input id="client-phone-input" type="text" />
+                        </div>
+                        <div class="field">
+                            <label for="client-contacts-input">Additional Contacts (one per line)</label>
+                            <textarea id="client-contacts-input" rows="4"></textarea>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="client-save-btn" class="btn-sm" type="button">Save Client</button>
+                            <button id="client-cancel-btn" class="btn-sm danger" type="button">Cancel</button>
+                        </div>
+                        <div id="client-form-msg" class="success-text" style="margin-top:6px;"></div>
+                    </div>
+                </section>
+
+                <!-- CONTRACTS -->
+                <section id="contracts-section" class="hidden">
+                    <h2>Contracts</h2>
+                    <div class="sub">Create and store Culture Gourmet catering agreements.</div>
+
+                    <div class="two-column">
+                        <div class="panel">
+                            <div class="panel-title-row">
+                                <div class="panel-title">Create Contract</div>
+                            </div>
+
+                            <div class="field">
+                                <label for="contract-client-name">Client Name</label>
+                                <input id="contract-client-name" type="text" placeholder="Adeel Jabbar" />
+                            </div>
+                            <div class="field">
+                                <label for="contract-client-email">Client Email</label>
+                                <input id="contract-client-email" type="email" placeholder="client@example.com" />
+                            </div>
+                            <div class="field">
+                                <label for="contract-event-date">Event Date</label>
+                                <input id="contract-event-date" type="date" />
+                            </div>
+                            <div class="field">
+                                <label for="contract-event-location">Event Location</label>
+                                <input id="contract-event-location" type="text" placeholder="Venue / Address" />
+                            </div>
+                            <div class="field">
+                                <label for="contract-guest-count">Guest Count</label>
+                                <input id="contract-guest-count" type="number" min="1" placeholder="e.g. 80" />
+                            </div>
+                            <div class="field">
+                                <label>Event Start / End Time</label>
+                                <div style="display:flex;gap:6px;">
+                                    <input id="contract-start-time" type="time" />
+                                    <input id="contract-end-time" type="time" />
+                                </div>
+                            </div>
+
+                            <button id="contract-send-btn" class="btn-primary" type="button">Create Contract</button>
+                            <div id="contract-send-message" class="success-text"></div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-title-row">
+                                <div>
+                                    <div class="panel-title">Live Contract Preview</div>
+                                    <div class="panel-sub">Updates as you type client details.</div>
+                                </div>
+                            </div>
+                            <div id="contract-preview" class="contract-preview"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-top:18px;">
+                        <div class="panel-title-row">
+                            <div class="panel-title">Contracts (from contracts.txt)</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Event Date</th>
+                                    <th>Status</th>
+                                    <th>Doc</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contracts-table-body">
+                                <tr>
+                                    <td colspan="5" style="text-align:center;color:#9ca3af;">
+                                        Contracts will appear here after you create them.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ADMIN (local-only) -->
+                <section id="admin-section" class="hidden">
+                    <h2>Admin Settings</h2>
+                    <div class="sub">Local settings (not stored server-side for now).</div>
+
+                    <div class="panel">
+                        <div class="panel-title-row">
+                            <div class="panel-title">Company Profile</div>
+                        </div>
+                        <div class="field">
+                            <label for="admin-company-name">Company Name</label>
+                            <input id="admin-company-name" type="text" value="Culture Gourmet" />
+                        </div>
+                        <div class="field">
+                            <label for="admin-company-address">Address</label>
+                            <textarea id="admin-company-address" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-title-row">
+                            <div class="panel-title">SMTP Email Settings</div>
+                        </div>
+                        <div class="field">
+                            <label for="smtp-host">SMTP Host</label>
+                            <input id="smtp-host" type="text" placeholder="smtp.gmail.com" />
+                        </div>
+                        <div class="field">
+                            <label for="smtp-port">SMTP Port</label>
+                            <input id="smtp-port" type="number" placeholder="587" />
+                        </div>
+                        <div class="field">
+                            <label for="smtp-user">SMTP User (Email)</label>
+                            <input id="smtp-user" type="text" placeholder="you@gmail.com" />
+                        </div>
+                        <div class="field">
+                            <label for="smtp-pass">SMTP Password (App Password)</label>
+                            <input id="smtp-pass" type="password" placeholder="****" />
+                        </div>
+                        <div class="field">
+                            <label for="smtp-from">From Email (Optional)</label>
+                            <input id="smtp-from" type="text" placeholder="Culture Gourmet <you@gmail.com>" />
+                        </div>
+                        <button id="btn-save-smtp" class="btn-primary" type="button">Save SMTP Settings</button>
+                        <div id="smtp-msg" class="success-text" style="margin-top:8px;"></div>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <!-- UI COMPONENTS -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div id="confirm-title" class="modal-title">Confirm Action</div>
+            <div id="confirm-text" class="modal-text">Are you sure you want to proceed?</div>
+            <div class="modal-actions">
+                <button id="confirm-no" class="btn-sm" style="padding: 8px 16px; font-size:13px;">Cancel</button>
+                <button id="confirm-yes" class="btn-primary"
+                    style="width:auto; margin:0; padding: 8px 20px; font-size:13px;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- UI Helpers ----------
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+
+            container.appendChild(toast);
+
+            // Auto remove
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease-in forwards';
+                toast.addEventListener('animationend', () => toast.remove());
+            }, 4000);
+        }
+
+        function showConfirm(message, title = "Confirm Action") {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('confirm-modal');
+                const titleEl = document.getElementById('confirm-title');
+                const textEl = document.getElementById('confirm-text');
+                const btnYes = document.getElementById('confirm-yes');
+                const btnNo = document.getElementById('confirm-no');
+
+                titleEl.textContent = title;
+                textEl.textContent = message;
+                overlay.classList.add('open');
+
+                // Remove previous listeners to avoid stacking
+                const newBtnYes = btnYes.cloneNode(true);
+                const newBtnNo = btnNo.cloneNode(true);
+                btnYes.parentNode.replaceChild(newBtnYes, btnYes);
+                btnNo.parentNode.replaceChild(newBtnNo, btnNo);
+
+                const close = (val) => {
+                    overlay.classList.remove('open');
+                    resolve(val);
+                };
+
+                newBtnYes.addEventListener('click', () => close(true));
+                newBtnNo.addEventListener('click', () => close(false));
+            });
+        }
+
+        // ---------- simple login ----------
+        const LOGIN_USER = "admin";
+        const LOGIN_PASS = "Abc123***";
+
+        const loginSection = document.getElementById("login-section");
+        const appSection = document.getElementById("app-section");
+        const loginBtn = document.getElementById("cg-login-btn");
+        const loginErr = document.getElementById("cg-login-error");
+        const userIdInput = document.getElementById("cg-user-id");
+        const userPassInput = document.getElementById("cg-user-pass");
+        const btnLogout = document.getElementById("btn-logout");
+
+        function showApp() {
+            loginSection.classList.add("hidden");
+            appSection.classList.remove("hidden");
+            loadInitialData();
+        }
+        function showLogin() {
+            appSection.classList.add("hidden");
+            loginSection.classList.remove("hidden");
+        }
+
+
+
+        loginBtn.addEventListener("click", () => {
+            const u = userIdInput.value.trim();
+            const p = userPassInput.value.trim();
+            if (u === LOGIN_USER && p === LOGIN_PASS) {
+                loginErr.textContent = "";
+                localStorage.setItem("cg_auth", "true");
+                showApp();
+            } else {
+                loginErr.textContent = "Invalid credentials.";
+            }
+        });
+
+        btnLogout.addEventListener("click", () => {
+            localStorage.removeItem("cg_auth");
+            showLogin();
+        });
+
+        // ---------- navigation ----------
+        const sections = {
+            "home-section": document.getElementById("home-section"),
+            "clients-section": document.getElementById("clients-section"),
+            "contracts-section": document.getElementById("contracts-section"),
+            "admin-section": document.getElementById("admin-section"),
+        };
+        const navItems = document.querySelectorAll(".nav-item");
+
+        function activateSection(id) {
+            Object.keys(sections).forEach((key) => {
+                sections[key].classList.toggle("hidden", key !== id);
+            });
+            navItems.forEach((item) => {
+                item.classList.toggle(
+                    "active",
+                    item.getAttribute("data-section") === id
+                );
+            });
+        }
+
+        navItems.forEach((item) => {
+            item.addEventListener("click", () => {
+                const id = item.getAttribute("data-section");
+                if (id) activateSection(id);
+            });
+        });
+
+        // ---------- API helper ----------
+        const API_URL = "/webhook/theCultureGourmetContract";
+
+        async function callCG(payload) {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            const raw = await res.json();
+            return raw.result || raw;
+        }
+
+        // ---------- Clients ----------
+        let clients = [];
+        const clientsTableBody = document.getElementById("clients-table-body");
+        const clientsCountBadge = document.getElementById("clients-count-badge");
+        const btnAddClient = document.getElementById("btn-add-client");
+        const clientFormPanel = document.getElementById("client-form-panel");
+        const clientNameInput = document.getElementById("client-name-input");
+        const clientEmailInput = document.getElementById("client-email-input");
+        const clientPhoneInput = document.getElementById("client-phone-input");
+        const clientContactsInput = document.getElementById("client-contacts-input");
+        const clientSaveBtn = document.getElementById("client-save-btn");
+        const clientCancelBtn = document.getElementById("client-cancel-btn");
+        const clientFormMsg = document.getElementById("client-form-msg");
+
+        function renderClients() {
+            clientsTableBody.innerHTML = "";
+            if (!clients.length) {
+                clientsTableBody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;color:#9ca3af;">No clients yet. Click "Add Client" to create one.</td></tr>';
+            } else {
+                clients.forEach((c) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+            <td>${c.name}</td>
+            <td>${c.email}</td>
+            <td>${c.phone || ""}</td>
+            <td>${c.contactsCount || 0}</td>
+            <td>
+                <button class="btn-sm" data-edit-client-id="${c.id}">Edit</button>
+                <button class="btn-sm" style="margin-left:4px; border-color: #fecaca; background: #fef2f2; color: #b91c1c;" data-delete-client-id="${c.id}">Delete</button>
+            </td>
+          `;
+                    clientsTableBody.appendChild(tr);
+                });
+
+                // Attach event listeners
+                document.querySelectorAll("[data-edit-client-id]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const id = btn.getAttribute("data-edit-client-id");
+                        handleEditClient(id);
+                    });
+                });
+
+                document.querySelectorAll("[data-delete-client-id]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const id = btn.getAttribute("data-delete-client-id");
+                        handleDeleteClient(id);
+                    });
+                });
+            }
+            clientsCountBadge.textContent = String(clients.length);
+        }
+
+        btnAddClient.addEventListener("click", () => {
+            clientNameInput.value = "";
+            clientEmailInput.value = "";
+            clientPhoneInput.value = "";
+            clientContactsInput.value = "";
+            clientFormMsg.textContent = "";
+            clientFormPanel.classList.remove("hidden");
+        });
+
+        clientCancelBtn.addEventListener("click", () => {
+            clientFormPanel.classList.add("hidden");
+        });
+
+        clientSaveBtn.addEventListener("click", async () => {
+            const name = clientNameInput.value.trim();
+            const email = clientEmailInput.value.trim();
+            const phone = clientPhoneInput.value.trim();
+            const contactsRaw = clientContactsInput.value.trim();
+            if (!name || !email) {
+                showToast("Client name and email are required.", "error");
+                return;
+            }
+
+            const editingId = clientFormPanel.dataset.editingId;
+
+            try {
+                if (editingId) {
+                    // Update existing client
+                    const resp = await callCG({
+                        action: "updateClient",
+                        clientId: editingId,
+                        name,
+                        email,
+                        phone,
+                        contactsRaw,
+                    });
+                    if (!resp.success) {
+                        showToast(resp.message || "Error updating client.", "error");
+                        return;
+                    }
+                    const idx = clients.findIndex((c) => c.id === editingId);
+                    if (idx !== -1) {
+                        clients[idx] = resp.client;
+                    }
+                    showToast("Client updated successfully.", "success");
+                    delete clientFormPanel.dataset.editingId;
+                    clientSaveBtn.textContent = "Save Client";
+                } else {
+                    // Create new client
+                    const resp = await callCG({
+                        action: "createClient",
+                        name,
+                        email,
+                        phone,
+                        contactsRaw,
+                    });
+                    if (!resp.success) {
+                        showToast(resp.message || "Error saving client.", "error");
+                        return;
+                    }
+                    clientFormMsg.textContent = "Client saved.";
+                    clients.push(resp.client);
+                    showToast("Client created successfully.", "success");
+                }
+                renderClients();
+                setTimeout(() => {
+                    clientFormPanel.classList.add("hidden");
+                }, 700);
+            } catch (err) {
+                console.error(err);
+                showToast("Error contacting server.", "error");
+            }
+        });
+
+        async function handleEditClient(clientId) {
+            const client = clients.find((c) => c.id === clientId);
+            if (!client) return;
+
+            // Populate the form with existing data
+            clientNameInput.value = client.name || "";
+            clientEmailInput.value = client.email || "";
+            clientPhoneInput.value = client.phone || "";
+            clientContactsInput.value = (client.contacts || []).join("\n");
+            clientFormMsg.textContent = "";
+            clientFormPanel.classList.remove("hidden");
+
+            // Store the client ID for update
+            clientFormPanel.dataset.editingId = clientId;
+            clientSaveBtn.textContent = "Update Client";
+        }
+
+        async function handleDeleteClient(clientId) {
+            if (!await showConfirm("Are you sure you want to delete this client?", "Delete Client")) return;
+
+            try {
+                const resp = await callCG({
+                    action: "deleteClient",
+                    clientId,
+                });
+
+                if (!resp.success) {
+                    showToast(resp.message || "Error deleting client.", "error");
+                    return;
+                }
+
+                const idx = clients.findIndex((c) => c.id === clientId);
+                if (idx !== -1) {
+                    clients.splice(idx, 1);
+                }
+
+                renderClients();
+                showToast("Client deleted successfully.", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("Error contacting server.", "error");
+            }
+        }
+
+        // ---------- Contracts ----------
+        let contracts = [];
+        const contractsTableBody = document.getElementById("contracts-table-body");
+        const contractsCountBadge = document.getElementById("contracts-count-badge");
+        const contractClientName = document.getElementById("contract-client-name");
+        const contractClientEmail = document.getElementById("contract-client-email");
+        const contractEventDate = document.getElementById("contract-event-date");
+        const contractEventLocation = document.getElementById("contract-event-location");
+        const contractGuestCount = document.getElementById("contract-guest-count");
+        const contractStartTime = document.getElementById("contract-start-time");
+        const contractEndTime = document.getElementById("contract-end-time");
+        const contractPreview = document.getElementById("contract-preview");
+        const contractSendBtn = document.getElementById("contract-send-btn");
+        const contractSendMessage = document.getElementById("contract-send-message");
+
+        function fmtEventTime() {
+            const s = contractStartTime.value;
+            const e = contractEndTime.value;
+            if (!s && !e) return "____________________________";
+            if (s && e) return `${s} – ${e}`;
+            return s || e;
+        }
+        function fmtEventDate() {
+            return contractEventDate.value || "____________________________";
+        }
+
+        function updateContractPreview() {
+            const clientName = contractClientName.value || "________________________";
+            const eventDate = fmtEventDate();
+            const eventLocation = contractEventLocation.value || "____________________________";
+            const guestCount = contractGuestCount.value || "____________________________";
+            const eventTime = fmtEventTime();
+
+            const txt = `
+CULTURE GOURMET – CATERING AGREEMENT
+(One-Page Contract)
+
+This Catering Agreement (“Agreement”) is entered into between Culture Gourmet (“Caterer”) and the undersigned ${clientName} (“Client”) for catering services on the date listed below.
+
+1. EVENT DETAILS
+Client Name: ${clientName}
+Event Date: ${eventDate}
+Event Location: ${eventLocation}
+Guest Count: ${guestCount}
+Event Start/End Time: ${eventTime}
+
+2. SERVICE AREA
+Culture Gourmet provides catering services locally within the DMV and nationwide, subject to travel fees.
+
+3. DEPOSIT & BOOKING POLICY
+- A 50% deposit is required to secure the event date.
+- The deposit is non-refundable and holds the selected date.
+- In cases of inclement weather, the deposit is fully transferable to a new mutually agreed-upon date.
+
+4. CANCELLATION POLICY
+If the Client cancels for any reason:
+- Payments made are credited in full toward a future event date within 12 months.
+- No cash refunds will be provided.
+
+5. RESCHEDULING POLICY
+- Rescheduling due to weather or unforeseen circumstances is allowed at no additional cost, pending availability.
+- New dates are subject to availability and may incur rate differences on holidays or peak days.
+
+6. PAYMENT TERMS
+- Accepted payment methods: Credit Card or Cash.
+- All events must be paid in full no later than 14 days prior to the event date.
+- If an event is booked within 14 days of the event date, the full invoice amount is due at the time of booking.
+- Final payment is non-refundable but fully creditable toward a future date if the event is canceled.
+
+7. ALCOHOL SERVICE (If Applicable)
+- Alcohol service is provided only to guests 21+.
+- Culture Gourmet is not responsible for guest behavior related to alcohol.
+- Client agrees to maintain compliance with all state and local alcohol laws.
+
+8. LIABILITY & DAMAGES
+Client is responsible for any damages to equipment, rentals, or property caused by guests. Culture Gourmet is not liable for circumstances outside of its control, including venue limitations, acts of nature, or client-provided items.
+
+9. AGREEMENT & SIGNATURES
+By signing below, the Client acknowledges and agrees to all terms outlined.
+
+Client Name: ${clientName}
+Client Signature: ________________________________
+Date: ____________________
+
+Culture Gourmet Representative: ______________________________
+Signature: _____________________________________
+Date: ____________________
+`;
+            contractPreview.textContent = txt.trim();
+        }
+
+        [
+            contractClientName,
+            contractClientEmail,
+            contractEventDate,
+            contractEventLocation,
+            contractGuestCount,
+            contractStartTime,
+            contractEndTime,
+        ].forEach((el) => {
+            el.addEventListener("input", updateContractPreview);
+            el.addEventListener("change", updateContractPreview);
+        });
+
+        function renderContracts() {
+            contractsTableBody.innerHTML = "";
+            if (!contracts.length) {
+                contractsTableBody.innerHTML =
+                    '<tr><td colspan="5" style="text-align:center;color:#9ca3af;">Contracts will appear here after you create them.</td></tr>';
+            } else {
+                contracts.forEach((c) => {
+                    const tr = document.createElement("tr");
+
+                    // treat missing status as Draft
+                    const status = c.status || "Draft";
+
+                    const actions = [];
+
+                    // DRAFT → Send + Edit + Delete
+                    if (status === "Draft") {
+                        actions.push(
+                            `<button class="btn-sm" data-send-id="${c.id}">Send</button>`
+                        );
+                        actions.push(
+                            `<button class="btn-sm" data-edit-id="${c.id}">Edit</button>`
+                        );
+                        actions.push(
+                            `<button class="btn-sm btn-danger" data-delete-id="${c.id}">Delete</button>`
+                        );
+                    } else {
+                        // non-draft → Resend + status change + Delete
+                        actions.push(
+                            `<button class="btn-sm" data-resend-id="${c.id}">Resend</button>`
+                        );
+
+                        if (status === "Sent") {
+                            actions.push(
+                                `<button class="btn-sm" data-status-id="${c.id}" data-status="Under Review">Mark Under Review</button>`
+                            );
+                        }
+                        if (status === "Sent" || status === "Under Review") {
+                            actions.push(
+                                `<button class="btn-sm" data-status-id="${c.id}" data-status="Signed">Mark Signed</button>`
+                            );
+                        }
+
+                        actions.push(
+                            `<button class="btn-sm btn-danger" data-delete-id="${c.id}">Delete</button>`
+                        );
+                    }
+
+                    tr.innerHTML = `
+        <td>${c.clientName || ""}</td>
+        <td>${c.eventDate || ""}</td>
+        <td><span class="badge-soft">${status}</span></td>
+        <td>${c.fileUrl
+                            ? `<a href="${c.fileUrl}" target="_blank">Open</a>`
+                            : "—"
+                        }</td>
+        <td>${actions.join(" ")}</td>
+      `;
+
+                    contractsTableBody.appendChild(tr);
+                });
+            }
+
+            // update dashboard counters as before
+            contractsCountBadge.textContent = String(contracts.length);
+            updateMetrics();
+            renderRecentActivity();
+
+            // wire buttons after DOM is created
+
+            // Send (for Draft)
+            document.querySelectorAll("[data-send-id]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-send-id");
+                    sendContract(id);
+                });
+            });
+
+            // Resend (for non-Draft)
+            document.querySelectorAll("[data-resend-id]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-resend-id");
+                    sendContract(id); // same handler = resend
+                });
+            });
+
+            // Status change (Under Review / Signed)
+            document.querySelectorAll("[data-status-id]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-status-id");
+                    const status = btn.getAttribute("data-status");
+                    updateContractStatus(id, status);
+                });
+            });
+
+            // Edit
+            document.querySelectorAll("[data-edit-id]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-edit-id");
+                    handleEditContract(id);
+                });
+            });
+
+            // Delete
+            document.querySelectorAll("[data-delete-id]").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    const id = btn.getAttribute("data-delete-id");
+                    handleDeleteContract(id);
+                });
+            });
+        }
+
+
+
+        async function sendContract(contractId) {
+            const contract = contracts.find((c) => c.id === contractId);
+            if (!contract) return;
+
+            if (!await showConfirm(`Send contract to ${contract.clientEmail}?`, "Send Contract")) return;
+
+            try {
+                const resp = await callCG({
+                    action: "sendContract",
+                    contractId,
+                });
+                if (!resp.success) {
+                    showToast(resp.message || "Error sending contract.", "error");
+                    return;
+                }
+
+                // update local contracts array
+                const idx = contracts.findIndex((c) => c.id === contractId);
+                if (idx !== -1) {
+                    contracts[idx] = resp.contract;
+                }
+
+                renderContracts();
+
+                if (resp.emailSent) {
+                    showToast("✅ Email sent successfully via SMTP!", "success");
+                } else {
+                    // Fallback to mailto if SMTP failed or not configured
+                    const fullLink = window.location.origin + (resp.contract.fileUrl || "");
+                    const subject = "Culture Gourmet Catering Agreement";
+                    const body =
+                        `Hi ${resp.contract.clientName},\n\n` +
+                        `Here is your catering agreement:\n${fullLink}\n\n` +
+                        `Thank you,\nCulture Gourmet`;
+
+                    if (resp.emailError) {
+                        console.warn("SMTP Error:", resp.emailError);
+                        showToast("⚠️ SMTP failed. Opening default mail client instead.", "warning");
+                    } else {
+                        showToast("ℹ️ SMTP not configured. Opening default mail client.", "info");
+                    }
+
+                    window.open(
+                        `mailto:${encodeURIComponent(
+                            resp.contract.clientEmail
+                        )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+                        "_blank"
+                    );
+                }
+
+            } catch (err) {
+                console.error(err);
+                showToast("Error contacting server.", "error");
+            }
+        }
+
+
+        async function updateContractStatus(contractId, status) {
+            if (!await showConfirm(`Mark this contract as "${status}"?`, "Update Status")) return;
+
+            try {
+                const resp = await callCG({
+                    action: "updateContractStatus",
+                    contractId,
+                    status,
+                });
+
+                if (!resp.success) {
+                    showToast(resp.message || "Error updating status.", "error");
+                    return;
+                }
+
+                const idx = contracts.findIndex((c) => c.id === contractId);
+                if (idx !== -1) {
+                    contracts[idx] = resp.contract;
+                }
+
+                renderContracts();
+                showToast(`Status updated to ${status}`, "success");
+            } catch (err) {
+                console.error(err);
+                showToast("Error contacting server.", "error");
+            }
+        }
+        async function handleEditContract(contractId) {
+            const contract = contracts.find((c) => c.id === contractId);
+            if (!contract) return;
+
+            const clientName = prompt("Client Name", contract.clientName || "");
+            if (clientName === null) return;
+
+            const clientEmail = prompt("Client Email", contract.clientEmail || "");
+            if (clientEmail === null) return;
+
+            const eventDate = prompt("Event Date", contract.eventDate || "");
+            if (eventDate === null) return;
+
+            const eventLocation = prompt("Event Location", contract.eventLocation || "");
+            if (eventLocation === null) return;
+
+            const guestCount = prompt("Guest Count", contract.guestCount || "");
+            if (guestCount === null) return;
+
+            const eventTime = prompt("Event Start/End Time", contract.eventTime || "");
+            if (eventTime === null) return;
+
+            try {
+                const resp = await callCG({
+                    action: "updateContractFields",
+                    contractId,
+                    clientName,
+                    clientEmail,
+                    eventDate,
+                    eventLocation,
+                    guestCount,
+                    eventTime,
+                });
+
+                if (!resp.success) {
+                    alert(resp.message || "Error updating contract.");
+                    return;
+                }
+
+                const idx = contracts.findIndex((c) => c.id === contractId);
+                if (idx !== -1) {
+                    contracts[idx] = resp.contract;
+                }
+
+                renderContracts();
+            } catch (err) {
+                console.error(err);
+                showToast("Error contacting server.", "error");
+            }
+        }
+
+        async function handleDeleteContract(contractId) {
+            if (!await showConfirm("Are you sure you want to delete this contract?", "Delete Contract")) return;
+
+            try {
+                const resp = await callCG({
+                    action: "deleteContract",
+                    contractId,
+                });
+
+                if (!resp.success) {
+                    showToast(resp.message || "Error deleting contract.", "error");
+                    return;
+                }
+
+                // remove from local array
+                const idx = contracts.findIndex((c) => c.id === contractId);
+                if (idx !== -1) {
+                    contracts.splice(idx, 1);
+                }
+
+                renderContracts();
+                showToast("Contract deleted.", "success");
+            } catch (err) {
+                console.error(err);
+                showToast("Error contacting server.", "error");
+            }
+        }
+
+
+        contractSendBtn.addEventListener("click", async () => {
+            const clientName = contractClientName.value.trim();
+            const clientEmail = contractClientEmail.value.trim();
+            if (!clientName || !clientEmail) {
+                contractSendMessage.textContent = "Client name and email are required.";
+                return;
+            }
+            contractSendMessage.textContent = "";
+            try {
+                const resp = await callCG({
+                    action: "createContract",
+                    clientName,
+                    clientEmail,
+                    eventDate: contractEventDate.value,
+                    eventLocation: contractEventLocation.value,
+                    guestCount: contractGuestCount.value,
+                    eventTime: fmtEventTime(),
+                });
+                if (!resp.success) {
+                    contractSendMessage.textContent =
+                        resp.message || "Error creating contract.";
+                    return;
+                }
+                contracts.push(resp.contract);
+                renderContracts();
+                contractSendMessage.textContent =
+                    "Contract created (Draft). Click Send in the table to email it.";
+            } catch (err) {
+                console.error(err);
+                contractSendMessage.textContent = "Error contacting server.";
+            }
+        });
+
+        // ---------- Dashboard metrics & activity ----------
+        const metricTotal = document.getElementById("metric-total");
+        const metricSent = document.getElementById("metric-sent");
+        const metricUnderReview = document.getElementById("metric-under-review");
+        const metricSigned = document.getElementById("metric-signed");
+        const recentActivityBody = document.getElementById("recent-activity-body");
+
+        function updateMetrics() {
+            const total = contracts.length;
+            const sent = contracts.filter((c) => c.status === "Sent").length;
+            const signed = contracts.filter((c) => c.status === "Signed").length;
+            const under = contracts.filter((c) => c.status === "Under Review").length;
+
+            metricTotal.textContent = total;
+            metricSent.textContent = sent;
+            metricSigned.textContent = signed;
+            metricUnderReview.textContent = under;
+        }
+
+        function renderRecentActivity() {
+            recentActivityBody.innerHTML = "";
+            if (!contracts.length) {
+                recentActivityBody.innerHTML =
+                    '<tr><td colspan="4" style="text-align:center;color:#9ca3af;">Activity will appear once you create contracts.</td></tr>';
+                return;
+            }
+            const items = [];
+            contracts.forEach((c) => {
+                (c.timeline || []).forEach((ev) => {
+                    items.push({
+                        clientName: c.clientName,
+                        status: c.status,
+                        label: ev.label || "Event",
+                        at: ev.at || c.createdAt,
+                    });
+                });
+            });
+            items.sort((a, b) => (a.at || "").localeCompare(b.at || ""));
+            const last = items.slice(-5).reverse();
+
+            last.forEach((ev) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+          <td>${ev.clientName}</td>
+          <td>${ev.label}</td>
+          <td>${ev.at || ""}</td>
+          <td><span class="badge-soft">${ev.status || ""}</span></td>
+        `;
+                recentActivityBody.appendChild(tr);
+            });
+        }
+
+        // ---------- initial load after login ----------
+        async function loadInitialData() {
+            try {
+                const [clientsResp, contractsResp] = await Promise.all([
+                    callCG({ action: "listClients" }),
+                    callCG({ action: "listContracts" }),
+                ]);
+                clients = clientsResp.clients || [];
+                contracts = contractsResp.contracts || [];
+                renderClients();
+                renderContracts();
+                updateContractPreview();
+            } catch (err) {
+                console.error("Error loading initial data", err);
+            }
+
+            loadSmtpSettings();
+        }
+
+        // ---------- SMTP Settings ----------
+        const smtpHostInput = document.getElementById("smtp-host");
+        const smtpPortInput = document.getElementById("smtp-port");
+        const smtpUserInput = document.getElementById("smtp-user");
+        const smtpPassInput = document.getElementById("smtp-pass");
+        const smtpFromInput = document.getElementById("smtp-from");
+        const btnSaveSmtp = document.getElementById("btn-save-smtp");
+        const smtpMsg = document.getElementById("smtp-msg");
+
+        async function loadSmtpSettings() {
+            try {
+                const resp = await callCG({ action: "getSettings" });
+                if (resp.success && resp.settings) {
+                    const s = resp.settings;
+                    smtpHostInput.value = s.smtpHost || "";
+                    smtpPortInput.value = s.smtpPort || "";
+                    smtpUserInput.value = s.smtpUser || "";
+                    smtpPassInput.value = s.smtpPass || "";
+                    smtpFromInput.value = s.smtpFrom || "";
+                }
+            } catch (e) {
+                console.error("Error loading settings", e);
+            }
+        }
+
+        btnSaveSmtp.addEventListener("click", async () => {
+            btnSaveSmtp.disabled = true;
+            smtpMsg.textContent = "Saving...";
+            try {
+                const resp = await callCG({
+                    action: "saveSettings",
+                    smtpHost: smtpHostInput.value.trim(),
+                    smtpPort: smtpPortInput.value.trim(),
+                    smtpUser: smtpUserInput.value.trim(),
+                    smtpPass: smtpPassInput.value.trim(),
+                    smtpFrom: smtpFromInput.value.trim(),
+                });
+                if (resp.success) {
+                    smtpMsg.textContent = "✅ Settings saved.";
+                } else {
+                    smtpMsg.textContent = "❌ Error saving settings.";
+                }
+            } catch (e) {
+                console.error(e);
+                smtpMsg.textContent = "❌ Network error.";
+            } finally {
+                btnSaveSmtp.disabled = false;
+            }
+        });
+
+        // initialize preview for first load (before login)
+        updateContractPreview();
+
+        // Check for persisted session (moved to bottom to ensure all consts are init)
+        if (localStorage.getItem("cg_auth") === "true") {
+            showApp();
+        }
+    </script>
+</body>
+
+</html>

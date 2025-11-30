@@ -1,0 +1,383 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Culture Gourmet – Create Contract</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #e5e7eb;
+            margin: 0;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+            padding: 1.5rem 1.75rem 2rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+            color: #020617;
+        }
+
+        p {
+            margin-top: 0;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        form {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5f5;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        input:focus {
+            outline: 2px solid #0f766e;
+            outline-offset: 1px;
+            border-color: #0f766e;
+        }
+
+        .full-row {
+            grid-column: 1 / -1;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 1.1rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .status {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: #0f172a;
+        }
+
+        .link-section {
+            margin-top: 1.25rem;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 0.8rem;
+        }
+
+        .link-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .link-input {
+            flex: 1;
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5f5;
+            font-size: 0.75rem;
+        }
+
+        .btn-copy {
+            background: #0f172a;
+            color: #ffffff;
+        }
+
+        .preview {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .preview-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: #0f172a;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f9fafb;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            border: 1px dashed #d1d5db;
+        }
+
+        @media (max-width: 700px) {
+            form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Culture Gourmet – Create Contract</h1>
+        <p>Fill in the event details. When you create the contract, you will get a unique link to send to the client.
+        </p>
+
+        <form id="createForm">
+            <div class="full-row">
+                <label>Client Name</label>
+                <input id="clientName" placeholder="e.g. Adeel Jabbar" />
+            </div>
+
+            <div class="full-row">
+                <label>Client Email</label>
+                <input id="clientEmail" type="email" placeholder="client@example.com" />
+            </div>
+
+            <div>
+                <label>Event Date</label>
+                <input id="eventDate" placeholder="e.g. Dec 21, 2025" />
+            </div>
+
+            <div>
+                <label>Event Location</label>
+                <input id="eventLocation" placeholder="Venue, City, State" />
+            </div>
+
+            <div>
+                <label>Guest Count</label>
+                <input id="guestCount" placeholder="e.g. 120" />
+            </div>
+
+            <div>
+                <label>Event Start/End Time</label>
+                <input id="eventTime" placeholder="e.g. 6:00 PM – 10:00 PM" />
+            </div>
+
+            <div class="full-row">
+                <button type="submit" class="btn btn-primary" id="createBtn">
+                    Create Contract
+                </button>
+            </div>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <div id="linkSection" class="link-section" style="display:none;">
+            <div><strong>Contract Created</strong></div>
+            <div>ID: <span id="contractIdSpan"></span></div>
+            <div class="link-input-wrapper">
+                <input id="contractLinkInput" class="link-input" readonly />
+                <button type="button" class="btn btn-copy" id="copyLinkBtn">
+                    Copy Link
+                </button>
+            </div>
+            <div style="margin-top:0.25rem;">
+                Share this link with the client. They can review and sign the contract online.
+            </div>
+        </div>
+
+        <div class="preview">
+            <div class="preview-title">Live Contract Preview</div>
+            <pre id="previewText"></pre>
+        </div>
+    </div>
+
+    <script>
+        const clientNameEl = document.getElementById("clientName");
+        const eventDateEl = document.getElementById("eventDate");
+        const eventLocationEl = document.getElementById("eventLocation");
+        const guestCountEl = document.getElementById("guestCount");
+        const eventTimeEl = document.getElementById("eventTime");
+        const previewTextEl = document.getElementById("previewText");
+        const statusEl = document.getElementById("status");
+        const createBtn = document.getElementById("createBtn");
+        const linkSectionEl = document.getElementById("linkSection");
+        const contractIdSpan = document.getElementById("contractIdSpan");
+        const contractLinkInput = document.getElementById("contractLinkInput");
+        const copyLinkBtn = document.getElementById("copyLinkBtn");
+
+        function buildPreview() {
+            const clientName = clientNameEl.value || "Client";
+            const eventDate = eventDateEl.value || "____________________________";
+            const eventLocation = eventLocationEl.value || "____________________________";
+            const guestCount = guestCountEl.value || "____________________________";
+            const eventTime = eventTimeEl.value || "____________________________";
+
+            const text = `
+CULTURE GOURMET – CATERING AGREEMENT
+(One-Page Contract)
+
+This Catering Agreement (“Agreement”) is entered into between Culture Gourmet (“Caterer”) and the undersigned ${clientName} (“Client”) for catering services on the date listed below.
+
+1. EVENT DETAILS
+Client Name: ${clientName}
+Event Date: ${eventDate}
+Event Location: ${eventLocation}
+Guest Count: ${guestCount}
+Event Start/End Time: ${eventTime}
+
+2. SERVICE AREA
+Culture Gourmet provides catering services locally within the DMV and nationwide, subject to travel fees.
+
+3. DEPOSIT & BOOKING POLICY
+- A 50% deposit is required to secure the event date.
+- The deposit is non-refundable and holds the selected date.
+- In cases of inclement weather, the deposit is fully transferable to a new mutually agreed-upon date.
+
+4. CANCELLATION POLICY
+If the Client cancels for any reason:
+- Payments made are credited in full toward a future event date within 12 months.
+- No cash refunds will be provided.
+
+5. RESCHEDULING POLICY
+- Rescheduling due to weather or unforeseen circumstances is allowed at no additional cost, pending availability.
+- New dates are subject to availability and may incur rate differences on holidays or peak days.
+
+6. PAYMENT TERMS
+- Accepted payment methods: Credit Card or Cash.
+- All events must be paid in full no later than 14 days prior to the event date.
+- If an event is booked within 14 days of the event date, the full invoice amount is due at the time of booking.
+- Final payment is non-refundable but fully creditable toward a future date if the event is canceled.
+
+7. ALCOHOL SERVICE (If Applicable)
+- Alcohol service is provided only to guests 21+.
+- Culture Gourmet is not responsible for guest behavior related to alcohol.
+- Client agrees to maintain compliance with all state and local alcohol laws.
+
+8. LIABILITY & DAMAGES
+Client is responsible for any damages to equipment, rentals, or property caused by guests. Culture Gourmet is not liable for circumstances outside of its control, including venue limitations, acts of nature, or client-provided items.
+
+9. AGREEMENT & SIGNATURES
+By signing below, the Client acknowledges and agrees to all terms outlined.
+
+Client Name: ${clientName}
+Client Signature: ________________________________
+Date: ____________________
+
+Culture Gourmet Representative: ______________________________
+Signature: _____________________________________
+Date: ____________________
+`.trim();
+
+            previewTextEl.textContent = text;
+        }
+
+        [clientNameEl, eventDateEl, eventLocationEl, guestCountEl, eventTimeEl].forEach((el) => {
+            el.addEventListener("input", buildPreview);
+        });
+
+        buildPreview(); // initial
+
+        document.getElementById("createForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            statusEl.textContent = "";
+            linkSectionEl.style.display = "none";
+
+            const clientName = clientNameEl.value.trim();
+            const clientEmail = document.getElementById("clientEmail").value.trim();
+            const eventDate = eventDateEl.value.trim();
+            const eventLocation = eventLocationEl.value.trim();
+            const guestCount = guestCountEl.value.trim();
+            const eventTime = eventTimeEl.value.trim();
+
+            if (!clientName || !clientEmail || !eventDate || !eventLocation || !guestCount || !eventTime) {
+                statusEl.textContent = "Please fill all fields before creating the contract.";
+                return;
+            }
+
+            createBtn.disabled = true;
+            statusEl.textContent = "Creating contract...";
+
+            try {
+                const res = await fetch("/webhook/theCultureGourmetContract", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "create",
+                        clientName,
+                        clientEmail,
+                        eventDate,
+                        eventLocation,
+                        guestCount,
+                        eventTime,
+                    }),
+                });
+
+                const data = await res.json();
+                if (!data.success) {
+                    statusEl.textContent = "❌ Failed to create contract.";
+                    createBtn.disabled = false;
+                    return;
+                }
+
+                const id = data.contractId;
+                contractIdSpan.textContent = id;
+
+                const base = window.location.origin;
+                // assume client page at /clients/theCultureGourmetContract.html
+                const link = `${base}/clients/theCultureGourmetContract.html?contractId=${id}`;
+                contractLinkInput.value = link;
+
+                linkSectionEl.style.display = "block";
+                statusEl.textContent = "✅ Contract created successfully.";
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = "❌ Error contacting server.";
+            } finally {
+                createBtn.disabled = false;
+            }
+        });
+
+        copyLinkBtn.addEventListener("click", () => {
+            if (!contractLinkInput.value) return;
+            navigator.clipboard.writeText(contractLinkInput.value).then(
+                () => (statusEl.textContent = "🔗 Link copied to clipboard."),
+                () => (statusEl.textContent = "Could not copy link.")
+            );
+        });
+    </script>
+</body>
+
+</html> -->

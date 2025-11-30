@@ -1,0 +1,28 @@
+[
+  {
+    "id": "mil1dfy0-4jgcalak",
+    "clientName": "Skynet Silicon",
+    "clientEmail": "adeelkhipk@gmail.com",
+    "eventDate": "2025-11-30",
+    "eventLocation": "A2-39",
+    "guestCount": "80",
+    "eventTime": "20:00 – 23:00",
+    "status": "Sent",
+    "fileUrl": "/clients/contract-view.html?contractId=mil1dfy0-4jgcalak",
+    "createdAt": "2025-11-30T01:23:08.664Z",
+    "updatedAt": "2025-11-30T01:23:14.131Z",
+    "timeline": [
+      {
+        "at": "2025-11-30T01:23:08.664Z",
+        "type": "created",
+        "note": "Contract created"
+      },
+      {
+        "at": "2025-11-30T01:23:14.131Z",
+        "type": "sent",
+        "note": "Contract sent via SMTP"
+      }
+    ],
+    "contractText": "CULTURE GOURMET – CATERING AGREEMENT\n(One-Page Contract)\n\nThis Catering Agreement (\"Agreement\") is entered into between Culture Gourmet (\"Caterer\") and the undersigned Skynet Silicon (\"Client\") for catering services on the date listed below.\n\n1. EVENT DETAILS\nClient Name: Skynet Silicon\nEvent Date: 2025-11-30\nEvent Location: A2-39\nGuest Count: 80\nEvent Start/End Time: 20:00 – 23:00\n\n2. SERVICE AREA\nCulture Gourmet provides catering services locally within the DMV and nationwide, subject to travel fees.\n\n3. DEPOSIT & BOOKING POLICY\n- A 50% deposit is required to secure the event date.\n- The deposit is non-refundable and holds the selected date.\n- In cases of inclement weather, the deposit is fully transferable to a new mutually agreed-upon date.\n\n4. CANCELLATION POLICY\nIf the Client cancels for any reason:\n- Payments made are credited in full toward a future event date within 12 months.\n- No cash refunds will be provided.\n\n5. RESCHEDULING POLICY\n- Rescheduling due to weather or unforeseen circumstances is allowed at no additional cost, pending availability.\n- New dates are subject to availability and may incur rate differences on holidays or peak days.\n\n6. PAYMENT TERMS\n- Accepted payment methods: Credit Card or Cash.\n- All events must be paid in full no later than 14 days prior to the event date.\n- If an event is booked within 14 days of the event date, the full invoice amount is due at the time of booking.\n- Final payment is non-refundable but fully creditable toward a future date if the event is canceled.\n\n7. ALCOHOL SERVICE (If Applicable)\n- Alcohol service is provided only to guests 21+.\n- Culture Gourmet is not responsible for guest behavior related to alcohol.\n- Client agrees to maintain compliance with all state and local alcohol laws.\n\n8. LIABILITY & DAMAGES\nClient is responsible for any damages to equipment, rentals, or property caused by guests. Culture Gourmet is not liable for circumstances outside of its control, including venue limitations, acts of nature, or client-provided items.\n\n9. AGREEMENT & SIGNATURES\nBy signing below, the Client acknowledges and agrees to all terms outlined.\n\nClient Name: Skynet Silicon\nClient Signature: ________________________________\nDate: ____________________\n\nCulture Gourmet Representative: ______________________________\nSignature: _____________________________________\nDate: ____________________\n\nStatus: Sent"
+  }
+]

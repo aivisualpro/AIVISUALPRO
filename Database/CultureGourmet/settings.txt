@@ -1,0 +1,7 @@
+{
+  "smtpHost": "smtp.hostinger.com",
+  "smtpPort": "465",
+  "smtpUser": "admin@aivisualpro.com",
+  "smtpPass": "xIzwi4-qappev-tupmis",
+  "smtpFrom": "Adeel Jabbar"
+}
