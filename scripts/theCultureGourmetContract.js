@@ -585,6 +585,258 @@ async function signContract(payload) {
     return { success: true, contract };
 }
 
+async function sendSignedCopy(payload) {
+    try {
+        console.log('[CG] sendSignedCopy called with payload:', JSON.stringify(payload));
+        const { contractId } = payload;
+        const contracts = readJsonSafe(contractsFile);
+        const contract = contracts.find((c) => c.id === contractId);
+
+        if (!contract) {
+            return { success: false, message: "Contract not found" };
+        }
+
+        if (contract.status !== "Signed") {
+            return { success: false, message: "Contract is not signed yet" };
+        }
+
+        // Get email settings
+        const fileSettings = readJsonSafe(settingsFile);
+        const defaults = getDefaultSettings();
+        const settings = {
+            resendApiKey: defaults.resendApiKey || fileSettings.resendApiKey,
+            resendFromEmail: defaults.resendFromEmail || fileSettings.resendFromEmail,
+            smtpHost: defaults.smtpHost || fileSettings.smtpHost,
+            smtpPort: defaults.smtpPort || fileSettings.smtpPort,
+            smtpUser: defaults.smtpUser || fileSettings.smtpUser,
+            smtpPass: defaults.smtpPass || fileSettings.smtpPass,
+            smtpFrom: defaults.smtpFrom || fileSettings.smtpFrom
+        };
+
+        const fromName = settings.smtpFrom || "Culture Gourmet";
+        const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
+        const signedDate = new Date(contract.signedAt || contract.updatedAt);
+        const formattedDate = signedDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        // Beautiful HTML email template for signed contract
+        const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f4; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden;">
+                    <!-- Header with Success -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 40px 30px; text-align: center;">
+                            <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 32px; color: white;">✓</span>
+                            </div>
+                            <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 600;">Contract Signed!</h1>
+                            <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Your signed copy is ready</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h2 style="margin: 0 0 20px; color: #1a1a2e; font-size: 20px; font-weight: 600;">Hello ${contract.clientName}! 🎉</h2>
+                            
+                            <p style="margin: 0 0 24px; color: #4a4a68; font-size: 16px; line-height: 1.6;">
+                                Congratulations! Your catering agreement has been successfully signed. Below is a copy for your records.
+                            </p>
+                            
+                            <!-- Contract Summary Card -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fc; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e5e7eb;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p style="margin: 0 0 12px; color: #10b981; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">✓ Signed Contract Summary</p>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Event Date:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${contract.eventDate || 'To be confirmed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${contract.eventLocation || 'To be confirmed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Guest Count:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${contract.guestCount || 'To be confirmed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Signed On:</td>
+                                                <td style="padding: 8px 0; color: #10b981; font-size: 14px; font-weight: 600; text-align: right;">${formattedDate}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Signature Display -->
+                            ${contract.clientSignature && contract.clientSignature.startsWith('data:image') ? `
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; margin-bottom: 30px; border: 2px solid #86efac;">
+                                <tr>
+                                    <td style="padding: 24px; text-align: center;">
+                                        <p style="margin: 0 0 12px; color: #166534; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Your Signature</p>
+                                        <img src="${contract.clientSignature}" alt="Your Signature" style="max-width: 200px; max-height: 60px; border-bottom: 2px solid #1a1a2e; padding-bottom: 8px;" />
+                                        <p style="margin: 10px 0 0; color: #374151; font-size: 13px;">${contract.clientName}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            ` : ''}
+                            
+                            <!-- CTA Button -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="center" style="padding: 10px 0 30px;">
+                                        <a href="${fullLink}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+                                            📄 View Full Contract
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 0; color: #9ca3af; font-size: 13px; text-align: center; line-height: 1.5;">
+                                You can also download a PDF copy from the contract page.<br>
+                                <a href="${fullLink}" style="color: #667eea; word-break: break-all;">${fullLink}</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fc; padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0 0 8px; color: #1a1a2e; font-size: 14px; font-weight: 600;">🍽️ Culture Gourmet</p>
+                            <p style="margin: 0 0 16px; color: #6b7280; font-size: 13px;">Thank you for trusting us with your event!</p>
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                                © ${new Date().getFullYear()} Culture Gourmet. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+        const emailText = `Hello ${contract.clientName},
+
+Congratulations! Your catering agreement has been successfully signed.
+
+Contract Summary:
+- Event Date: ${contract.eventDate || 'To be confirmed'}
+- Location: ${contract.eventLocation || 'To be confirmed'}
+- Guest Count: ${contract.guestCount || 'To be confirmed'}
+- Signed On: ${formattedDate}
+
+View your signed contract:
+${fullLink}
+
+You can also download a PDF copy from the contract page.
+
+Thank you for trusting us with your event!
+
+Culture Gourmet
+Elevating Your Events with Exceptional Cuisine`;
+
+        let emailSent = false;
+        let emailError = null;
+
+        // Try Resend API first
+        if (settings.resendApiKey) {
+            try {
+                console.log('[CG] Trying Resend API for signed copy...');
+                const resend = new Resend(settings.resendApiKey);
+                
+                const { data, error } = await resend.emails.send({
+                    from: `${fromName} <${settings.resendFromEmail || 'onboarding@resend.dev'}>`,
+                    to: [contract.clientEmail],
+                    subject: "✅ Your Signed Culture Gourmet Contract",
+                    text: emailText,
+                    html: emailHtml,
+                });
+
+                if (error) {
+                    console.error('[CG] Resend API Error:', error);
+                    emailError = error.message || JSON.stringify(error);
+                } else {
+                    emailSent = true;
+                    console.log('[CG] Signed copy sent via Resend! ID:', data?.id);
+                }
+            } catch (err) {
+                console.error('[CG] Resend Error:', err.message);
+                emailError = err.message;
+            }
+        }
+
+        // Fallback to SMTP
+        if (!emailSent && settings.smtpHost && settings.smtpUser && settings.smtpPass) {
+            const portsToTry = [parseInt(settings.smtpPort || "587"), 2525, 587, 465];
+            const uniquePorts = [...new Set(portsToTry)];
+
+            const fromAddress = settings.smtpFrom
+                ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
+                : settings.smtpUser;
+
+            for (const port of uniquePorts) {
+                if (emailSent) break;
+                
+                try {
+                    console.log(`[CG] Trying SMTP on port ${port} for signed copy...`);
+                    const transporter = nodemailer.createTransport({
+                        host: settings.smtpHost,
+                        port: port,
+                        secure: port === 465,
+                        connectionTimeout: 10000,
+                        greetingTimeout: 10000,
+                        auth: {
+                            user: settings.smtpUser,
+                            pass: settings.smtpPass,
+                        },
+                    });
+
+                    await transporter.sendMail({
+                        from: fromAddress,
+                        to: contract.clientEmail,
+                        subject: "✅ Your Signed Culture Gourmet Contract",
+                        text: emailText,
+                        html: emailHtml,
+                    });
+                    emailSent = true;
+                    console.log(`[CG] Signed copy sent via SMTP on port ${port}!`);
+                } catch (err) {
+                    console.error(`[CG] SMTP Error on port ${port}:`, err.message);
+                    emailError = err.message;
+                }
+            }
+        }
+
+        if (!emailSent) {
+            return { success: false, message: `Failed to send email: ${emailError || 'No email provider configured'}` };
+        }
+
+        return { success: true, message: `Signed contract sent to ${contract.clientEmail}` };
+    } catch (err) {
+        console.error('[CG] sendSignedCopy FATAL ERROR:', err);
+        return { success: false, message: 'Server error: ' + err.message };
+    }
+}
+
 async function updateContractStatus(payload) {
     const { contractId, status } = payload;
     const contracts = readJsonSafe(contractsFile);
@@ -704,6 +956,8 @@ export default async function theCultureGourmetContract(payload = {}) {
                 return await getContract(payload);
             case "signContract":
                 return await signContract(payload);
+            case "sendSignedCopy":
+                return await sendSignedCopy(payload);
             case "updateContractStatus":
                 return await updateContractStatus(payload);
             case "updateContractFields":
