@@ -64,7 +64,7 @@
     "status": "Sent",
     "fileUrl": "/clients/contract-view.html?contractId=mil5x1jr-42kp7p0n",
     "createdAt": "2025-11-30T03:30:21.591Z",
-    "updatedAt": "2025-11-30T03:30:23.358Z",
+    "updatedAt": "2025-11-30T03:37:52.498Z",
     "timeline": [
       {
         "at": "2025-11-30T03:30:21.591Z",
@@ -73,6 +73,16 @@
       },
       {
         "at": "2025-11-30T03:30:23.358Z",
+        "type": "sent",
+        "note": "Contract sent via SMTP"
+      },
+      {
+        "at": "2025-11-30T03:35:55.313Z",
+        "type": "sent",
+        "note": "Contract sent via SMTP"
+      },
+      {
+        "at": "2025-11-30T03:37:52.498Z",
         "type": "sent",
         "note": "Contract sent via SMTP"
       }

@@ -1109,7 +1109,7 @@ Date: ____________________
                 btn.addEventListener("click", async (e) => {
                     e.preventDefault();
                     const id = btn.getAttribute("data-resend-id");
-                    if (await showConfirm("Resend this contract to the client?", "Confirm Resend")) await sendContract(id);
+                    if (await showConfirm("Resend this contract to the client?", "Confirm Resend")) await sendContract(id, true);
                 });
             });
 
@@ -1122,30 +1122,49 @@ Date: ____________________
             });
         }
 
-        async function sendContract(contractId) {
+        async function sendContract(contractId, skipConfirm = false) {
             const contract = contracts.find((c) => c.id === contractId);
-            if (!contract) return;
-            if (!await showConfirm(`Send contract to ${contract.clientEmail}?`, "Send Contract")) return;
+            if (!contract) {
+                showToast("Contract not found.", "error");
+                return;
+            }
+            
+            if (!skipConfirm && !await showConfirm(`Send contract to ${contract.clientEmail}?`, "Send Contract")) return;
+
+            const timestamp = new Date().toLocaleString();
+            console.log(`[${timestamp}] Sending contract ${contractId} to ${contract.clientEmail}...`);
 
             try {
                 const resp = await callCG({ action: "sendContract", contractId });
-                if (!resp.success) { showToast(resp.message || "Error sending contract.", "error"); return; }
+                console.log(`[${new Date().toLocaleString()}] Server response:`, resp);
+                
+                if (!resp.success) { 
+                    console.error(`[${new Date().toLocaleString()}] Send failed:`, resp.message);
+                    showToast(resp.message || "Error sending contract.", "error"); 
+                    return; 
+                }
+                
                 const idx = contracts.findIndex((c) => c.id === contractId);
                 if (idx !== -1) contracts[idx] = resp.contract;
                 renderContracts();
 
                 if (resp.emailSent) {
-                    showToast("Email sent successfully via SMTP!", "success");
+                    console.log(`[${new Date().toLocaleString()}] Email sent successfully to ${contract.clientEmail}`);
+                    showToast(`Email sent successfully to ${contract.clientEmail}!`, "success");
                 } else {
-                    const fullLink = window.location.origin + (resp.contract.fileUrl || "");
+                    console.warn(`[${new Date().toLocaleString()}] SMTP not used. Error: ${resp.emailError || 'Not configured'}`);
+                    const fullLink = "https://backend.aivisualpro.com" + (resp.contract.fileUrl || "");
                     const subject = "Culture Gourmet Catering Agreement";
                     const body = `Hi ${resp.contract.clientName},\n\nHere is your catering agreement:\n${fullLink}\n\nThank you,\nCulture Gourmet`;
-                    if (resp.emailError) showToast("SMTP failed. Opening default mail client instead.", "warning");
-                    else showToast("SMTP not configured. Opening default mail client.", "info");
+                    if (resp.emailError) {
+                        showToast(`SMTP failed: ${resp.emailError}. Opening mail client.`, "warning");
+                    } else {
+                        showToast("SMTP not configured. Opening default mail client.", "info");
+                    }
                     window.open(`mailto:${encodeURIComponent(resp.contract.clientEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, "_blank");
                 }
             } catch (err) {
-                console.error(err);
+                console.error(`[${new Date().toLocaleString()}] Error:`, err);
                 showToast("Error contacting server.", "error");
             }
         }

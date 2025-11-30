@@ -299,7 +299,7 @@ async function sendContract(payload) {
                 },
             });
 
-            const fullLink = `http://localhost:3000${contract.fileUrl}`; // Adjust domain in production
+            const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
 
             const fromAddress = settings.smtpFrom
                 ? (settings.smtpFrom.includes('@') ? settings.smtpFrom : `${settings.smtpFrom} <${settings.smtpUser}>`)
