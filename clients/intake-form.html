@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Inquiry | Culture Gourmet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --bg-light: #f8f9fc;
+            --text-dark: #1a1a2e;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --card-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+        
+        * {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: var(--bg-light);
+            min-height: 100vh;
+        }
+        
+        .hero-header {
+            background: var(--primary-gradient);
+            padding: 50px 20px;
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .hero-header h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        
+        .hero-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--bg-light);
+        }
+        
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 4px 0 0;
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        
+        .form-label .required {
+            color: #ef4444;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1.5px solid transparent;
+        }
+        
+        .checkbox-item:hover {
+            background: #f0f0f5;
+        }
+        
+        .checkbox-item.selected {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            display: none;
+        }
+        
+        .checkbox-item .check-icon {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .checkbox-item.selected .check-icon {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .radio-item {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .radio-item input[type="radio"] {
+            display: none;
+        }
+        
+        .radio-item label {
+            display: block;
+            padding: 14px 20px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1.5px solid transparent;
+            font-weight: 500;
+        }
+        
+        .radio-item input[type="radio"]:checked + label {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .conditional-field {
+            display: none;
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 10px;
+        }
+        
+        .conditional-field.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .submit-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .btn-submit {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 16px 48px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Success Modal */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .success-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .success-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 48px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+        
+        .success-overlay.show .success-modal {
+            transform: scale(1);
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            color: white;
+            font-size: 2.5rem;
+        }
+        
+        .success-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+        
+        .success-message {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-section {
+                padding: 24px 20px;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .radio-group {
+                flex-direction: column;
+            }
+        }
+
+        /* Tag input for dietary allergies */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            background: white;
+            min-height: 50px;
+            cursor: text;
+        }
+        
+        .tag-input-container:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #667eea;
+        }
+        
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+        
+        .tag-remove:hover {
+            opacity: 1;
+        }
+        
+        .tag-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 150px;
+            padding: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .input-group-text {
+            background: var(--bg-light);
+            border: 1.5px solid var(--border-color);
+            border-right: none;
+            border-radius: 10px 0 0 10px;
+        }
+        
+        .input-group .form-control {
+            border-radius: 0 10px 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero-header">
+        <h1>🍽️ Culture Gourmet</h1>
+        <p>Premium Catering Services — Event Inquiry Form</p>
+    </header>
+
+    <main class="form-container">
+        <form id="intakeForm" novalidate>
+            <!-- Section 1: Client Info -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="bi bi-person-fill"></i></div>
+                    <div>
+                        <h2 class="section-title">Client Information</h2>
+                        <p class="section-subtitle">Tell us about yourself</p>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="John Smith" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number <span class="required">*</span></label>
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="(555) 123-4567" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email Address <span class="required">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Company / Organization</label>
+                        <input type="text" class="form-control" id="company" name="company" placeholder="Company name (optional)">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Preferred Contact Method <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="contact-phone" name="preferredContactMethod" value="Phone">
+                                <label for="contact-phone"><i class="bi bi-telephone me-1"></i> Phone</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="contact-email" name="preferredContactMethod" value="Email" checked>
+                                <label for="contact-email"><i class="bi bi-envelope me-1"></i> Email</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="contact-text" name="preferredContactMethod" value="Text">
+                                <label for="contact-text"><i class="bi bi-chat-dots me-1"></i> Text</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="contact-other" name="preferredContactMethod" value="Other">
+                                <label for="contact-other"><i class="bi bi-three-dots me-1"></i> Other</label>
+                            </div>
+                        </div>
+                        <div class="conditional-field" id="otherContactMethodField">
+                            <input type="text" class="form-control" id="otherContactMethod" name="otherContactMethod" placeholder="Please specify your preferred contact method">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Event Info -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="bi bi-calendar-event"></i></div>
+                    <div>
+                        <h2 class="section-title">Event Information</h2>
+                        <p class="section-subtitle">What type of event are you planning?</p>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Type of Event <span class="required">*</span></label>
+                        <select class="form-select" id="typeOfEvent" name="typeOfEvent" required>
+                            <option value="">Select event type...</option>
+                            <option value="Wedding">Wedding</option>
+                            <option value="Corporate">Corporate</option>
+                            <option value="Birthday">Birthday</option>
+                            <option value="Holiday Party">Holiday Party</option>
+                            <option value="Private Dinner">Private Dinner</option>
+                            <option value="Social / Shower">Social / Shower</option>
+                            <option value="Delivery / Drop Off">Delivery / Drop Off</option>
+                            <option value="Other">Other Event</option>
+                        </select>
+                        <div class="conditional-field" id="otherEventTypeField">
+                            <input type="text" class="form-control" id="otherTypeOfEvent" name="otherTypeOfEvent" placeholder="Please describe your event type">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Event Details -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="bi bi-clipboard-data"></i></div>
+                    <div>
+                        <h2 class="section-title">Event Details</h2>
+                        <p class="section-subtitle">Tell us more about your event</p>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Event Date <span class="required">*</span></label>
+                        <input type="date" class="form-control" id="eventDate" name="eventDate" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" class="form-control" id="startTime" name="startTime">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">End Time</label>
+                        <input type="time" class="form-control" id="endTime" name="endTime">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Event Venue / Location <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="eventVenueLocation" name="eventVenueLocation" placeholder="Full address of the venue" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Number of Guests <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="noOfGuests" name="noOfGuests" placeholder="Estimated guest count" min="1" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Event Setting</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="setting-indoor" name="eventSetting" value="Indoor">
+                                <label for="setting-indoor">Indoor</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="setting-outdoor" name="eventSetting" value="Outdoor">
+                                <label for="setting-outdoor">Outdoor</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="setting-both" name="eventSetting" value="Both">
+                                <label for="setting-both">Both</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Food Preferences</label>
+                        <textarea class="form-control" id="foodPreferences" name="foodPreferences" placeholder="Any specific dishes, ingredients, or cuisines you'd like to include..."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Service Style / Theme</label>
+                        <select class="form-select" id="serviceStyleTheme" name="serviceStyleTheme">
+                            <option value="">Select service style...</option>
+                            <option value="Plated">Plated</option>
+                            <option value="Family Style">Family Style</option>
+                            <option value="Passed Hors d'oeuvres">Passed Hors d'oeuvres</option>
+                            <option value="Food Stations">Food Stations</option>
+                            <option value="Drop Off Only">Drop Off Only</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="conditional-field" id="otherServiceStyleField">
+                            <input type="text" class="form-control" id="otherServiceStyle" name="otherServiceStyle" placeholder="Please describe your preferred service style">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Cuisine Theme</label>
+                        <input type="text" class="form-control" id="cuisineTheme" name="cuisineTheme" placeholder="e.g., Italian, Mexican, Asian Fusion...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Dietary Restrictions / Allergies</label>
+                        <p class="text-muted small mb-2">Type each allergy and press Enter to add</p>
+                        <div class="tag-input-container" id="allergyContainer">
+                            <input type="text" class="tag-input" id="allergyInput" placeholder="Type and press Enter...">
+                        </div>
+                        <input type="hidden" id="dietaryAllergies" name="dietaryAllergies">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Additional Services Needed</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Beverages">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Beverages</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Desserts">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Desserts</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Bartending Services">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Bartending Services</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Staffing">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Staffing</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Tableware">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Tableware</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Utensils">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Utensils</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Linen">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Linen</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Decor">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Decor</span>
+                            </label>
+                            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="additionalServices" value="Other">
+                                <span class="check-icon"><i class="bi bi-check"></i></span>
+                                <span>Other</span>
+                            </label>
+                        </div>
+                        <div class="conditional-field" id="otherServicesField">
+                            <input type="text" class="form-control" id="otherServicesNeeded" name="otherServicesNeeded" placeholder="Please specify other services needed">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Budget Info -->
+            <section class="form-section">
+                <div class="section-header">
+                    <div class="section-icon"><i class="bi bi-currency-dollar"></i></div>
+                    <div>
+                        <h2 class="section-title">Budget Information</h2>
+                        <p class="section-subtitle">Help us understand your budget</p>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Estimated Budget <span class="required">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="estimatedBudget" name="estimatedBudget" placeholder="0.00" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">How Did You Hear About Us? <span class="required">*</span></label>
+                        <select class="form-select" id="howDoYouKnow" name="howDoYouKnow" required>
+                            <option value="">Select...</option>
+                            <option value="Referral">Referral</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Website">Website</option>
+                            <option value="Past Client">Past Client</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="conditional-field" id="howDoYouKnowOtherField">
+                            <input type="text" class="form-control" id="howDoYouKnowOther" name="howDoYouKnowOther" placeholder="Please specify how you heard about us">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Budget Additional Information</label>
+                        <textarea class="form-control" id="budgetAdditionalInfo" name="budgetAdditionalInfo" placeholder="Any additional budget considerations or flexibility..."></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Would you like menu recommendations?</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="menu-yes" name="menuRecommendations" value="Yes">
+                                <label for="menu-yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="menu-no" name="menuRecommendations" value="No" checked>
+                                <label for="menu-no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Do you need setup assistance?</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="setup-yes" name="needSetup" value="Yes">
+                                <label for="setup-yes">Yes</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="setup-no" name="needSetup" value="No" checked>
+                                <label for="setup-no">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Additional Comments</label>
+                        <textarea class="form-control" id="additionalComments" name="additionalComments" rows="4" placeholder="Any other details or special requests you'd like us to know about..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <span id="submitText"><i class="bi bi-send me-2"></i>Submit Inquiry</span>
+                    <span id="submitLoading" class="d-none">
+                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Submitting...
+                    </span>
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Success Modal -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-modal">
+            <div class="success-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <h3 class="success-title">Thank You!</h3>
+            <p class="success-message">
+                We've received your event inquiry and are excited about the possibility of catering your special occasion!<br><br>
+                Our team will review your request and get back to you within 24-48 hours.
+            </p>
+            <button class="btn btn-lg mt-4" style="background: var(--primary-gradient); color: white; border-radius: 50px; padding: 12px 36px;" onclick="location.reload()">
+                Submit Another Inquiry
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // API endpoint
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000/webhook/theCultureGourmetContract'
+            : '/webhook/theCultureGourmetContract';
+
+        // Allergies array for tag input
+        let allergies = [];
+
+        // Toggle checkbox selection
+        function toggleCheckbox(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('selected', checkbox.checked);
+            
+            // Check if "Other" is selected for additional services
+            if (checkbox.value === 'Other') {
+                const otherField = document.getElementById('otherServicesField');
+                otherField.classList.toggle('show', checkbox.checked);
+            }
+        }
+
+        // Show/hide conditional fields based on selection
+        document.querySelectorAll('input[name="preferredContactMethod"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const otherField = document.getElementById('otherContactMethodField');
+                otherField.classList.toggle('show', e.target.value === 'Other');
+            });
+        });
+
+        document.getElementById('typeOfEvent').addEventListener('change', (e) => {
+            const otherField = document.getElementById('otherEventTypeField');
+            otherField.classList.toggle('show', e.target.value === 'Other');
+        });
+
+        document.getElementById('serviceStyleTheme').addEventListener('change', (e) => {
+            const otherField = document.getElementById('otherServiceStyleField');
+            otherField.classList.toggle('show', e.target.value === 'Other');
+        });
+
+        document.getElementById('howDoYouKnow').addEventListener('change', (e) => {
+            const otherField = document.getElementById('howDoYouKnowOtherField');
+            otherField.classList.toggle('show', e.target.value === 'Other');
+        });
+
+        // Tag input for allergies
+        const allergyInput = document.getElementById('allergyInput');
+        const allergyContainer = document.getElementById('allergyContainer');
+
+        allergyInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const value = allergyInput.value.trim();
+                if (value && !allergies.includes(value)) {
+                    allergies.push(value);
+                    renderTags();
+                    allergyInput.value = '';
+                }
+            }
+        });
+
+        function renderTags() {
+            // Remove existing tags
+            allergyContainer.querySelectorAll('.tag').forEach(tag => tag.remove());
+            
+            // Add tags
+            allergies.forEach((allergy, index) => {
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.innerHTML = `${allergy} <span class="tag-remove" onclick="removeTag(${index})">×</span>`;
+                allergyContainer.insertBefore(tag, allergyInput);
+            });
+
+            // Update hidden input
+            document.getElementById('dietaryAllergies').value = JSON.stringify(allergies);
+        }
+
+        function removeTag(index) {
+            allergies.splice(index, 1);
+            renderTags();
+        }
+
+        // Form submission
+        document.getElementById('intakeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoading = document.getElementById('submitLoading');
+
+            submitBtn.disabled = true;
+            submitText.classList.add('d-none');
+            submitLoading.classList.remove('d-none');
+
+            try {
+                // Gather form data
+                const formData = new FormData(form);
+                
+                // Get selected additional services
+                const additionalServices = [];
+                document.querySelectorAll('input[name="additionalServices"]:checked').forEach(cb => {
+                    additionalServices.push(cb.value);
+                });
+
+                const payload = {
+                    action: 'submitIntakeRequest',
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    company: formData.get('company'),
+                    preferredContactMethod: formData.get('preferredContactMethod'),
+                    otherContactMethod: formData.get('otherContactMethod'),
+                    typeOfEvent: formData.get('typeOfEvent'),
+                    otherTypeOfEvent: formData.get('otherTypeOfEvent'),
+                    eventDate: formData.get('eventDate'),
+                    startTime: formData.get('startTime'),
+                    endTime: formData.get('endTime'),
+                    eventVenueLocation: formData.get('eventVenueLocation'),
+                    noOfGuests: formData.get('noOfGuests'),
+                    eventSetting: formData.get('eventSetting'),
+                    foodPreferences: formData.get('foodPreferences'),
+                    serviceStyleTheme: formData.get('serviceStyleTheme'),
+                    otherServiceStyle: formData.get('otherServiceStyle'),
+                    cuisineTheme: formData.get('cuisineTheme'),
+                    dietaryAllergies: allergies,
+                    additionalServicesNeeded: additionalServices,
+                    otherServicesNeeded: formData.get('otherServicesNeeded'),
+                    estimatedBudget: formData.get('estimatedBudget'),
+                    budgetAdditionalInfo: formData.get('budgetAdditionalInfo'),
+                    menuRecommendations: formData.get('menuRecommendations'),
+                    needSetup: formData.get('needSetup'),
+                    howDoYouKnow: formData.get('howDoYouKnow'),
+                    howDoYouKnowOther: formData.get('howDoYouKnowOther'),
+                    additionalComments: formData.get('additionalComments'),
+                };
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Show success modal
+                    document.getElementById('successOverlay').classList.add('show');
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+            } catch (err) {
+                console.error('Submission error:', err);
+                alert('There was an error submitting your inquiry. Please try again or contact us directly.');
+            } finally {
+                submitBtn.disabled = false;
+                submitText.classList.remove('d-none');
+                submitLoading.classList.add('d-none');
+            }
+        });
+
+        // Set minimum date to today
+        document.getElementById('eventDate').min = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

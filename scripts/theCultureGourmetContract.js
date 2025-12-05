@@ -11,11 +11,11 @@ let db = null;
 
 async function getDb() {
     if (db) return db;
-    
+
     if (!MONGODB_URI) {
         throw new Error("THECULTUREGOURMETMONGODB_URI environment variable not set");
     }
-    
+
     try {
         client = new MongoClient(MONGODB_URI);
         await client.connect();
@@ -49,6 +49,11 @@ async function getTemplatesCollection() {
     return database.collection("templates");
 }
 
+async function getIntakeRequestsCollection() {
+    const database = await getDb();
+    return database.collection("intakeRequests");
+}
+
 // ---------- Helpers ----------
 
 function nowIso() {
@@ -66,7 +71,7 @@ function makeId() {
 // Replace template variables with actual values
 function replaceTemplateVariables(templateBody, contractData, companySettings = {}) {
     const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    
+
     const variables = {
         '{{clientName}}': contractData.clientName || '____________________________',
         '{{clientEmail}}': contractData.clientEmail || '____________________________',
@@ -78,46 +83,46 @@ function replaceTemplateVariables(templateBody, contractData, companySettings = 
         '{{repName}}': companySettings.repName || '____________________________',
         '{{todayDate}}': today,
     };
-    
+
     let result = templateBody;
     for (const [key, value] of Object.entries(variables)) {
         result = result.split(key).join(value);
     }
-    
+
     return result;
 }
 
 // Build the human-readable contract text from template (template required)
 async function buildContractTextFromTemplate(c, companySettings = {}, templateId = null) {
     const templatesCollection = await getTemplatesCollection();
-    
+
     // Try to get the specified template
     let template = null;
     if (templateId) {
         template = await templatesCollection.findOne({ id: templateId });
     }
-    
+
     // Fall back to default template if specified template not found
     if (!template) {
         template = await templatesCollection.findOne({ isDefault: true });
     }
-    
+
     // Fall back to any template
     if (!template) {
         template = await templatesCollection.findOne({});
     }
-    
+
     // Template is required - return error message if none found
     if (!template || !template.body) {
         return "ERROR: No contract template found. Please create a template first.";
     }
-    
+
     // Increment usage count
     await templatesCollection.updateOne(
         { id: template.id },
         { $inc: { usageCount: 1 } }
     );
-    
+
     return replaceTemplateVariables(template.body, c, companySettings);
 }
 
@@ -172,7 +177,7 @@ async function createContract(payload) {
     contract.contractText = await buildContractTextFromTemplate(contract, companySettings, templateId);
 
     await collection.insertOne(contract);
-    
+
     // Return all contracts for UI update
     const contracts = await collection.find({}).sort({ createdAt: -1 }).toArray();
 
@@ -263,12 +268,12 @@ async function updateContractFields(payload) {
     if (eventTime !== undefined) updates.eventTime = eventTime;
 
     updates.updatedAt = nowIso();
-    
+
     // Merge with existing contract to rebuild text using template
     const updatedContract = { ...contract, ...updates };
     const companySettings = await getCompanySettings();
     updates.contractText = await buildContractTextFromTemplate(updatedContract, companySettings, contract.templateId);
-    
+
     // Add timeline entry
     const timelineEntry = {
         at: nowIso(),
@@ -278,7 +283,7 @@ async function updateContractFields(payload) {
 
     await collection.updateOne(
         { id: contractId },
-        { 
+        {
             $set: updates,
             $push: { timeline: timelineEntry }
         }
@@ -305,9 +310,9 @@ async function updateContractStatus(payload) {
 
     await collection.updateOne(
         { id: contractId },
-        { 
-            $set: { 
-                status, 
+        {
+            $set: {
+                status,
                 updatedAt: nowIso()
             },
             $push: { timeline: timelineEntry }
@@ -321,7 +326,7 @@ async function updateContractStatus(payload) {
 async function deleteContract(payload) {
     const { contractId } = payload;
     const collection = await getContractsCollection();
-    
+
     const result = await collection.deleteOne({ id: contractId });
 
     if (result.deletedCount === 0) {
@@ -352,12 +357,12 @@ async function signContract(payload) {
         signedAt: nowIso(),
         updatedAt: nowIso(),
     };
-    
+
     if (clientName) updates.clientName = clientName;
 
     await collection.updateOne(
         { id: contractId },
-        { 
+        {
             $set: updates,
             $push: { timeline: timelineEntry }
         }
@@ -375,7 +380,7 @@ async function createClient(payload) {
 
     const id = makeId();
     const contactsArray = contacts || [];
-    
+
     const primaryEmail = contactsArray.length > 0 ? (contactsArray[0].email || "") : "";
     const primaryPhone = contactsArray.length > 0 ? (contactsArray[0].phone || "") : "";
 
@@ -412,11 +417,11 @@ async function updateClient(payload) {
     const updates = { updatedAt: nowIso() };
 
     if (name !== undefined) updates.name = name;
-    
+
     if (contacts !== undefined) {
         updates.contacts = contacts;
         updates.contactsCount = contacts.length;
-        
+
         if (contacts.length > 0) {
             const primaryContact = contacts[0];
             updates.email = primaryContact.email || "";
@@ -433,7 +438,7 @@ async function updateClient(payload) {
 async function deleteClient(payload) {
     const { clientId } = payload;
     const collection = await getClientsCollection();
-    
+
     const result = await collection.deleteOne({ id: clientId });
 
     if (result.deletedCount === 0) {
@@ -458,33 +463,33 @@ async function getSettings() {
     const collection = await getSettingsCollection();
     let dbSettings = await collection.findOne({ type: "email" }) || {};
     const defaults = getDefaultSettings();
-    
+
     const settings = {
         resendApiKey: defaults.resendApiKey || dbSettings.resendApiKey,
         resendFromEmail: defaults.resendFromEmail || dbSettings.resendFromEmail,
-        
+
     };
-    
+
     return { success: true, settings };
 }
 
 async function saveSettings(payload) {
     const { resendApiKey, resendFromEmail } = payload;
     const collection = await getSettingsCollection();
-    
-    const settings = { 
+
+    const settings = {
         type: "email",
-        resendApiKey, 
+        resendApiKey,
         resendFromEmail,
         updatedAt: nowIso()
     };
-    
+
     await collection.updateOne(
         { type: "email" },
         { $set: settings },
         { upsert: true }
     );
-    
+
     return { success: true, settings };
 }
 
@@ -493,9 +498,9 @@ async function saveSettings(payload) {
 async function getCompanySettings() {
     const collection = await getSettingsCollection();
     const dbSettings = await collection.findOne({ type: "company" }) || {};
-    
-    return { 
-        success: true, 
+
+    return {
+        success: true,
         settings: {
             companyName: dbSettings.companyName || "Culture Gourmet",
             companyAddress: dbSettings.companyAddress || "",
@@ -508,8 +513,8 @@ async function getCompanySettings() {
 async function saveCompanySettings(payload) {
     const { companyName, companyAddress, repName, repSignature } = payload;
     const collection = await getSettingsCollection();
-    
-    const settings = { 
+
+    const settings = {
         type: "company",
         companyName: companyName || "Culture Gourmet",
         companyAddress: companyAddress || "",
@@ -517,13 +522,13 @@ async function saveCompanySettings(payload) {
         repSignature: repSignature || "",
         updatedAt: nowIso()
     };
-    
+
     await collection.updateOne(
         { type: "company" },
         { $set: settings },
         { upsert: true }
     );
-    
+
     return { success: true, settings };
 }
 
@@ -533,11 +538,11 @@ async function getEmailSettings() {
     const collection = await getSettingsCollection();
     const dbSettings = await collection.findOne({ type: "email" }) || {};
     const defaults = getDefaultSettings();
-    
+
     return {
         resendApiKey: defaults.resendApiKey || dbSettings.resendApiKey,
         resendFromEmail: defaults.resendFromEmail || dbSettings.resendFromEmail,
-        
+
     };
 }
 
@@ -557,10 +562,10 @@ async function sendContract(payload) {
         const settings = await getEmailSettings();
         console.log('[CG] Using Resend from email:', settings.resendFromEmail);
         console.log('[CG] Using settings - Resend:', settings.resendApiKey ? 'configured' : 'not configured');
-        
+
         let emailSent = false;
         let emailError = null;
-        
+
         const fullLink = `https://backend.aivisualpro.com/clients/contract-view.html?contractId=${contract.id}`;
         console.log('[CG] Contract Link being sent:', fullLink);
 
@@ -675,7 +680,7 @@ Elevating Your Events with Exceptional Cuisine`;
             try {
                 console.log('[CG] Trying Resend API...');
                 const resend = new Resend(settings.resendApiKey);
-                
+
                 const { data, error } = await resend.emails.send({
                     from: `${fromName} <${settings.resendFromEmail || 'onboarding@resend.dev'}>`,
                     to: [contract.clientEmail],
@@ -706,8 +711,8 @@ Elevating Your Events with Exceptional Cuisine`;
 
         await collection.updateOne(
             { id: contractId },
-            { 
-                $set: { 
+            {
+                $set: {
                     status: "Sent",
                     fileUrl: contract.fileUrl,
                     updatedAt: nowIso()
@@ -893,7 +898,7 @@ Elevating Your Events with Exceptional Cuisine`;
             try {
                 console.log('[CG] Trying Resend API for signed copy...');
                 const resend = new Resend(settings.resendApiKey);
-                
+
                 const { data, error } = await resend.emails.send({
                     from: `${fromName} <${settings.resendFromEmail || 'onboarding@resend.dev'}>`,
                     to: [contract.clientEmail],
@@ -985,7 +990,7 @@ async function createTemplate(payload) {
     };
 
     await collection.insertOne(template);
-    
+
     const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
     return { success: true, template, templates };
 }
@@ -993,7 +998,7 @@ async function createTemplate(payload) {
 async function updateTemplate(payload) {
     const { templateId, name, description, body, isDefault } = payload;
     const collection = await getTemplatesCollection();
-    
+
     const template = await collection.findOne({ id: templateId });
     if (!template) {
         return { success: false, message: "Template not found" };
@@ -1011,7 +1016,7 @@ async function updateTemplate(payload) {
     if (isDefault !== undefined) updates.isDefault = isDefault;
 
     await collection.updateOne({ id: templateId }, { $set: updates });
-    
+
     const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
     const updatedTemplate = await collection.findOne({ id: templateId });
     return { success: true, template: updatedTemplate, templates };
@@ -1020,14 +1025,14 @@ async function updateTemplate(payload) {
 async function deleteTemplate(payload) {
     const { templateId } = payload;
     const collection = await getTemplatesCollection();
-    
+
     const template = await collection.findOne({ id: templateId });
     if (!template) {
         return { success: false, message: "Template not found" };
     }
 
     await collection.deleteOne({ id: templateId });
-    
+
     const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
     return { success: true, message: "Template deleted", templates };
 }
@@ -1035,7 +1040,7 @@ async function deleteTemplate(payload) {
 async function duplicateTemplate(payload) {
     const { templateId } = payload;
     const collection = await getTemplatesCollection();
-    
+
     const template = await collection.findOne({ id: templateId });
     if (!template) {
         return { success: false, message: "Template not found" };
@@ -1055,7 +1060,7 @@ async function duplicateTemplate(payload) {
     delete newTemplate._id;
 
     await collection.insertOne(newTemplate);
-    
+
     const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
     return { success: true, template: newTemplate, templates };
 }
@@ -1063,13 +1068,13 @@ async function duplicateTemplate(payload) {
 async function setDefaultTemplate(payload) {
     const { templateId } = payload;
     const collection = await getTemplatesCollection();
-    
+
     // Unset all defaults first
     await collection.updateMany({ isDefault: true }, { $set: { isDefault: false } });
-    
+
     // Set the new default
     await collection.updateOne({ id: templateId }, { $set: { isDefault: true, updatedAt: nowIso() } });
-    
+
     const templates = await collection.find({}).sort({ createdAt: -1 }).toArray();
     return { success: true, templates };
 }
@@ -1086,13 +1091,245 @@ async function incrementTemplateUsage(templateId) {
 async function getDefaultTemplate() {
     const collection = await getTemplatesCollection();
     let template = await collection.findOne({ isDefault: true });
-    
+
     if (!template) {
         // Fall back to first template
         template = await collection.findOne({});
     }
-    
+
     return { success: true, template, variables: TEMPLATE_VARIABLES };
+}
+
+// ---------- Intake Request Actions ----------
+
+async function submitIntakeRequest(payload) {
+    try {
+        const collection = await getIntakeRequestsCollection();
+
+        const id = makeId();
+        const intakeRequest = {
+            id,
+            // Client Info
+            name: payload.name || "",
+            phone: payload.phone || "",
+            email: payload.email || "",
+            company: payload.company || "",
+            preferredContactMethod: payload.preferredContactMethod || "Email",
+            otherContactMethod: payload.otherContactMethod || "",
+            // Event Info
+            typeOfEvent: payload.typeOfEvent || "",
+            otherTypeOfEvent: payload.otherTypeOfEvent || "",
+            // Event Details
+            eventDate: payload.eventDate || "",
+            startTime: payload.startTime || "",
+            endTime: payload.endTime || "",
+            eventVenueLocation: payload.eventVenueLocation || "",
+            noOfGuests: payload.noOfGuests || "",
+            eventSetting: payload.eventSetting || "",
+            foodPreferences: payload.foodPreferences || "",
+            serviceStyleTheme: payload.serviceStyleTheme || "",
+            otherServiceStyle: payload.otherServiceStyle || "",
+            cuisineTheme: payload.cuisineTheme || "",
+            dietaryAllergies: payload.dietaryAllergies || [],
+            additionalServicesNeeded: payload.additionalServicesNeeded || [],
+            otherServicesNeeded: payload.otherServicesNeeded || "",
+            // Budget Info
+            estimatedBudget: payload.estimatedBudget || "",
+            budgetAdditionalInfo: payload.budgetAdditionalInfo || "",
+            menuRecommendations: payload.menuRecommendations || "No",
+            needSetup: payload.needSetup || "No",
+            howDoYouKnow: payload.howDoYouKnow || "",
+            howDoYouKnowOther: payload.howDoYouKnowOther || "",
+            additionalComments: payload.additionalComments || "",
+            // Status
+            status: "pending",
+            createdAt: nowIso(),
+            updatedAt: nowIso(),
+        };
+
+        await collection.insertOne(intakeRequest);
+        console.log("[CG] Intake request saved:", id);
+
+        // Send confirmation email to client
+        let emailSent = false;
+        let emailError = null;
+
+        if (intakeRequest.email) {
+            try {
+                const settings = await getEmailSettings();
+
+                if (settings.resendApiKey) {
+                    const resend = new Resend(settings.resendApiKey);
+
+                    const eventDateFormatted = intakeRequest.eventDate ?
+                        new Date(intakeRequest.eventDate).toLocaleDateString('en-US', {
+                            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                        }) : 'To be confirmed';
+
+                    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f4f4f4; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 40px 30px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">Culture Gourmet</h1>
+                            <p style="margin: 8px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Premium Catering Services</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <h2 style="margin: 0 0 20px; color: #1a1a2e; font-size: 22px; font-weight: 600;">Thank You, ${intakeRequest.name}! 🎉</h2>
+                            
+                            <p style="margin: 0 0 24px; color: #4a4a68; font-size: 16px; line-height: 1.6;">
+                                We've received your event inquiry and are excited about the possibility of catering your special occasion! Our team will review your request and get back to you shortly.
+                            </p>
+                            
+                            <!-- Event Summary Card -->
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8f9fc; border-radius: 12px; margin-bottom: 30px;">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p style="margin: 0 0 12px; color: #667eea; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Your Event Summary</p>
+                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Event Type:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${intakeRequest.typeOfEvent || 'To be discussed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Event Date:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${eventDateFormatted}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Guest Count:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${intakeRequest.noOfGuests || 'To be confirmed'}</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Location:</td>
+                                                <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 500; text-align: right;">${intakeRequest.eventVenueLocation || 'To be confirmed'}</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="margin: 0 0 16px; color: #4a4a68; font-size: 15px; line-height: 1.6;">
+                                <strong>What happens next?</strong><br>
+                                Our team will review your request and contact you within 24-48 hours via your preferred contact method (${intakeRequest.preferredContactMethod}).
+                            </p>
+                            
+                            <p style="margin: 0; color: #9ca3af; font-size: 13px; text-align: center;">
+                                If you have any urgent questions, please don't hesitate to reach out to us directly.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fc; padding: 30px 40px; text-align: center; border-top: 1px solid #e5e7eb;">
+                            <p style="margin: 0 0 8px; color: #1a1a2e; font-size: 14px; font-weight: 600;">Culture Gourmet</p>
+                            <p style="margin: 0 0 16px; color: #6b7280; font-size: 13px;">Elevating Your Events with Exceptional Cuisine</p>
+                            <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                                © ${new Date().getFullYear()} Culture Gourmet. All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
+
+                    const emailText = `Thank you, ${intakeRequest.name}!
+
+We've received your event inquiry and are excited about the possibility of catering your special occasion!
+
+Your Event Summary:
+- Event Type: ${intakeRequest.typeOfEvent || 'To be discussed'}
+- Event Date: ${eventDateFormatted}
+- Guest Count: ${intakeRequest.noOfGuests || 'To be confirmed'}
+- Location: ${intakeRequest.eventVenueLocation || 'To be confirmed'}
+
+What happens next?
+Our team will review your request and contact you within 24-48 hours via your preferred contact method (${intakeRequest.preferredContactMethod}).
+
+Thank you,
+Culture Gourmet
+Elevating Your Events with Exceptional Cuisine`;
+
+                    const { data, error } = await resend.emails.send({
+                        from: `Culture Gourmet <${settings.resendFromEmail || 'onboarding@resend.dev'}>`,
+                        to: [intakeRequest.email],
+                        subject: "🍽️ We've Received Your Event Inquiry - Culture Gourmet",
+                        text: emailText,
+                        html: emailHtml,
+                    });
+
+                    if (error) {
+                        console.error('[CG] Intake confirmation email error:', error);
+                        emailError = error.message || JSON.stringify(error);
+                    } else {
+                        emailSent = true;
+                        console.log('[CG] Intake confirmation email sent! ID:', data?.id);
+                    }
+                }
+            } catch (err) {
+                console.error('[CG] Email send error:', err.message);
+                emailError = err.message;
+            }
+        }
+
+        return { success: true, intakeRequest, emailSent, emailError };
+    } catch (err) {
+        console.error("[CG] submitIntakeRequest error:", err);
+        return { success: false, message: "Failed to submit intake request: " + err.message };
+    }
+}
+
+async function listIntakeRequests() {
+    try {
+        const collection = await getIntakeRequestsCollection();
+        const intakeRequests = await collection.find({}).sort({ createdAt: -1 }).toArray();
+        return { success: true, intakeRequests };
+    } catch (err) {
+        console.error("[CG] listIntakeRequests error:", err);
+        return { success: false, message: "Failed to list intake requests: " + err.message };
+    }
+}
+
+async function updateIntakeRequestStatus(payload) {
+    try {
+        const { requestId, status } = payload;
+        const collection = await getIntakeRequestsCollection();
+
+        const intakeRequest = await collection.findOne({ id: requestId });
+        if (!intakeRequest) {
+            return { success: false, message: "Intake request not found" };
+        }
+
+        await collection.updateOne(
+            { id: requestId },
+            { $set: { status, updatedAt: nowIso() } }
+        );
+
+        const updatedRequest = await collection.findOne({ id: requestId });
+        console.log("[CG] Intake request status updated:", requestId, "->", status);
+
+        return { success: true, intakeRequest: updatedRequest };
+    } catch (err) {
+        console.error("[CG] updateIntakeRequestStatus error:", err);
+        return { success: false, message: "Failed to update status: " + err.message };
+    }
 }
 
 // ---------- Main Handler ----------
@@ -1162,6 +1399,13 @@ export default async function theCultureGourmetContract(payload = {}) {
                 return await setDefaultTemplate(payload);
             case "getDefaultTemplate":
                 return await getDefaultTemplate();
+            // Intake request actions
+            case "submitIntakeRequest":
+                return await submitIntakeRequest(payload);
+            case "listIntakeRequests":
+                return await listIntakeRequests();
+            case "updateIntakeRequestStatus":
+                return await updateIntakeRequestStatus(payload);
             default:
                 console.warn("[CG] Unknown action:", action);
                 return { success: false, message: `Unknown action: ${action}` };
