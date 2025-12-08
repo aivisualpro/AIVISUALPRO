@@ -57,6 +57,15 @@ export default async function munchofm(payload) {
 
             // 3) inside that: recordNo folder (e.g. "25-000001")
             const recordFolder = await ensureFolder(drive, recordNo, categoryFolder.id);
+            await drive.permissions.create({
+                fileId: recordFolder.id,
+                requestBody: {
+                    role: "writer",  // allows uploading & editing
+                    type: "user",
+                    emailAddress: email,
+                },
+                fields: "id",
+            });
 
             const folderLink = `https://drive.google.com/drive/folders/${recordFolder.id}`;
 
