@@ -17,6 +17,8 @@
             background-color: #f8fafc;
             color: #334155;
             padding: 2rem;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .paper {
@@ -24,14 +26,15 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             max-width: 800px;
             margin: 0 auto;
-            padding: 3rem;
-            min-height: 100vh;
+            padding: 40px;
+            /* Consistent padding */
+            /* Removed min-height: 100vh to prevent empty pages in PDF */
         }
 
         .brand-header {
-            border-bottom: 2px solid #38bdf8;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
+            border-bottom: 3px solid #38bdf8;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -39,41 +42,63 @@
 
         .brand-title {
             color: #0f172a;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: -0.5px;
+            font-size: 2rem;
         }
 
         .proposal-meta {
             color: #64748b;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            margin-bottom: 3rem;
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        /* Section styling for better breaks */
+        .pdf-section {
+            page-break-inside: avoid;
             margin-bottom: 2rem;
         }
 
+        h2,
+        h3 {
+            color: #0f172a;
+        }
+
         .signatures-section {
-            margin-top: 4rem;
+            margin-top: 5rem;
             border-top: 1px solid #e2e8f0;
-            padding-top: 2rem;
+            padding-top: 3rem;
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 2rem;
+            page-break-inside: avoid;
+            /* Don't break signatures */
         }
 
         .sig-box {
-            border: 1px dashed #cbd5e1;
-            padding: 1rem;
-            width: 200px;
+            border: 2px dashed #cbd5e1;
+            padding: 1.5rem;
+            width: 220px;
             text-align: center;
+            background: #f8fafc;
+            border-radius: 8px;
         }
 
         .sig-img {
             max-width: 100%;
-            height: auto;
+            height: 60px;
             font-family: 'Cursive', cursive;
-            /* Fallback if using text */
             font-style: italic;
             font-size: 1.5rem;
             color: #0ea5e9;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .action-bar {
@@ -89,10 +114,11 @@
             display: flex;
             justify-content: center;
             gap: 1rem;
+            z-index: 1000;
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
     </style>
 </head>
@@ -200,7 +226,11 @@
             document.getElementById('prop-title').innerText = proposalData.title;
             document.getElementById('prop-client').innerText = proposalData.clientName;
             document.getElementById('prop-date').innerText = new Date(proposalData.createdAt).toLocaleDateString();
-            document.getElementById('prop-body').innerHTML = proposalData.content;
+            document.getElementById('prop-date').innerText = new Date(proposalData.createdAt).toLocaleDateString();
+
+            // Wrap content in a div that applies better page breaking if needed, 
+            // though html2pdf handles it via config, adding a class helps if we need fine control
+            document.getElementById('prop-body').innerHTML = `<div class="pdf-section">${proposalData.content}</div>`;
 
             // Signatures
             const sigs = proposalData.signatures;
@@ -265,34 +295,30 @@
         function downloadPDF() {
             const element = document.getElementById('proposal-content');
 
-            // Temporary style adjustments for print
-            const originalShadow = element.style.boxShadow;
-            const originalMargin = element.style.margin;
-            const originalMaxWidth = element.style.maxWidth;
-            const originalPadding = element.style.padding;
-
-            element.style.boxShadow = 'none';
-            element.style.margin = '0';
-            element.style.maxWidth = '100%';
-            element.style.padding = '0'; // Let PDF margin handle it, or keep internal padding? 
-            // Better to keep internal padding maybe, but 3rem is huge data. Let's reduce for PDF.
-            element.style.padding = '20px';
-
+            // Options for better sizing
             const opt = {
-                margin: 0.5,
+                margin: [0.3, 0.4], // [top/bottom, left/right] in inches
                 filename: `Proposal_${proposalData.title.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true }, // Higher scale = better quality
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
+            // Start loading state
+            const btn = document.getElementById('btn-download');
+            const originalText = btn.innerText;
+            btn.innerText = 'Generating PDF...';
+            btn.disabled = true;
+
             html2pdf().set(opt).from(element).save().then(() => {
-                // Restore original styles
-                element.style.boxShadow = originalShadow;
-                element.style.margin = originalMargin;
-                element.style.maxWidth = originalMaxWidth;
-                element.style.padding = originalPadding;
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }).catch(err => {
+                console.error(err);
+                alert("Error generating PDF");
+                btn.innerText = originalText;
+                btn.disabled = false;
             });
         }
 
