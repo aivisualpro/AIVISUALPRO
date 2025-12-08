@@ -144,14 +144,14 @@ function validatePayload(payload) {
 // =========================================
 
 async function getDriveClient() {
-    // 1) Prefer JSON-in-env if you later add it
-    if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-        let credentials;
-        try {
-            credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-        } catch (e) {
-            throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON is not valid JSON");
-        }
+    const raw = process.env.MUNCHOFM_GOOGLE_APPLICATION_CREDENTIALS;
+    if (!raw) {
+        throw new Error("MUNCHOFM_GOOGLE_APPLICATION_CREDENTIALS env var is missing");
+    }
+
+    // Try: treat value as JSON credentials
+    try {
+        const credentials = JSON.parse(raw);
 
         const auth = new google.auth.GoogleAuth({
             credentials,
@@ -159,23 +159,19 @@ async function getDriveClient() {
         });
 
         return google.drive({ version: "v3", auth });
+    } catch (e) {
+        // Not valid JSON => treat as file path
+        const keyFile = raw;
+        const auth = new google.auth.GoogleAuth({
+            keyFilename: keyFile,
+            scopes: ["https://www.googleapis.com/auth/drive"],
+        });
+
+        return google.drive({ version: "v3", auth });
     }
-
-    // 2) Otherwise, use key file path from your env
-    const keyFile = process.env.MUNCHOFM_GOOGLE_APPLICATION_CREDENTIALS;
-    if (!keyFile) {
-        throw new Error(
-            "Set either GOOGLE_SERVICE_ACCOUNT_JSON or MUNCHOFM_GOOGLE_APPLICATION_CREDENTIALS"
-        );
-    }
-
-    const auth = new google.auth.GoogleAuth({
-        keyFilename: keyFile, // 👈 uses your /var/www/keys/munchofm-service-account.json
-        scopes: ["https://www.googleapis.com/auth/drive"],
-    });
-
-    return google.drive({ version: "v3", auth });
 }
+
+
 
 
 
