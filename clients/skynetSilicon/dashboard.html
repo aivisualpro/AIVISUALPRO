@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skynet Silicon | Proposal System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --secondary-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Login Section */
+        #login-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            background: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--secondary-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent-color);
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background-color: var(--primary-bg);
+        }
+
+        /* Cards */
+        .glass-card {
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-control,
+        .form-select {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #0f172a;
+            border-color: var(--accent-color);
+            color: var(--text-color);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+
+        /* Status Badges */
+        .badge-status-draft {
+            background: #475569;
+            color: white;
+        }
+
+        .badge-status-signed_partial {
+            background: #ca8a04;
+            color: white;
+        }
+
+        .badge-status-ready_to_send {
+            background: #0891b2;
+            color: white;
+        }
+
+        .badge-status-sent {
+            background: #2563eb;
+            color: white;
+        }
+
+        .badge-status-signed_client {
+            background: #16a34a;
+            color: white;
+        }
+
+        /* Helpers */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Screen -->
+    <div id="login-section">
+        <div class="login-card">
+            <h3 class="text-center mb-4 fw-bold" style="color: var(--accent-color)">SKYNET SILICON</h3>
+            <div class="mb-3">
+                <label class="form-label text-muted small">USERNAME</label>
+                <input type="text" id="login-username" class="form-control" placeholder="username">
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted small">PASSWORD</label>
+                <input type="password" id="login-password" class="form-control" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary w-100 py-2" onclick="handleLogin()">ACCESS SYSTEM</button>
+            <div id="login-error" class="text-danger small mt-2 text-center"></div>
+        </div>
+    </div>
+
+    <!-- App Container -->
+    <div id="app-container" class="d-flex h-100 hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h5 class="fw-bold mb-4 px-2" style="color: var(--accent-color)">SKYNET SILICON</h5>
+            <nav class="nav flex-column">
+                <a href="#" class="nav-link active" onclick="showSection('dashboard')">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+                <a href="#" class="nav-link" onclick="showSection('clients')">
+                    <i class="bi bi-people-fill"></i> Clients
+                </a>
+                <a href="#" class="nav-link" onclick="showSection('proposals')">
+                    <i class="bi bi-file-earmark-text-fill"></i> Proposals
+                </a>
+            </nav>
+            <div class="mt-auto">
+                <div class="p-3 rounded bg-dark border border-secondary mb-3">
+                    <small class="text-muted d-block">Logged in as</small>
+                    <strong id="user-display-name">User</strong>
+                </div>
+                <button class="btn btn-outline-danger w-100 btn-sm" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Dashboard Section -->
+            <section id="section-dashboard">
+                <h2 class="fw-light mb-4">Overview</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h6 class="text-muted">Total Proposals</h6>
+                            <h2 class="fw-bold" id="dash-total">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h6 class="text-muted">Pending Signatures</h6>
+                            <h2 class="fw-bold text-warning" id="dash-pending">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card">
+                            <h6 class="text-muted">Completed</h6>
+                            <h2 class="fw-bold text-success" id="dash-completed">0</h2>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clients Section -->
+            <section id="section-clients" class="hidden">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-light">Clients</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showAddClientModal()">+ Add Client</button>
+                </div>
+                <div class="glass-card">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Company</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clients-tbody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Proposals Section -->
+            <section id="section-proposals" class="hidden">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-light">Proposals</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateProposalModal()">+ New Proposal</button>
+                </div>
+                <div class="glass-card">
+                    <table class="table table-dark table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Client</th>
+                                <th>Status</th>
+                                <th>My Sign</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="proposals-tbody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Client Modal -->
+    <div class="modal fade" id="clientModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark border-secondary text-light">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Client Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="client-id">
+                    <div class="mb-3">
+                        <label>Company Name</label>
+                        <input type="text" id="client-company" class="form-control" placeholder="e.g. Skynet Silicon">
+                    </div>
+                    <div class="mb-3">
+                        <label>Contact Person</label>
+                        <input type="text" id="client-name" class="form-control" placeholder="e.g. John Doe">
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" id="client-email" class="form-control" placeholder="name@company.com">
+                    </div>
+                    <div class="mb-3">
+                        <label>Phone</label>
+                        <input type="text" id="client-phone" class="form-control" placeholder="+1 234 567 890">
+                    </div>
+                    <div class="mb-3">
+                        <label>Address</label>
+                        <textarea id="client-address" class="form-control" rows="2"
+                            placeholder="123 Tech Street, Silicon Valley"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveClient()">Save Client</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Proposal Modal -->
+    <div class="modal fade" id="proposalModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-dark border-secondary text-light">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="proposalModalLabel">New Proposal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">CLIENT</label>
+                            <select id="prop-client-select" class="form-select"></select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted small">PROJECT TITLE</label>
+                            <input type="text" id="prop-title" class="form-control"
+                                placeholder="e.g. OTOBIX Inspection App">
+                        </div>
+                    </div>
+
+                    <!-- Builder Tabs -->
+                    <ul class="nav nav-tabs border-secondary mb-3" id="propTabs">
+                        <li class="nav-item"><a class="nav-link active text-light bg-dark border-secondary"
+                                data-bs-toggle="tab" href="#tab-overview">Overview</a></li>
+                        <li class="nav-item"><a class="nav-link text-light bg-dark border-secondary"
+                                data-bs-toggle="tab" href="#tab-payment">Timeline & Payment</a></li>
+                        <li class="nav-item"><a class="nav-link text-light bg-dark border-secondary"
+                                data-bs-toggle="tab" href="#tab-tech">Tech Stack</a></li>
+                        <li class="nav-item"><a class="nav-link text-light bg-dark border-secondary"
+                                data-bs-toggle="tab" href="#tab-deliverables">Deliverables</a></li>
+                        <li class="nav-item"><a class="nav-link text-light bg-dark border-secondary"
+                                data-bs-toggle="tab" href="#tab-conclusion">Conclusion</a></li>
+                        <li class="nav-item"><a class="nav-link text-light bg-dark border-secondary"
+                                data-bs-toggle="tab" href="#tab-preview">Preview</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Overview -->
+                        <div class="tab-pane fade show active" id="tab-overview">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">OVERVIEW DESCRIPTION</label>
+                                <textarea id="prop-overview" class="form-control" rows="6"
+                                    placeholder="We are pleased to present a proposal for..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Payment -->
+                        <div class="tab-pane fade" id="tab-payment">
+                            <div class="row">
+                                <div class="col-md-6 border-end border-secondary">
+                                    <h6 class="text-info mb-3">Option 1 (Required)</h6>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">Option Name</label>
+                                        <input type="text" id="prop-pay1-name" class="form-control"
+                                            value="Monthly Payment Plan">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">Line Items (One per line)</label>
+                                        <textarea id="prop-pay1-items" class="form-control" rows="6"
+                                            placeholder="Cost: $800 per month&#10;Timeline: 4 months&#10;Includes integrations..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-info mb-3">Option 2 (Optional)</h6>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">Option Name</label>
+                                        <input type="text" id="prop-pay2-name" class="form-control"
+                                            value="Full Project Price (Upfront)">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="small text-muted">Line Items (One per line)</label>
+                                        <textarea id="prop-pay2-items" class="form-control" rows="6"
+                                            placeholder="Cost: $2,000 (100% upfront)&#10;Timeline: 3 months&#10;Priority completion..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tech -->
+                        <div class="tab-pane fade" id="tab-tech">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">DESCRIPTION</label>
+                                <textarea id="prop-tech-desc" class="form-control" rows="3"
+                                    placeholder="To ensure a robust and scalable application..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">TECH STACK ITEMS (One per line)</label>
+                                <textarea id="prop-tech-items" class="form-control" rows="5"
+                                    placeholder="Flutter: For front-end development&#10;Node.js: For the backend&#10;MongoDB: For the database"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Deliverables -->
+                        <div class="tab-pane fade" id="tab-deliverables">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">DESCRIPTION</label>
+                                <textarea id="prop-del-desc" class="form-control" rows="3"
+                                    placeholder="We will provide the following deliverables..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">DELIVERABLES LIST (One per line)</label>
+                                <textarea id="prop-del-items" class="form-control" rows="5"
+                                    placeholder="Inspection App&#10;CRM for Lead Generation&#10;Quality Control (QC)"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Conclusion -->
+                        <div class="tab-pane fade" id="tab-conclusion">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">DESCRIPTION</label>
+                                <textarea id="prop-conc-desc" class="form-control" rows="3"
+                                    placeholder="We are excited about the opportunity..."></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">NEXT STEPS / CONTACT INFO (One per
+                                    line)</label>
+                                <textarea id="prop-conc-items" class="form-control" rows="5"
+                                    placeholder="Project Kickoff: Upon agreement...&#10;Regular Updates...&#10;Contact: email@example.com"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="tab-pane fade" id="tab-preview">
+                            <div class="d-flex justify-content-end mb-2">
+                                <button class="btn btn-sm btn-outline-info" onclick="generatePreview()">Generate
+                                    HTML</button>
+                            </div>
+                            <textarea id="prop-content" class="form-control" rows="12"
+                                placeholder="Generated HTML will appear here..."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btn-save-prop" class="btn btn-primary" onclick="saveProposal()">Create
+                        Proposal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div class="modal fade" id="signatureModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark border-secondary text-light">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title">Sign Proposal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Sign as <strong id="sig-signer-name"></strong></p>
+                    <input type="text" id="sig-text" class="form-control mb-3"
+                        placeholder="Type your full name as signature">
+                    <!-- In a real app we might use a canvas pad, but text or simple checking is fine for this MVP -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="sig-confirm">
+                        <label class="form-check-label" for="sig-confirm">
+                            I approve this proposal and authorize its release.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-primary" onclick="submitSignature()">Sign Document</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // State
+        let currentUser = null;
+        let clients = [];
+        let proposals = [];
+        let currentProposalId = null;
+
+        const API_URL = '/webhook/skynetBackend';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSession();
+        });
+
+        async function api(action, payload = {}) {
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, payload })
+                });
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'API Error');
+                return data.result;
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
+                throw err;
+            }
+        }
+
+        // Auth
+        async function handleLogin() {
+            const u = document.getElementById('login-username').value;
+            const p = document.getElementById('login-password').value;
+            try {
+                const res = await api('login', { username: u, password: p });
+                loginUser(res.user);
+            } catch (e) {
+                document.getElementById('login-error').innerText = e.message;
+            }
+        }
+
+        function loginUser(user) {
+            currentUser = user;
+            localStorage.setItem('skynet_user', JSON.stringify(user));
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('login-section').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            loadData();
+        }
+
+        function checkSession() {
+            const saved = localStorage.getItem('skynet_user');
+            if (saved) {
+                try {
+                    const user = JSON.parse(saved);
+                    loginUser(user);
+                } catch (e) {
+                    console.error("Invalid session", e);
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('skynet_user');
+            location.reload();
+        }
+
+        async function loadData() {
+            clients = await api('getClients');
+            proposals = await api('getProposals');
+            renderClients();
+            renderProposals();
+            updateDashboard();
+        }
+
+        // Navigation
+        function showSection(sec) {
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${sec}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Dashboard
+        function updateDashboard() {
+            document.getElementById('dash-total').innerText = proposals.length;
+            const pending = proposals.filter(p => !p.status.includes('SIGNED_CLIENT')).length;
+            const completed = proposals.filter(p => p.status === 'SIGNED_CLIENT').length;
+            document.getElementById('dash-pending').innerText = pending;
+            document.getElementById('dash-completed').innerText = completed;
+        }
+
+        // Clients
+        function renderClients() {
+            const tbody = document.getElementById('clients-tbody');
+            tbody.innerHTML = clients.map(c => `
+                <tr>
+                    <td><strong>${c.company || '-'}</strong></td>
+                    <td>${c.name}</td>
+                    <td>${c.email}</td>
+                    <td>${c.phone || '-'}</td>
+                    <td><button class="btn btn-sm btn-outline-light" onclick="editClient('${c._id}')">Edit</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddClientModal() {
+            document.getElementById('client-id').value = '';
+            document.getElementById('client-name').value = '';
+            document.getElementById('client-email').value = '';
+            document.getElementById('client-company').value = '';
+            document.getElementById('client-phone').value = '';
+            document.getElementById('client-address').value = '';
+            new bootstrap.Modal(document.getElementById('clientModal')).show();
+        }
+
+        function editClient(id) {
+            const c = clients.find(cl => cl._id === id);
+            if (!c) return;
+            document.getElementById('client-id').value = c._id;
+            document.getElementById('client-company').value = c.company || '';
+            document.getElementById('client-name').value = c.name;
+            document.getElementById('client-email').value = c.email;
+            document.getElementById('client-phone').value = c.phone || '';
+            document.getElementById('client-address').value = c.address || '';
+            new bootstrap.Modal(document.getElementById('clientModal')).show();
+        }
+
+        async function saveClient() {
+            const payload = {
+                _id: document.getElementById('client-id').value || undefined,
+                name: document.getElementById('client-name').value,
+                email: document.getElementById('client-email').value,
+                company: document.getElementById('client-company').value,
+                phone: document.getElementById('client-phone').value,
+                address: document.getElementById('client-address').value
+            };
+            await api('saveClient', payload);
+            bootstrap.Modal.getInstance(document.getElementById('clientModal')).hide();
+            await loadData();
+        }
+
+        let currentEditId = null;
+
+        // Proposals
+        function renderProposals() {
+            const tbody = document.getElementById('proposals-tbody');
+            tbody.innerHTML = proposals.map(p => {
+                const mySig = currentUser.id === 'adeel' ? p.signatures.adeel.signed : p.signatures.sagheer.signed;
+                const bothSigned = p.signatures.adeel.signed && p.signatures.sagheer.signed;
+                const canEdit = p.status === 'DRAFT' || p.status === 'SIGNED_PARTIAL' || p.status === 'READY_TO_SEND';
+                const canSign = !mySig && p.status !== 'SENT' && p.status !== 'SIGNED_CLIENT';
+
+                // Send is visible ONLY if both signed
+                const canSend = bothSigned && (p.status === 'READY_TO_SEND' || p.status === 'SENT' || p.status === 'SIGNED_PARTIAL');
+                // Note: SIGNED_PARTIAL shouldn't theoretically happen if bothSigned is true (it should be READY_TO_SEND), 
+                // but checking the flag is safer as per user request.
+
+                let actionHtml = '';
+                // View Button
+                actionHtml += `<a href="view.html?id=${p._id}" target="_blank" class="btn btn-sm btn-outline-light me-2">View</a>`;
+
+                if (canEdit) {
+                    actionHtml += `<button class="btn btn-sm btn-outline-warning me-2" onclick="editProposal('${p._id}')">Edit</button>`;
+                    actionHtml += `<button class="btn btn-sm btn-outline-danger me-2" onclick="deleteProposal('${p._id}')">Delete</button>`;
+                }
+                if (canSign) {
+                    actionHtml += `<button class="btn btn-sm btn-warning me-2" onclick="openSignModal('${p._id}')">Sign</button>`;
+                }
+                if (canSend && p.status !== 'SIGNED_CLIENT') {
+                    actionHtml += `<button class="btn btn-sm btn-info" onclick="sendProposal('${p._id}')">Send to Client</button>`;
+                }
+                if (p.status === 'SIGNED_CLIENT') {
+                    actionHtml += `<span class="text-success ms-2"><i class="bi bi-check-all"></i> Done</span>`;
+                }
+
+                return `
+                <tr>
+                    <td>${p.title}</td>
+                    <td>${p.clientName}</td>
+                    <td><span class="badge badge-status-${p.status.toLowerCase()}">${p.status}</span></td>
+                    <td>${mySig ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-circle text-muted"></i>'}</td>
+                    <td>${actionHtml}</td>
+                </tr>
+            `}).join('');
+        }
+
+        async function deleteProposal(id) {
+            if (!confirm("Are you sure you want to delete this proposal?")) return;
+            await api('deleteProposal', { id });
+            await loadData();
+        }
+
+        function showCreateProposalModal(proposal = null) {
+            // Populate clients drop down (if not already done, but usually clients list is loaded)
+            const sel = document.getElementById('prop-client-select');
+            // Retain selection if editing
+            const currentVal = sel.value;
+            sel.innerHTML = '<option value="">Select Client...</option>' +
+                clients.map(c => `<option value="${c._id}">${c.name} (${c.company || '-'})</option>`).join('');
+
+            // Reset or Populate
+            if (proposal) {
+                currentEditId = proposal._id;
+                document.getElementById('proposalModalLabel').innerText = "Edit Proposal";
+                document.getElementById('prop-client-select').value = proposal.clientId;
+                document.getElementById('prop-title').value = proposal.title;
+
+                // Populate from formData if available
+                if (proposal.formData) {
+                    const f = proposal.formData;
+                    document.getElementById('prop-overview').value = f.overview || '';
+                    document.getElementById('prop-pay1-name').value = f.pay1Name || '';
+                    document.getElementById('prop-pay1-items').value = f.pay1Items || '';
+                    document.getElementById('prop-pay2-name').value = f.pay2Name || '';
+                    document.getElementById('prop-pay2-items').value = f.pay2Items || '';
+                    document.getElementById('prop-tech-desc').value = f.techDesc || '';
+                    document.getElementById('prop-tech-items').value = f.techItems || '';
+                    document.getElementById('prop-del-desc').value = f.delDesc || '';
+                    document.getElementById('prop-del-items').value = f.delItems || '';
+                    document.getElementById('prop-conc-desc').value = f.concDesc || '';
+                    document.getElementById('prop-conc-items').value = f.concItems || '';
+                } else {
+                    // Fallback for old proposals without formData, or if formData is empty
+                    document.getElementById('prop-overview').value = '';
+                    document.getElementById('prop-pay1-name').value = '';
+                    document.getElementById('prop-pay1-items').value = '';
+                    document.getElementById('prop-pay2-name').value = '';
+                    document.getElementById('prop-pay2-items').value = '';
+                    document.getElementById('prop-tech-desc').value = '';
+                    document.getElementById('prop-tech-items').value = '';
+                    document.getElementById('prop-del-desc').value = '';
+                    document.getElementById('prop-del-items').value = '';
+                    document.getElementById('prop-conc-desc').value = '';
+                    document.getElementById('prop-conc-items').value = '';
+                }
+
+                document.getElementById('prop-content').value = proposal.content;
+                document.getElementById('btn-save-prop').innerText = "Update Proposal";
+            } else {
+                currentEditId = null;
+                document.getElementById('proposalModalLabel').innerText = "New Proposal";
+                document.getElementById('prop-client-select').value = '';
+                document.getElementById('prop-title').value = '';
+                document.getElementById('prop-overview').value = 'We are pleased to present a proposal for...';
+                // Defaults
+                document.getElementById('prop-pay1-name').value = 'Monthly Payment Plan';
+                document.getElementById('prop-pay1-items').value = 'Cost: $800 per month\nTimeline: 4 months\nIncludes integrations for:\n- Inspection App\n- CRM\n- QC';
+                document.getElementById('prop-pay2-name').value = 'Full Project Price (Upfront)';
+                document.getElementById('prop-pay2-items').value = 'Cost: $2,000 (100% upfront)\nTimeline: We will prioritize completing...';
+                document.getElementById('prop-tech-desc').value = 'To ensure a robust and scalable application, we will use:';
+                document.getElementById('prop-tech-items').value = 'Flutter: For front-end development\nNode.js: For the backend\nMongoDB: For the database';
+                document.getElementById('prop-del-desc').value = 'We will provide the following deliverables:';
+                document.getElementById('prop-del-items').value = 'Inspection App\nCRM for Lead Generation & Scheduling\nQuality Control (QC)\nPrice Discovery';
+                document.getElementById('prop-conc-desc').value = 'We are excited about the opportunity to work with you.';
+                document.getElementById('prop-conc-items').value = 'Project Kickoff: Upon agreement...\nRegular Updates: ...\nPost-Launch Support: ...';
+
+                document.getElementById('prop-content').value = '';
+                document.getElementById('btn-save-prop').innerText = "Create Proposal";
+            }
+
+            if (currentEditId) sel.value = proposal.clientId;
+
+            // Activate first tab
+            const triggerEl = document.querySelector('#propTabs a[href="#tab-overview"]');
+            bootstrap.Tab.getInstance(triggerEl) ? bootstrap.Tab.getInstance(triggerEl).show() : new bootstrap.Tab(triggerEl).show();
+
+            new bootstrap.Modal(document.getElementById('proposalModal')).show();
+        }
+
+        function generatePreview() {
+            // Helper to make lists
+            const makeList = (txt) => {
+                if (!txt.trim()) return '';
+                const items = txt.split('\n').filter(x => x.trim());
+                if (items.length === 0) return '';
+                return `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+            };
+
+            const overview = document.getElementById('prop-overview').value;
+
+            // Payment
+            const pay1Name = document.getElementById('prop-pay1-name').value;
+            const pay1Items = document.getElementById('prop-pay1-items').value;
+            const pay2Name = document.getElementById('prop-pay2-name').value;
+            const pay2Items = document.getElementById('prop-pay2-items').value;
+
+            // Tech 
+            const techDesc = document.getElementById('prop-tech-desc').value;
+            const techItems = document.getElementById('prop-tech-items').value;
+
+            // Deliverables
+            const delDesc = document.getElementById('prop-del-desc').value;
+            const delItems = document.getElementById('prop-del-items').value;
+
+            // Conclusion
+            const concDesc = document.getElementById('prop-conc-desc').value;
+            const concItems = document.getElementById('prop-conc-items').value;
+
+            let html = `
+                <h2 style="border-bottom: 2px solid #38bdf8; padding-bottom: 10px; margin-top:20px;">Overview</h2>
+                <p>${overview.replace(/\n/g, '<br/>')}</p>
+
+                <h2 style="border-bottom: 2px solid #38bdf8; padding-bottom: 10px; margin-top:30px;">Project Timeline and Payment Options</h2>
+                
+                <h3 style="color: #0ea5e9; margin-top: 20px;">1. ${pay1Name}</h3>
+                ${makeList(pay1Items)}
+            `;
+
+            if (pay2Name && pay2Items.trim()) {
+                html += `
+                    <h3 style="color: #0ea5e9; margin-top: 20px;">2. ${pay2Name}</h3>
+                    ${makeList(pay2Items)}
+                `;
+            }
+
+            html += `
+                <h2 style="border-bottom: 2px solid #38bdf8; padding-bottom: 10px; margin-top:30px;">Tech Stack</h2>
+                <p>${techDesc}</p>
+                ${makeList(techItems)}
+
+                <h2 style="border-bottom: 2px solid #38bdf8; padding-bottom: 10px; margin-top:30px;">Deliverables</h2>
+                <p>${delDesc}</p>
+                ${makeList(delItems)}
+
+                <h2 style="border-bottom: 2px solid #38bdf8; padding-bottom: 10px; margin-top:30px;">Conclusion</h2>
+                <p>${concDesc}</p>
+                ${makeList(concItems)}
+            `;
+
+            document.getElementById('prop-content').value = html;
+        }
+
+        async function editProposal(id) {
+            const proposal = proposals.find(p => p._id === id);
+            if (!proposal) return;
+            showCreateProposalModal(proposal);
+        }
+
+        async function saveProposal() {
+            // ALWAYS generate HTML from current form data before saving
+            generatePreview();
+
+            const clientId = document.getElementById('prop-client-select').value;
+            const title = document.getElementById('prop-title').value;
+            const content = document.getElementById('prop-content').value;
+
+            if (!clientId || !title) return alert("Please select client and title");
+            if (!content) return alert("Please generate preview first");
+
+            const client = clients.find(c => c._id === clientId);
+
+            // Gather Form Data
+            const formData = {
+                overview: document.getElementById('prop-overview').value,
+                pay1Name: document.getElementById('prop-pay1-name').value,
+                pay1Items: document.getElementById('prop-pay1-items').value,
+                pay2Name: document.getElementById('prop-pay2-name').value,
+                pay2Items: document.getElementById('prop-pay2-items').value,
+                techDesc: document.getElementById('prop-tech-desc').value,
+                techItems: document.getElementById('prop-tech-items').value,
+                delDesc: document.getElementById('prop-del-desc').value,
+                delItems: document.getElementById('prop-del-items').value,
+                concDesc: document.getElementById('prop-conc-desc').value,
+                concItems: document.getElementById('prop-conc-items').value
+            };
+
+            const payload = {
+                _id: currentEditId || undefined,
+                clientId,
+                clientName: client.name,
+                clientEmail: client.email,
+                title,
+                content,
+                formData // Save raw data
+            };
+
+            await api('saveProposal', payload);
+            bootstrap.Modal.getInstance(document.getElementById('proposalModal')).hide();
+            await loadData();
+        }
+
+        function openSignModal(id) {
+            currentProposalId = id;
+            document.getElementById('sig-signer-name').innerText = currentUser.name;
+            document.getElementById('sig-text').value = '';
+            document.getElementById('sig-confirm').checked = false;
+            new bootstrap.Modal(document.getElementById('signatureModal')).show();
+        }
+
+        async function submitSignature() {
+            if (!document.getElementById('sig-confirm').checked) return alert("Please confirm.");
+            const sigData = document.getElementById('sig-text').value; // Simple text signature
+            if (!sigData) return alert("Please type your name.");
+
+            await api('signProposalInternal', {
+                proposalId: currentProposalId,
+                signerId: currentUser.id,
+                signatureData: sigData
+            });
+            bootstrap.Modal.getInstance(document.getElementById('signatureModal')).hide();
+            await loadData();
+        }
+
+        async function sendProposal(id) {
+            if (!confirm("Are you sure you want to send this proposal to the client?")) return;
+            // UPDATE: Check correct path
+            const clientLink = window.location.href.replace('skynetSilicon.html', 'dashboard.html').replace('dashboard.html', 'view.html');
+            await api('sendProposalToClient', {
+                proposalId: id,
+                clientLink: clientLink
+            });
+            await loadData();
+            alert("Proposal sent successfully!");
+        }
+
+    </script>
+</body>
+
+</html>
