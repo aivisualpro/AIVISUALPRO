@@ -907,7 +907,8 @@
         async function sendProposal(id) {
             if (!confirm("Are you sure you want to send this proposal to the client?")) return;
             // UPDATE: Check correct path
-            const clientLink = window.location.href.replace('skynetSilicon.html', 'dashboard.html').replace('dashboard.html', 'view.html');
+            // UPDATE: Check correct path
+            const clientLink = window.location.href.replace('dashboard.html', 'view.html');
             await api('sendProposalToClient', {
                 proposalId: id,
                 clientLink: clientLink
