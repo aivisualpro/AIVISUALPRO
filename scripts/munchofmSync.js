@@ -9,12 +9,30 @@ const APPSHEET_ACCESS = process.env.MUNCHOFMAPPSHEET_ACCESS;
 // Same service-account env as munchofm.js
 const SA_CREDENTIALS_RAW = process.env.MUNCHOFM_GOOGLE_APPLICATION_CREDENTIALS;
 
-// AppSheet table to sync
+// AppSheet table to sync FILES into
+// Make sure table name is exactly "Content Data"
 const APPSHEET_TABLE = "Content Data";
 
-// =========================================
-// MAIN ENTRYPOINT  (called by /webhook/munchofmSync)
-// =========================================
+/**
+ * Payload expected:
+ * {
+ *   "contentId": "<<[ContentID]>>",
+ *   "folderLink": "<<[folderLink]>>"
+ * }
+ *
+ * Behavior:
+ *  - Reads all files in the Drive folder
+ *  - Syncs to AppSheet table "Content Data" with columns:
+ *      ContentID
+ *      fileurl
+ *      fileName   (Key column in AppSheet)
+ *      type       (image, video, pdf, zip, other)
+ *      timestamp  (MM/DD/YYYY HH:MM)
+ *      uploadedby
+ *  - Deletes rows from Content Data where fileName no longer exists in Drive
+ *  - Updates table "Content" (row with ContentID) column "Sync Summary"
+ *    with: "timestamp: ... | Summary: Added X file(s), Deleted Y file(s)"
+ */
 export default async function munchofmSync(payload) {
     const startedAt = Date.now();
 
@@ -40,11 +58,13 @@ export default async function munchofmSync(payload) {
         logRow(
             "INFO",
             "Drive files fetched",
-            `count=${driveFiles.length} :: names=${shorten(driveFiles.map(f => f.name))}`
+            `count=${driveFiles.length} :: names=${shorten(driveFiles.map((f) => f.name))}`
         );
 
-        // If there are zero files, we stop early on purpose so it's obvious
+        // If there are zero files, still update summary but skip AppSheet add/edit/delete
         if (!driveFiles.length) {
+            await updateSyncSummary(contentId, 0, 0);
+
             const finishedAt = Date.now();
             const summary = {
                 ok: true,
@@ -107,10 +127,10 @@ export default async function munchofmSync(payload) {
             }
         }
 
-        // Deletes
+        // Deletes: rows existing in AppSheet but not in Drive anymore
         for (const [fileName, existing] of Object.entries(appMap)) {
             if (!driveMap[fileName]) {
-                deletes.push({ fileName });
+                deletes.push(buildDeleteRow(fileName)); // key row
             }
         }
 
@@ -125,6 +145,7 @@ export default async function munchofmSync(payload) {
         if (adds.length) {
             const addRes = await appsheetInvoke(APPSHEET_TABLE, "Add", adds);
             results.push({ type: "Add", count: adds.length, raw: addRes });
+            logRow("INFO", `AppSheet Add ${adds.length} rows`, shorten(addRes));
         } else {
             logRow("INFO", "No rows to Add", "");
         }
@@ -132,6 +153,7 @@ export default async function munchofmSync(payload) {
         if (edits.length) {
             const editRes = await appsheetInvoke(APPSHEET_TABLE, "Edit", edits);
             results.push({ type: "Edit", count: edits.length, raw: editRes });
+            logRow("INFO", `AppSheet Edit ${edits.length} rows`, shorten(editRes));
         } else {
             logRow("INFO", "No rows to Edit", "");
         }
@@ -139,9 +161,13 @@ export default async function munchofmSync(payload) {
         if (deletes.length) {
             const delRes = await appsheetInvoke(APPSHEET_TABLE, "Delete", deletes);
             results.push({ type: "Delete", count: deletes.length, raw: delRes });
+            logRow("INFO", `AppSheet Delete ${deletes.length} rows`, shorten(delRes));
         } else {
             logRow("INFO", "No rows to Delete", "");
         }
+
+        // 4) Update Sync Summary row in Content table
+        await updateSyncSummary(contentId, adds.length, deletes.length);
 
         const finishedAt = Date.now();
         const summary = {
@@ -166,7 +192,6 @@ export default async function munchofmSync(payload) {
         };
     }
 }
-
 
 // =========================================
 // VALIDATION
@@ -269,7 +294,6 @@ async function listFilesInFolder(drive, folderId) {
     return out;
 }
 
-
 // Build MM/DD/YYYY HH:MM string
 function formatTimestamp(ts) {
     const d = new Date(ts);
@@ -328,7 +352,6 @@ function buildFileInfoForRow(file, contentId) {
     // Prefer metadata time, then created/modified
     let rawTs =
         file.imageMediaMetadata?.time ||
-        file.videoMediaMetadata?.creationTime ||
         file.createdTime ||
         file.modifiedTime ||
         new Date().toISOString();
@@ -341,7 +364,7 @@ function buildFileInfoForRow(file, contentId) {
     }
     const timestampStr = formatTimestamp(ts);
 
-    // owner email
+    // owner email (first owner)
     const ownerEmail =
         (file.owners && file.owners[0]?.emailAddress) || "";
 
@@ -372,7 +395,10 @@ function buildEditDiff(newRow, existingRow) {
     let changed = false;
 
     function cmp(colKey, newVal) {
-        const oldVal = existingRow[colKey] ?? existingRow[colKey.replace(/ /g, "")];
+        const oldVal =
+            existingRow[colKey] ??
+            existingRow[colKey.replace(/ /g, "")] ??
+            existingRow[colKey.replace(/ /g, "_")];
         const oldStr = oldVal == null ? "" : String(oldVal);
         const newStr = newVal == null ? "" : String(newVal);
         if (oldStr !== newStr) {
@@ -388,6 +414,18 @@ function buildEditDiff(newRow, existingRow) {
     cmp("uploadedby", newRow.uploadedby);
 
     return changed ? diff : null;
+}
+
+/**
+ * Build row for Delete.
+ * We send multiple key variants so AppSheet can match whichever column name you use.
+ */
+function buildDeleteRow(fileName) {
+    return {
+        fileName: fileName,
+        FileName: fileName,
+        "file name": fileName,
+    };
 }
 
 // =========================================
@@ -465,9 +503,29 @@ async function appsheetFind(tableName, selectorExpr) {
     try {
         return JSON.parse(txt);
     } catch (e) {
-        logRow("WARN", "Find JSON parse failed", String(e));
+        logRow("WARN", "Find JSON parse failed, returning no rows", String(e));
         return { Rows: [] };
     }
+}
+
+/**
+ * Update Sync Summary in Content table:
+ *  - finds row by ContentID (Key)
+ *  - sets column "Sync Summary"
+ */
+async function updateSyncSummary(contentId, added, deleted) {
+    const nowIso = new Date().toISOString();
+    const stamp = formatTimestamp(nowIso);
+
+    const summaryText = `timestamp: ${stamp} | Summary: Added ${added} file(s), Deleted ${deleted} file(s)`;
+
+    const row = {
+        ContentID: contentId,          // key column in Content table
+        "Sync Summary": summaryText,   // make sure this column name matches AppSheet
+    };
+
+    const res = await appsheetInvoke("Content", "Edit", [row]);
+    logRow("INFO", "Updated Sync Summary on Content", shorten(res));
 }
 
 // =========================================
