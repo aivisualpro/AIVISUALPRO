@@ -144,13 +144,24 @@ function validatePayload(payload) {
 // =========================================
 
 async function getDriveClient() {
-    // Requires GOOGLE_APPLICATION_CREDENTIALS or equivalent auth configured
-    const auth = new google.auth.GoogleAuth({
-        scopes: ["https://www.googleapis.com/auth/drive"],
-    });
+    const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+    if (!serviceAccountJson) {
+        throw new Error(
+            "GOOGLE_SERVICE_ACCOUNT_JSON env var is missing. Please set it to your service account JSON."
+        );
+    }
+
+    let credentials;
+    try {
+        credentials = JSON.parse(serviceAccountJson);
+    } catch (e) {
+        throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON is not valid JSON");
+    }
+
     const drive = google.drive({ version: "v3", auth });
     return drive;
 }
+
 
 /**
  * Ensure a folder exists with given name under a parent folder.
