@@ -61,7 +61,7 @@ export default async function munchofmSync(payload) {
             `count=${driveFiles.length} :: names=${shorten(driveFiles.map((f) => f.name))}`
         );
 
-        // If there are zero files, still update summary but skip AppSheet add/edit/delete
+        // Even if zero files, still update Sync Summary (0 added, 0 deleted)
         if (!driveFiles.length) {
             await updateSyncSummary(contentId, 0, 0);
 
@@ -130,7 +130,7 @@ export default async function munchofmSync(payload) {
         // Deletes: rows existing in AppSheet but not in Drive anymore
         for (const [fileName, existing] of Object.entries(appMap)) {
             if (!driveMap[fileName]) {
-                deletes.push(buildDeleteRow(fileName)); // key row
+                deletes.push(buildDeleteRow(fileName)); // row with Key
             }
         }
 
@@ -418,13 +418,11 @@ function buildEditDiff(newRow, existingRow) {
 
 /**
  * Build row for Delete.
- * We send multiple key variants so AppSheet can match whichever column name you use.
+ * IMPORTANT: this assumes the Key column in "Content Data" is [fileName].
  */
 function buildDeleteRow(fileName) {
     return {
-        fileName: fileName,
-        FileName: fileName,
-        "file name": fileName,
+        fileName: fileName, // key column MUST be fileName in AppSheet
     };
 }
 
