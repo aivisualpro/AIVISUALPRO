@@ -255,7 +255,7 @@ async function listFilesInFolder(drive, folderId) {
             q: `'${folderId}' in parents and trashed = false`,
             spaces: "drive",
             fields:
-                "nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink, owners(emailAddress,displayName), imageMediaMetadata(time), videoMediaMetadata(creationTime))",
+                "nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink, owners(emailAddress,displayName), imageMediaMetadata)",
             pageSize: 1000,
             pageToken,
         });
@@ -268,6 +268,7 @@ async function listFilesInFolder(drive, folderId) {
 
     return out;
 }
+
 
 // Build MM/DD/YYYY HH:MM string
 function formatTimestamp(ts) {
