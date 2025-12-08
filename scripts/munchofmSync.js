@@ -22,17 +22,16 @@ const APPSHEET_TABLE = "Content Data";
  *
  * Behavior:
  *  - Reads all files in the Drive folder
- *  - Syncs to AppSheet table "Content Data" with columns:
+ *  - WIPES all rows in "Content Data" where [ContentID] = contentId (Delete by Selector)
+ *  - Re-adds one row per file:
  *      ContentID
  *      fileurl
  *      fileName   (Key column in AppSheet)
  *      type       (image, video, pdf, zip, other)
  *      timestamp  (MM/DD/YYYY HH:MM)
  *      uploadedby
- *  - Deletes rows from Content Data where fileName no longer exists in Drive
- *  - Updates table "Content" (row with ContentID) column "Sync Summary"
- *    by APPENDING:
- *      "timestamp: ... | Summary: Added X file(s), Deleted Y file(s)"
+ *  - Updates "Content" table [Sync Summary] by APPENDING a line if Find works,
+ *    otherwise overwrites (because AppSheet isn't letting the API read).
  */
 export default async function munchofmSync(payload) {
     const startedAt = Date.now();
@@ -62,120 +61,59 @@ export default async function munchofmSync(payload) {
             `count=${driveFiles.length} :: names=${shorten(driveFiles.map((f) => f.name))}`
         );
 
-        // Even if zero files, still update Sync Summary (0 added, 0 deleted)
-        if (!driveFiles.length) {
-            await updateSyncSummary(contentId, 0, 0);
+        // Build rows from Drive
+        const driveRows = driveFiles.map((f) => buildFileInfoForRow(f, contentId));
 
-            const finishedAt = Date.now();
-            const summary = {
-                ok: true,
-                reason: "no_files_in_drive_folder",
-                contentId,
-                folderId,
-                ms: finishedAt - startedAt,
-            };
-            logRow("INFO", "munchofmSync completed (no files)", shorten(summary));
-            return summary;
-        }
-
-        // Map Drive -> by fileName
-        const driveMap = {};
-        for (const f of driveFiles) {
-            const fileName = f.name;
-            if (!fileName) continue;
-
-            const row = buildFileInfoForRow(f, contentId);
-            driveMap[fileName] = row;
-        }
-
-        // 2) Get existing AppSheet rows for this ContentID
+        // 2) DELETE ALL existing rows in Content Data for this ContentID
         const selector = `([ContentID] = "${escapeQuotes(contentId)}")`;
-        const existingRes = await appsheetFind(APPSHEET_TABLE, selector);
-        const existingRows = getRowsArray(existingRes);
-        logRow(
-            "INFO",
-            "Existing AppSheet rows fetched",
-            `count=${existingRows.length}`
-        );
+        logRow("INFO", "Deleting existing rows in Content Data with selector", selector);
 
-        // Map existing -> by fileName (Key)
-        const appMap = {};
-        for (const row of existingRows) {
-            const fn =
-                row.fileName ||
-                row.FileName ||
-                row["file name"] ||
-                row["fileName"] ||
-                "";
-            const fileName = String(fn || "").trim();
-            if (!fileName) continue;
-            appMap[fileName] = row;
-        }
+        const deleteRes = await appsheetInvoke(APPSHEET_TABLE, "Delete", [], {
+            Selector: selector,
+        });
+        logRow("INFO", "Delete-by-selector result", shorten(deleteRes));
 
-        // 3) Diff: adds, edits, deletes
-        const adds = [];
-        const edits = [];
-        const deletes = [];
+        // We don't know exactly how many were deleted (AppSheet doesn't return a count),
+        // but we can assume that anything not in Drive now is gone in the table.
+        // For summary, we'll just show Deleted = (oldCount - newCount) if we can read,
+        // otherwise we approximate as 0.
+        let deletedCount = 0;
 
-        // Adds + edits
-        for (const [fileName, driveRow] of Object.entries(driveMap)) {
-            const existing = appMap[fileName];
-            if (!existing) {
-                adds.push(driveRow);
-            } else {
-                const diff = buildEditDiff(driveRow, existing);
-                if (diff) edits.push(diff);
+        // Try to approximate deletedCount using Content row's Related Content Datas BEFORE Add
+        // (if AppSheet ever lets us read).
+        try {
+            const beforeRes = await appsheetFind("Content", selector);
+            const beforeRows = getRowsArray(beforeRes);
+            if (beforeRows.length) {
+                const r = beforeRows[0];
+                const related =
+                    r["Related Content Datas"] ||
+                    r.RelatedContentDatas ||
+                    "";
+                if (related && typeof related === "string") {
+                    const parts = related
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean);
+                    deletedCount = Math.max(0, parts.length - driveFiles.length);
+                }
             }
+        } catch (e) {
+            logRow("WARN", "Could not estimate deletedCount", String(e));
         }
 
-        // Deletes: rows existing in AppSheet but not in Drive anymore
-        for (const [fileName, existing] of Object.entries(appMap)) {
-            if (!driveMap[fileName]) {
-                deletes.push(buildDeleteRow(fileName)); // row with Key
-            }
-        }
-
-        logRow(
-            "INFO",
-            "Diff summary",
-            `adds=${adds.length}, edits=${edits.length}, deletes=${deletes.length}`
-        );
-        if (deletes.length) {
-            logRow(
-                "INFO",
-                "Delete candidates (fileName keys)",
-                deletes.map((d) => d.fileName)
-            );
-        }
-
-        const results = [];
-
-        if (adds.length) {
-            const addRes = await appsheetInvoke(APPSHEET_TABLE, "Add", adds);
-            results.push({ type: "Add", count: adds.length, raw: addRes });
-            logRow("INFO", `AppSheet Add ${adds.length} rows`, shorten(addRes));
+        // 3) ADD all current Drive files
+        let addsCount = 0;
+        if (driveRows.length) {
+            const addRes = await appsheetInvoke(APPSHEET_TABLE, "Add", driveRows);
+            addsCount = driveRows.length;
+            logRow("INFO", `AppSheet Add ${driveRows.length} rows`, shorten(addRes));
         } else {
-            logRow("INFO", "No rows to Add", "");
+            logRow("INFO", "No rows to Add (folder empty)", "");
         }
 
-        if (edits.length) {
-            const editRes = await appsheetInvoke(APPSHEET_TABLE, "Edit", edits);
-            results.push({ type: "Edit", count: edits.length, raw: editRes });
-            logRow("INFO", `AppSheet Edit ${edits.length} rows`, shorten(editRes));
-        } else {
-            logRow("INFO", "No rows to Edit", "");
-        }
-
-        if (deletes.length) {
-            const delRes = await appsheetInvoke(APPSHEET_TABLE, "Delete", deletes);
-            results.push({ type: "Delete", count: deletes.length, raw: delRes });
-            logRow("INFO", `AppSheet Delete ${deletes.length} rows`, shorten(delRes));
-        } else {
-            logRow("INFO", "No rows to Delete", "");
-        }
-
-        // 4) Update Sync Summary row in Content table (APPEND)
-        await updateSyncSummary(contentId, adds.length, deletes.length);
+        // 4) Update Sync Summary row in Content table (APPEND if Find works)
+        await updateSyncSummary(contentId, addsCount, deletedCount);
 
         const finishedAt = Date.now();
         const summary = {
@@ -184,10 +122,8 @@ export default async function munchofmSync(payload) {
             contentId,
             folderId,
             driveFileCount: driveFiles.length,
-            adds: adds.length,
-            edits: edits.length,
-            deletes: deletes.length,
-            results,
+            adds: addsCount,
+            deletes: deletedCount,
         };
 
         logRow("INFO", "munchofmSync completed", shorten(summary));
@@ -261,10 +197,6 @@ async function getDriveClient() {
 
 /**
  * Extract folderId from a Drive folder link
- * Supports:
- *  - https://drive.google.com/drive/folders/<FOLDER_ID>
- *  - https://drive.google.com/drive/u/0/folders/<FOLDER_ID>
- *  - https://drive.google.com/open?id=<FOLDER_ID>
  */
 function extractFolderIdFromLink(link) {
     if (!link) return null;
@@ -340,13 +272,6 @@ function decideType(mime) {
 
 /**
  * Build a row object for AppSheet Content Data table from a Drive file.
- * Columns:
- *  - ContentID
- *  - fileurl
- *  - fileName
- *  - type
- *  - timestamp
- *  - uploadedby
  */
 function buildFileInfoForRow(file, contentId) {
     const fileId = file.id;
@@ -372,7 +297,6 @@ function buildFileInfoForRow(file, contentId) {
     }
     const timestampStr = formatTimestamp(ts);
 
-    // owner email (first owner)
     const ownerEmail =
         (file.owners && file.owners[0]?.emailAddress) || "";
 
@@ -383,54 +307,6 @@ function buildFileInfoForRow(file, contentId) {
         type: type,
         timestamp: timestampStr,
         uploadedby: ownerEmail,
-    };
-}
-
-/**
- * Build partial row for Edit if any relevant fields changed.
- * Key column is fileName.
- */
-function buildEditDiff(newRow, existingRow) {
-    const key =
-        existingRow.fileName ||
-        existingRow.FileName ||
-        existingRow["file name"] ||
-        existingRow["fileName"] ||
-        newRow.fileName;
-
-    const diff = { fileName: key }; // Key column
-
-    let changed = false;
-
-    function cmp(colKey, newVal) {
-        const oldVal =
-            existingRow[colKey] ??
-            existingRow[colKey.replace(/ /g, "")] ??
-            existingRow[colKey.replace(/ /g, "_")];
-        const oldStr = oldVal == null ? "" : String(oldVal);
-        const newStr = newVal == null ? "" : String(newVal);
-        if (oldStr !== newStr) {
-            diff[colKey] = newVal;
-            changed = true;
-        }
-    }
-
-    cmp("ContentID", newRow.ContentID);
-    cmp("fileurl", newRow.fileurl);
-    cmp("type", newRow.type);
-    cmp("timestamp", newRow.timestamp);
-    cmp("uploadedby", newRow.uploadedby);
-
-    return changed ? diff : null;
-}
-
-/**
- * Build row for Delete.
- * IMPORTANT: this assumes the Key column in "Content Data" is [fileName].
- */
-function buildDeleteRow(fileName) {
-    return {
-        fileName: fileName, // key column MUST be fileName in AppSheet
     };
 }
 
@@ -517,8 +393,8 @@ async function appsheetFind(tableName, selectorExpr) {
 /**
  * Update Sync Summary in Content table:
  *  - finds row by ContentID (Key)
- *  - APPENDS a new line:
- *      "timestamp: ... | Summary: Added X file(s), Deleted Y file(s)"
+ *  - APPENDS a new line when Find works
+ *  - If Find returns nothing (like now), it just overwrites with the latest line.
  */
 async function updateSyncSummary(contentId, added, deleted) {
     const nowIso = new Date().toISOString();
@@ -526,18 +402,22 @@ async function updateSyncSummary(contentId, added, deleted) {
 
     const newLine = `timestamp: ${stamp} | Summary: Added ${added} file(s), Deleted ${deleted} file(s)`;
 
-    // 1) Get existing Content row to read current Sync Summary
-    const selector = `([ContentID] = "${escapeQuotes(contentId)}")`;
-    const findRes = await appsheetFind("Content", selector);
-    const rows = getRowsArray(findRes);
-
     let existingSummary = "";
-    if (rows.length) {
-        const r = rows[0];
-        existingSummary =
-            r["Sync Summary"] ||
-            r.SyncSummary ||
-            "";
+
+    try {
+        const selector = `([ContentID] = "${escapeQuotes(contentId)}")`;
+        const findRes = await appsheetFind("Content", selector);
+        const rows = getRowsArray(findRes);
+
+        if (rows.length) {
+            const r = rows[0];
+            existingSummary =
+                r["Sync Summary"] ||
+                r.SyncSummary ||
+                "";
+        }
+    } catch (e) {
+        logRow("WARN", "Could not read existing Sync Summary", String(e));
     }
 
     const combined =
@@ -546,8 +426,8 @@ async function updateSyncSummary(contentId, added, deleted) {
             : newLine;
 
     const row = {
-        ContentID: contentId,          // key column in Content table
-        "Sync Summary": combined,      // make sure this column name matches AppSheet
+        ContentID: contentId,
+        "Sync Summary": combined,
     };
 
     const res = await appsheetInvoke("Content", "Edit", [row]);
