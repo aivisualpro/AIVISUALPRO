@@ -31,7 +31,8 @@ const APPSHEET_TABLE = "Content Data";
  *      uploadedby
  *  - Deletes rows from Content Data where fileName no longer exists in Drive
  *  - Updates table "Content" (row with ContentID) column "Sync Summary"
- *    with: "timestamp: ... | Summary: Added X file(s), Deleted Y file(s)"
+ *    by APPENDING:
+ *      "timestamp: ... | Summary: Added X file(s), Deleted Y file(s)"
  */
 export default async function munchofmSync(payload) {
     const startedAt = Date.now();
@@ -139,6 +140,13 @@ export default async function munchofmSync(payload) {
             "Diff summary",
             `adds=${adds.length}, edits=${edits.length}, deletes=${deletes.length}`
         );
+        if (deletes.length) {
+            logRow(
+                "INFO",
+                "Delete candidates (fileName keys)",
+                deletes.map((d) => d.fileName)
+            );
+        }
 
         const results = [];
 
@@ -166,7 +174,7 @@ export default async function munchofmSync(payload) {
             logRow("INFO", "No rows to Delete", "");
         }
 
-        // 4) Update Sync Summary row in Content table
+        // 4) Update Sync Summary row in Content table (APPEND)
         await updateSyncSummary(contentId, adds.length, deletes.length);
 
         const finishedAt = Date.now();
@@ -509,17 +517,37 @@ async function appsheetFind(tableName, selectorExpr) {
 /**
  * Update Sync Summary in Content table:
  *  - finds row by ContentID (Key)
- *  - sets column "Sync Summary"
+ *  - APPENDS a new line:
+ *      "timestamp: ... | Summary: Added X file(s), Deleted Y file(s)"
  */
 async function updateSyncSummary(contentId, added, deleted) {
     const nowIso = new Date().toISOString();
     const stamp = formatTimestamp(nowIso);
 
-    const summaryText = `timestamp: ${stamp} | Summary: Added ${added} file(s), Deleted ${deleted} file(s)`;
+    const newLine = `timestamp: ${stamp} | Summary: Added ${added} file(s), Deleted ${deleted} file(s)`;
+
+    // 1) Get existing Content row to read current Sync Summary
+    const selector = `([ContentID] = "${escapeQuotes(contentId)}")`;
+    const findRes = await appsheetFind("Content", selector);
+    const rows = getRowsArray(findRes);
+
+    let existingSummary = "";
+    if (rows.length) {
+        const r = rows[0];
+        existingSummary =
+            r["Sync Summary"] ||
+            r.SyncSummary ||
+            "";
+    }
+
+    const combined =
+        existingSummary && existingSummary.trim().length
+            ? `${existingSummary}\n${newLine}`
+            : newLine;
 
     const row = {
         ContentID: contentId,          // key column in Content table
-        "Sync Summary": summaryText,   // make sure this column name matches AppSheet
+        "Sync Summary": combined,      // make sure this column name matches AppSheet
     };
 
     const res = await appsheetInvoke("Content", "Edit", [row]);
