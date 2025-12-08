@@ -138,7 +138,7 @@
 
     <div class="action-bar" id="action-bar">
         <button id="btn-sign" class="btn btn-primary btn-lg" onclick="showSignModal()">Review & Sign</button>
-        <button id="btn-download" class="btn btn-outline-dark btn-lg hidden" onclick="downloadPDF()">Download
+        <button id="btn-download" class="btn btn-outline-dark btn-lg" onclick="downloadPDF()">Download
             PDF</button>
     </div>
 
@@ -218,7 +218,7 @@
                     <small>${new Date(sigs.client.date).toLocaleDateString()}</small>
                 `;
                 document.getElementById('btn-sign').classList.add('hidden');
-                document.getElementById('btn-download').classList.remove('hidden');
+                // document.getElementById('btn-download').classList.remove('hidden'); // Always visible now
             } else {
                 // Check if admins have signed
                 if (sigs.adeel.signed && sigs.sagheer.signed) {
