@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devco | Dashboard</title>
+    <meta name="description" content="Devco Proposals Management System">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel" src="components.js"></script>
+
+    <script type="text/babel">
+        const { Header, Card, StatCard, Button } = window.DevcoComponents;
+
+        // Quick Link Card
+        const QuickLinkCard = ({ title, description, icon, href, color }) => (
+            <a href={href} className="block group">
+                <Card className="p-6 h-full">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                        {icon}
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">{title}</h3>
+                    <p className="text-sm text-gray-500">{description}</p>
+                    <div className="mt-4 text-indigo-600 text-sm font-semibold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Open <span className="group-hover:translate-x-1 transition-transform duration-200">→</span>
+                    </div>
+                </Card>
+            </a>
+        );
+
+        function DashboardApp() {
+            const [stats, setStats] = React.useState({
+                catalogueItems: 0,
+                templates: 0,
+                estimates: 0
+            });
+
+            React.useEffect(() => {
+                loadStats();
+            }, []);
+
+            const loadStats = async () => {
+                try {
+                    // Load estimates count
+                    const estimatesRes = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'getEstimates' })
+                    });
+                    const estimatesData = await estimatesRes.json();
+
+                    // Load catalogue count (just equipment as sample)
+                    const catalogueRes = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'getCatalogueItems', payload: { type: 'equipment' } })
+                    });
+                    const catalogueData = await catalogueRes.json();
+
+                    setStats({
+                        estimates: estimatesData.success && estimatesData.result ? estimatesData.result.length : 0,
+                        catalogueItems: catalogueData.success && catalogueData.result ? catalogueData.result.length : 0,
+                        templates: 0
+                    });
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                }
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <Header activePage="dashboard" />
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {/* Welcome Section */}
+                        <div className="mb-8">
+                            <h1 className="text-3xl font-bold text-gray-900">Welcome back! 👋</h1>
+                            <p className="text-gray-500 mt-2">Here's an overview of your Devco workspace</p>
+                        </div>
+
+                        {/* Quick Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <StatCard icon="📦" value={stats.catalogueItems} label="Catalogue Items" color="blue" />
+                            <StatCard icon="📄" value={stats.templates} label="Templates" color="green" />
+                            <StatCard icon="📊" value={stats.estimates} label="Estimates" color="purple" />
+                        </div>
+
+                        {/* Quick Links */}
+                        <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Access</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <QuickLinkCard
+                                title="Catalogue"
+                                description="Manage equipment, labor, materials and more"
+                                icon="📦"
+                                href="catalogue.html"
+                                color="from-blue-100 to-indigo-200"
+                            />
+                            <QuickLinkCard
+                                title="Templates"
+                                description="Create and manage proposal templates"
+                                icon="📄"
+                                href="templates.html"
+                                color="from-emerald-100 to-teal-200"
+                            />
+                            <QuickLinkCard
+                                title="Estimates"
+                                description="View and manage customer estimates"
+                                icon="📊"
+                                href="estimates.html"
+                                color="from-purple-100 to-violet-200"
+                            />
+                        </div>
+
+                        {/* Recent Activity (placeholder) */}
+                        <Card className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
+                                <Button variant="ghost" size="sm">View All</Button>
+                            </div>
+                            <div className="text-center py-8 text-gray-400">
+                                <div className="text-4xl mb-2">📝</div>
+                                <p className="text-sm">Recent activity will appear here</p>
+                            </div>
+                        </Card>
+                    </main>
+                </div>
+            );
+        }
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<DashboardApp />);
+    </script>
+</body>
+
+</html>

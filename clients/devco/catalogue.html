@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devco | Catalogue</title>
+    <meta name="description" content="Manage catalogue items - Equipment, Labor, Materials and more">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes modal {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-modal {
+            animation: modal 0.2s ease-out;
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gray-50 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel" src="components.js"></script>
+
+    <script type="text/babel">
+        const { Header, Button, Card, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, Loading, EmptyState, Modal, Input, SearchInput, StatusTabs, Pagination, ActionDropdown, IconButton } = window.DevcoComponents;
+
+        // Category configurations - Equipment/Machine (or item name) is second column after S.No
+        const categoryConfig = {
+            equipment: {
+                title: 'Equipment Items',
+                headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Daily Cost', 'Weekly Cost', 'Monthly Cost', 'Fuel Additive'],
+                fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost'],
+                fieldTypes: { dailyCost: 'number', weeklyCost: 'number', monthlyCost: 'number', fuelAdditiveCost: 'number' }
+            },
+            labor: {
+                title: 'Labor Items',
+                headers: ['Labor', 'Classification', 'Sub Classification', 'Fringe', 'UOM', 'Cost', 'W Comp %', 'Payroll Tax %'],
+                fields: ['_labor', 'classification', 'subClassification', 'fringe', 'uom', 'cost', 'wCompPercent', 'payrollTaxesPercent'],
+                fieldTypes: { cost: 'number', wCompPercent: 'number', payrollTaxesPercent: 'number' },
+                computedFields: {
+                    _labor: (item) => `${item.classification || ''}${item.classification && item.fringe ? '-' : ''}${item.fringe || ''}`
+                }
+            },
+            overhead: {
+                title: 'Overhead Items',
+                headers: ['Overhead', 'Classification', 'Sub Classification', 'UOM', 'Days', 'Hours', 'Hourly Rate', 'Daily Rate'],
+                fields: ['overhead', 'classification', 'subClassification', 'uom', 'days', 'hours', 'hourlyRate', 'dailyRate'],
+                fieldTypes: { days: 'number', hours: 'number', hourlyRate: 'number', dailyRate: 'number' }
+            },
+            subcontractor: {
+                title: 'Subcontractor Items',
+                headers: ['Subcontractor', 'Classification', 'Sub Classification', 'UOM', 'Notes', 'Cost'],
+                fields: ['subcontractor', 'classification', 'subClassification', 'uom', 'notes', 'cost'],
+                fieldTypes: { cost: 'number' }
+            },
+            disposal: {
+                title: 'Disposal Items',
+                headers: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost'],
+                fields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'quantity', 'cost'],
+                fieldTypes: { quantity: 'number', cost: 'number' }
+            },
+            material: {
+                title: 'Material Items',
+                headers: ['Material', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes'],
+                fields: ['material', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes'],
+                fieldTypes: { cost: 'number', quantity: 'number', taxes: 'number' }
+            },
+            miscellaneous: {
+                title: 'Miscellaneous Items',
+                headers: ['Item', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost'],
+                fields: ['item', 'classification', 'subClassification', 'uom', 'quantity', 'cost'],
+                fieldTypes: { quantity: 'number', cost: 'number' }
+            },
+            tool: {
+                title: 'Tool Items',
+                headers: ['Tool', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes'],
+                fields: ['tool', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes'],
+                fieldTypes: { cost: 'number', quantity: 'number', taxes: 'number' }
+            }
+        };
+
+        // Fields that should use searchable dropdowns with add feature
+        const dropdownFields = ['classification', 'subClassification', 'supplier', 'fringe', 'uom'];
+
+        // Searchable Select Component with Add feature
+        const SearchableSelect = ({ label, value, onChange, options, placeholder = 'Select or type to add...' }) => {
+            const [isOpen, setIsOpen] = React.useState(false);
+            const [searchTerm, setSearchTerm] = React.useState('');
+            const dropdownRef = React.useRef(null);
+
+            // Filter options based on search
+            const filteredOptions = options.filter(opt =>
+                opt.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            // Check if search term is a new value
+            const isNewValue = searchTerm && !options.some(opt =>
+                opt.toLowerCase() === searchTerm.toLowerCase()
+            );
+
+            // Close dropdown when clicking outside
+            React.useEffect(() => {
+                const handleClickOutside = (e) => {
+                    if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                        setIsOpen(false);
+                    }
+                };
+                document.addEventListener('mousedown', handleClickOutside);
+                return () => document.removeEventListener('mousedown', handleClickOutside);
+            }, []);
+
+            const handleSelect = (opt) => {
+                onChange(opt);
+                setSearchTerm('');
+                setIsOpen(false);
+            };
+
+            const handleAddNew = () => {
+                if (searchTerm.trim()) {
+                    onChange(searchTerm.trim());
+                    setSearchTerm('');
+                    setIsOpen(false);
+                }
+            };
+
+            return (
+                <div className="relative" ref={dropdownRef}>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">{label}</label>
+                    <div
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white cursor-pointer flex items-center justify-between"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                        <span className={value ? 'text-gray-900' : 'text-gray-400'}>
+                            {value || placeholder}
+                        </span>
+                        <svg className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="m6 9 6 6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
+                        </svg>
+                    </div>
+
+                    {isOpen && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-hidden">
+                            {/* Search Input */}
+                            <div className="p-2 border-b border-gray-100">
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    placeholder="Type to search or add..."
+                                    className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                    onClick={(e) => e.stopPropagation()}
+                                    autoFocus
+                                />
+                            </div>
+
+                            {/* Options List */}
+                            <div className="max-h-40 overflow-y-auto">
+                                {filteredOptions.length > 0 ? (
+                                    filteredOptions.map((opt, i) => (
+                                        <div
+                                            key={i}
+                                            className={`px-3 py-2 text-sm cursor-pointer hover:bg-indigo-50 ${value === opt ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'}`}
+                                            onClick={() => handleSelect(opt)}
+                                        >
+                                            {opt}
+                                        </div>
+                                    ))
+                                ) : !isNewValue && (
+                                    <div className="px-3 py-2 text-sm text-gray-400">No options found</div>
+                                )}
+
+                                {/* Add New Option */}
+                                {isNewValue && (
+                                    <div
+                                        className="px-3 py-2 text-sm cursor-pointer hover:bg-green-50 text-green-600 font-medium border-t border-gray-100 flex items-center gap-2"
+                                        onClick={handleAddNew}
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                            <path d="M12 5v14M5 12h14" strokeLinecap="round" strokeLinejoin="round"></path>
+                                        </svg>
+                                        Add "{searchTerm}"
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Main Catalogue App
+        function CatalogueApp() {
+            const [category, setCategory] = React.useState('equipment');
+            const [items, setItems] = React.useState([]);
+            const [allCounts, setAllCounts] = React.useState({});
+            const [loading, setLoading] = React.useState(true);
+            const [search, setSearch] = React.useState('');
+            const [sortBy, setSortBy] = React.useState('oldest');
+            const [modalOpen, setModalOpen] = React.useState(false);
+            const [editingItem, setEditingItem] = React.useState(null);
+            const [formData, setFormData] = React.useState({});
+            const [currentPage, setCurrentPage] = React.useState(1);
+            const itemsPerPage = 10;
+
+            const config = categoryConfig[category];
+
+            // Get unique values for dropdown fields from existing items
+            const getOptionsForField = (field) => {
+                const values = items
+                    .map(item => item[field])
+                    .filter(Boolean)
+                    .filter((v, i, arr) => arr.indexOf(v) === i)
+                    .sort();
+                return values;
+            };
+
+            // Load all category counts on mount
+            React.useEffect(() => {
+                loadAllCounts();
+            }, []);
+
+            // Load items when category changes
+            React.useEffect(() => {
+                loadItems();
+                setCurrentPage(1);
+            }, [category]);
+
+            const loadAllCounts = async () => {
+                const counts = {};
+                for (const cat of Object.keys(categoryConfig)) {
+                    try {
+                        const response = await fetch('/webhook/devcoBackend', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'getCatalogueItems', payload: { type: cat } })
+                        });
+                        const result = await response.json();
+                        counts[cat] = result.success && result.result ? result.result.length : 0;
+                    } catch (e) {
+                        counts[cat] = 0;
+                    }
+                }
+                setAllCounts(counts);
+            };
+
+            const loadItems = async () => {
+                setLoading(true);
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'getCatalogueItems',
+                            payload: { type: category }
+                        })
+                    });
+                    const result = await response.json();
+                    const loadedItems = result.success && result.result ? result.result : [];
+                    setItems(loadedItems);
+                    setAllCounts(prev => ({ ...prev, [category]: loadedItems.length }));
+                } catch (error) {
+                    console.error('Error loading items:', error);
+                    setItems([]);
+                }
+                setLoading(false);
+            };
+
+            // Filter items by search
+            const filteredItems = items.filter(item =>
+                config.fields.some(field =>
+                    String(item[field] || '').toLowerCase().includes(search.toLowerCase())
+                )
+            );
+
+            // Sort items
+            const sortedItems = [...filteredItems].sort((a, b) => {
+                if (sortBy === 'newest') {
+                    return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+                } else if (sortBy === 'oldest') {
+                    return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+                } else if (sortBy === 'name') {
+                    // Sort by first field (which is the item name)
+                    const nameA = String(a[config.fields[0]] || '').toLowerCase();
+                    const nameB = String(b[config.fields[0]] || '').toLowerCase();
+                    return nameA.localeCompare(nameB);
+                }
+                return 0;
+            });
+
+            // Pagination
+            const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
+            const paginatedItems = sortedItems.slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage
+            );
+
+            // Category tabs with counts
+            const categoryTabs = [
+                { id: 'equipment', label: 'Equipment', count: allCounts.equipment || 0 },
+                { id: 'labor', label: 'Labor', count: allCounts.labor || 0 },
+                { id: 'overhead', label: 'Overhead', count: allCounts.overhead || 0 },
+                { id: 'subcontractor', label: 'Subcontractor', count: allCounts.subcontractor || 0 },
+                { id: 'disposal', label: 'Disposal', count: allCounts.disposal || 0 },
+                { id: 'material', label: 'Material', count: allCounts.material || 0 },
+                { id: 'miscellaneous', label: 'Miscellaneous', count: allCounts.miscellaneous || 0 },
+                { id: 'tool', label: 'Tools', count: allCounts.tool || 0 }
+            ];
+
+            // Open add modal
+            const openAddModal = () => {
+                setEditingItem(null);
+                // Set defaults for labor category
+                if (category === 'labor') {
+                    setFormData({
+                        uom: 'Hourly',
+                        wCompPercent: 12,
+                        payrollTaxesPercent: 16
+                    });
+                } else {
+                    setFormData({});
+                }
+                setModalOpen(true);
+            };
+
+            // Open edit modal
+            const openEditModal = (item) => {
+                setEditingItem(item);
+                setFormData({ ...item });
+                setModalOpen(true);
+            };
+
+            // Save item
+            const saveItem = async () => {
+                // Convert number fields from strings to actual numbers
+                const processedData = { ...formData };
+                if (config.fieldTypes) {
+                    Object.keys(config.fieldTypes).forEach(field => {
+                        if (config.fieldTypes[field] === 'number' && processedData[field] !== undefined) {
+                            processedData[field] = parseFloat(processedData[field]) || 0;
+                        }
+                    });
+                }
+
+                const action = editingItem ? 'updateCatalogueItem' : 'addCatalogueItem';
+                const payload = editingItem
+                    ? { type: category, id: editingItem._id, data: processedData }
+                    : { type: category, data: processedData };
+
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action, payload })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        setModalOpen(false);
+                        loadItems();
+                    } else {
+                        alert('Error: ' + (result.error || 'Failed to save'));
+                    }
+                } catch (error) {
+                    console.error('Error saving:', error);
+                    alert('Error saving item');
+                }
+            };
+
+            // Delete item
+            const deleteItem = async (id) => {
+                if (!confirm('Delete this item?')) return;
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'deleteCatalogueItem',
+                            payload: { type: category, id }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success) loadItems();
+                } catch (error) {
+                    console.error('Error deleting:', error);
+                }
+            };
+
+            return (
+                <div className="h-screen w-screen flex flex-col bg-white overflow-hidden">
+                    <Header activePage="catalogue" />
+
+                    <main className="flex-1 flex flex-col overflow-hidden">
+                        {/* Status Tabs Bar */}
+                        <div className="flex-shrink-0 border-b border-gray-200 bg-white px-6 pt-4">
+                            <StatusTabs
+                                tabs={categoryTabs}
+                                activeTab={category}
+                                onChange={setCategory}
+                            />
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                            {/* Search, Sort, Add Row */}
+                            <div className="flex-shrink-0 flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
+                                <div className="relative flex-1 max-w-md">
+                                    <input
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+                                        placeholder="Search"
+                                        className="w-full px-4 py-2 pl-10 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                    />
+                                    <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round"></path>
+                                    </svg>
+                                </div>
+                                <div className="flex items-center gap-3 ml-4">
+                                    <select
+                                        value={sortBy}
+                                        onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                                        className="px-4 py-2 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none cursor-pointer"
+                                    >
+                                        <option value="newest">Sort by: Newest</option>
+                                        <option value="oldest">Sort by: Oldest</option>
+                                        <option value="name">Sort by: Name</option>
+                                    </select>
+                                    <button
+                                        onClick={openAddModal}
+                                        className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-1"
+                                    >
+                                        + Add New
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Table */}
+                            {loading ? (
+                                <Loading text="Loading items..." />
+                            ) : sortedItems.length === 0 ? (
+                                <EmptyState
+                                    icon="📦"
+                                    title="No items found"
+                                    message="Add your first item to get started"
+                                    action={
+                                        <button
+                                            onClick={openAddModal}
+                                            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                                        >
+                                            + Add Item
+                                        </button>
+                                    }
+                                />
+                            ) : (
+                                <div className="flex-1 flex flex-col overflow-hidden">
+                                    <div className="flex-1 overflow-auto">
+                                        <table className="w-full">
+                                            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+                                                <tr>
+                                                    <th className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-12">
+                                                        S.No
+                                                    </th>
+                                                    {config.headers.map(h => (
+                                                        <th key={h} className="px-3 py-2 text-left text-[10px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                                            {h}
+                                                        </th>
+                                                    ))}
+                                                    <th className="px-3 py-2 text-right text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                                                        Actions
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100 bg-white">
+                                                {paginatedItems.map((item, index) => (
+                                                    <tr key={item._id} className="hover:bg-gray-50 transition-colors">
+                                                        <td className="px-3 py-2.5 text-xs text-gray-500 whitespace-nowrap">
+                                                            {(currentPage - 1) * itemsPerPage + index + 1}
+                                                        </td>
+                                                        {config.fields.map(field => {
+                                                            // Handle computed fields (start with _)
+                                                            const value = field.startsWith('_') && config.computedFields?.[field]
+                                                                ? config.computedFields[field](item)
+                                                                : item[field];
+
+                                                            // Format value based on field type
+                                                            let displayValue = '--';
+                                                            if (value !== undefined && value !== null && value !== '') {
+                                                                // Currency fields (cost, dailyCost, weeklyCost, monthlyCost, hourlyRate, dailyRate)
+                                                                if (['cost', 'dailyCost', 'weeklyCost', 'monthlyCost', 'hourlyRate', 'dailyRate', 'fuelAdditiveCost'].includes(field)) {
+                                                                    displayValue = `$${Number(value).toLocaleString()}`;
+                                                                }
+                                                                // Percentage fields
+                                                                else if (['wCompPercent', 'payrollTaxesPercent', 'taxes'].includes(field)) {
+                                                                    displayValue = `${value}%`;
+                                                                }
+                                                                // Regular numbers
+                                                                else if (typeof value === 'number') {
+                                                                    displayValue = value.toLocaleString();
+                                                                }
+                                                                // Strings
+                                                                else {
+                                                                    displayValue = value;
+                                                                }
+                                                            }
+
+                                                            return (
+                                                                <td key={field} className="px-3 py-2.5 text-xs text-gray-700 whitespace-nowrap">
+                                                                    {displayValue}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                        <td className="px-3 py-2.5 text-right">
+                                                            <div className="flex items-center justify-end gap-1">
+                                                                <button
+                                                                    onClick={() => openEditModal(item)}
+                                                                    className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                                                                    title="Edit"
+                                                                >
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                                    </svg>
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => deleteItem(item._id)}
+                                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                                                    title="Delete"
+                                                                >
+                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                                                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Pagination */}
+                                    <div className="flex-shrink-0 border-t border-gray-100">
+                                        <Pagination
+                                            currentPage={currentPage}
+                                            totalPages={totalPages}
+                                            onPageChange={setCurrentPage}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+
+                    {/* Add/Edit Modal */}
+                    <Modal
+                        isOpen={modalOpen}
+                        onClose={() => setModalOpen(false)}
+                        title={editingItem ? 'Edit Item' : 'Add New Item'}
+                        footer={
+                            <>
+                                <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
+                                <Button onClick={saveItem}>Save Item</Button>
+                            </>
+                        }
+                    >
+                        <div className="grid grid-cols-2 gap-4">
+                            {config.fields.map((field, i) => {
+                                // Skip computed fields (start with _)
+                                if (field.startsWith('_')) return null;
+
+                                return dropdownFields.includes(field) ? (
+                                    <SearchableSelect
+                                        key={field}
+                                        label={config.headers[i]}
+                                        value={formData[field] || ''}
+                                        onChange={(val) => setFormData({ ...formData, [field]: val })}
+                                        options={getOptionsForField(field)}
+                                    />
+                                ) : (
+                                    <Input
+                                        key={field}
+                                        label={config.headers[i]}
+                                        type={config.fieldTypes?.[field] === 'number' ? 'number' : 'text'}
+                                        value={formData[field] || ''}
+                                        onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+                                        className={field === 'notes' ? 'col-span-2' : ''}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </Modal>
+                </div>
+            );
+        }
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<CatalogueApp />);
+    </script>
+</body>
+
+</html>

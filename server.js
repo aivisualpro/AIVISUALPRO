@@ -48,6 +48,33 @@ app.post("/webhook/:script", async (req, res) => {
     }
 });
 
+// GET endpoint for AppSheet delete webhook
+// Usage: /webhook/devcoBackend/delete?id=[Record_Id]
+app.get("/webhook/devcoBackend/delete", async (req, res) => {
+    try {
+        const { id } = req.query;
+
+        if (!id) {
+            return res.status(400).json({ error: "Missing id parameter" });
+        }
+
+        const scriptFile = path.join(scriptsPath, "devcoBackend.js");
+        const script = await import(scriptFile);
+
+        const result = await script.default({
+            action: 'deleteEstimateFromAppSheet',
+            payload: { estimateId: id }
+        });
+
+        console.log(`AppSheet DELETE webhook called for id: ${id}`);
+        return res.json({ success: true, result });
+
+    } catch (err) {
+        console.error("DELETE WEBHOOK ERROR:", err);
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 // healthcheck
 app.get("/", (req, res) => res.send("Node Webhook Server Running"));
 

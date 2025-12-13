@@ -33,6 +33,132 @@ const EstimateSchema = new mongoose.Schema({
     _id: false // Disable auto _id generation since we're using recordId
 });
 
+// ==================== CATALOGUE SCHEMAS ====================
+
+// 1. Equipment Items Schema
+const EquipmentItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    equipmentMachine: { type: String },
+    uom: { type: String },
+    supplier: { type: String },
+    timePeriod: { type: String },
+    cost: { type: Number, default: 0 },
+    dailyCost: { type: Number, default: 0 },
+    weeklyCost: { type: Number, default: 0 },
+    monthlyCost: { type: Number, default: 0 },
+    quantity: { type: Number, default: 0 },
+    quantityOfTime: { type: Number, default: 0 },
+    fuelAdditiveCost: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 2. Labor Items Schema
+const LaborItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    fringe: { type: String },
+    uom: { type: String },
+    cost: { type: Number, default: 0 },
+    quantity: { type: Number, default: 0 },
+    days: { type: Number, default: 0 },
+    otPd: { type: Number, default: 0 },
+    wCompPercent: { type: Number, default: 0 },
+    payrollTaxesPercent: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 3. Overhead Items Schema
+const OverheadItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    overhead: { type: String },
+    uom: { type: String },
+    days: { type: Number, default: 0 },
+    hours: { type: Number, default: 0 },
+    hourlyRate: { type: Number, default: 0 },
+    dailyRate: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 4. Subcontractor Items Schema
+const SubcontractorItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    subcontractor: { type: String },
+    uom: { type: String },
+    notes: { type: String },
+    cost: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 5. Disposal Items Schema
+const DisposalItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    disposalAndHaulOff: { type: String },
+    uom: { type: String },
+    quantity: { type: Number, default: 0 },
+    cost: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 6. Material Items Schema
+const MaterialItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    material: { type: String },
+    uom: { type: String },
+    supplier: { type: String },
+    cost: { type: Number, default: 0 },
+    quantity: { type: Number, default: 0 },
+    taxes: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 7. Miscellaneous Items Schema
+const MiscellaneousItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    item: { type: String },
+    uom: { type: String },
+    quantity: { type: Number, default: 0 },
+    cost: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 8. Tool Items Schema
+const ToolItemSchema = new mongoose.Schema({
+    classification: { type: String },
+    subClassification: { type: String },
+    tool: { type: String },
+    uom: { type: String },
+    supplier: { type: String },
+    cost: { type: Number, default: 0 },
+    quantity: { type: Number, default: 0 },
+    taxes: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 9. Template Schema
+const TemplateSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    description: { type: String },
+    category: { type: String },
+    status: { type: String, enum: ['draft', 'active'], default: 'draft' },
+    content: { type: mongoose.Schema.Types.Mixed }, // Template content/configuration
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
 async function getConnection() {
     if (conn && conn.readyState === 1) return conn;
 
@@ -48,10 +174,22 @@ async function getConnection() {
     });
 
     // Register models if not already registered
-    // Collection name will be 'estimatesdb' as requested
-    if (!conn.models.Estimate) {
-        conn.model('Estimate', EstimateSchema, 'estimatesdb');
-    }
+    if (!conn.models.Estimate) conn.model('Estimate', EstimateSchema, 'estimatesdb');
+
+    // Catalogue models - delete and re-register LaborItem to ensure updated schema
+    if (!conn.models.EquipmentItem) conn.model('EquipmentItem', EquipmentItemSchema, 'equipmentItems');
+
+    // Force re-register LaborItem with updated schema (includes cost field)
+    if (conn.models.LaborItem) delete conn.models.LaborItem;
+    conn.model('LaborItem', LaborItemSchema, 'laborItems');
+
+    if (!conn.models.OverheadItem) conn.model('OverheadItem', OverheadItemSchema, 'overheadItems');
+    if (!conn.models.SubcontractorItem) conn.model('SubcontractorItem', SubcontractorItemSchema, 'subcontractorItems');
+    if (!conn.models.DisposalItem) conn.model('DisposalItem', DisposalItemSchema, 'disposalItems');
+    if (!conn.models.MaterialItem) conn.model('MaterialItem', MaterialItemSchema, 'materialItems');
+    if (!conn.models.MiscellaneousItem) conn.model('MiscellaneousItem', MiscellaneousItemSchema, 'miscellaneousItems');
+    if (!conn.models.ToolItem) conn.model('ToolItem', ToolItemSchema, 'toolItems');
+    if (!conn.models.Template) conn.model('Template', TemplateSchema, 'templates');
 
     return conn;
 }
@@ -256,6 +394,217 @@ export default async function (body) {
         const connection = await getConnection();
         const Estimate = connection.model('Estimate');
         return await Estimate.findByIdAndDelete(id);
+    }
+
+    // Delete estimate from AppSheet webhook (supports estimateId or _id)
+    if (action === 'deleteEstimateFromAppSheet') {
+        const { estimateId, _id, Row_ID } = body.payload || body;
+        const idToUse = estimateId || _id || Row_ID;
+
+        if (!idToUse) {
+            throw new Error("Missing estimateId, _id, or Row_ID in payload");
+        }
+
+        const connection = await getConnection();
+        const Estimate = connection.model('Estimate');
+
+        // Try to find by estimateId first, then by _id
+        let result = await Estimate.findOneAndDelete({ estimateId: idToUse });
+
+        if (!result) {
+            // Try deleting by MongoDB _id if it's a valid ObjectId
+            try {
+                result = await Estimate.findByIdAndDelete(idToUse);
+            } catch (e) {
+                // Invalid ObjectId format, ignore
+            }
+        }
+
+        if (!result) {
+            return { message: `No estimate found with id: ${idToUse}`, deleted: false };
+        }
+
+        console.log(`Deleted estimate from AppSheet webhook: ${idToUse}`);
+        return {
+            message: 'Estimate deleted successfully',
+            deleted: true,
+            estimateId: idToUse
+        };
+    }
+
+    // ==================== CATALOGUE OPERATIONS ====================
+
+    // Model mapping for catalogue types
+    const catalogueModels = {
+        equipment: 'EquipmentItem',
+        labor: 'LaborItem',
+        overhead: 'OverheadItem',
+        subcontractor: 'SubcontractorItem',
+        disposal: 'DisposalItem',
+        material: 'MaterialItem',
+        miscellaneous: 'MiscellaneousItem',
+        tool: 'ToolItem'
+    };
+
+    // Get all items for a catalogue type
+    if (action === 'getCatalogueItems') {
+        const { type } = body.payload || {};
+        if (!type || !catalogueModels[type]) {
+            throw new Error("Invalid or missing catalogue type. Valid types: " + Object.keys(catalogueModels).join(', '));
+        }
+
+        const connection = await getConnection();
+        const Model = connection.model(catalogueModels[type]);
+        return await Model.find().sort({ classification: 1, subClassification: 1 });
+    }
+
+    // Get summary/counts for all catalogue types (for dashboard)
+    if (action === 'getCatalogueSummary') {
+        const connection = await getConnection();
+        const summary = {};
+
+        for (const [key, modelName] of Object.entries(catalogueModels)) {
+            const Model = connection.model(modelName);
+            summary[key] = await Model.countDocuments();
+        }
+
+        return summary;
+    }
+
+    // Add a new catalogue item
+    if (action === 'addCatalogueItem') {
+        const { type, data } = body.payload || {};
+        if (!type || !catalogueModels[type]) {
+            throw new Error("Invalid or missing catalogue type");
+        }
+        if (!data) throw new Error("Missing item data");
+
+        const connection = await getConnection();
+        const Model = connection.model(catalogueModels[type]);
+        const result = await Model.create(data);
+
+        return {
+            message: 'Item added successfully',
+            id: result._id,
+            data: result
+        };
+    }
+
+    // Update a catalogue item
+    if (action === 'updateCatalogueItem') {
+        const { type, id, data } = body.payload || {};
+        if (!type || !catalogueModels[type]) {
+            throw new Error("Invalid or missing catalogue type");
+        }
+        if (!id) throw new Error("Missing item id");
+        if (!data) throw new Error("Missing item data");
+
+        const connection = await getConnection();
+        const Model = connection.model(catalogueModels[type]);
+
+        data.updatedAt = new Date();
+        const result = await Model.findByIdAndUpdate(id, data, { new: true });
+
+        if (!result) throw new Error("Item not found");
+
+        return {
+            message: 'Item updated successfully',
+            id: result._id,
+            data: result
+        };
+    }
+
+    // Delete a catalogue item
+    if (action === 'deleteCatalogueItem') {
+        const { type, id } = body.payload || {};
+        if (!type || !catalogueModels[type]) {
+            throw new Error("Invalid or missing catalogue type");
+        }
+        if (!id) throw new Error("Missing item id");
+
+        const connection = await getConnection();
+        const Model = connection.model(catalogueModels[type]);
+        const result = await Model.findByIdAndDelete(id);
+
+        if (!result) throw new Error("Item not found");
+
+        return {
+            message: 'Item deleted successfully',
+            id: id
+        };
+    }
+
+    // ==================== TEMPLATE ACTIONS ====================
+
+    // Get all templates
+    if (action === 'getTemplates') {
+        const connection = await getConnection();
+        const Template = connection.model('Template');
+        const templates = await Template.find({}).sort({ createdAt: -1 }).lean();
+        return templates;
+    }
+
+    // Add a new template
+    if (action === 'addTemplate') {
+        const { name, description, category, status, content } = body.payload || {};
+        if (!name) throw new Error("Template name is required");
+
+        const connection = await getConnection();
+        const Template = connection.model('Template');
+        const newTemplate = new Template({
+            name,
+            description,
+            category,
+            status: status || 'draft',
+            content
+        });
+        const result = await newTemplate.save();
+
+        return {
+            message: 'Template created successfully',
+            id: result._id,
+            data: result
+        };
+    }
+
+    // Update a template
+    if (action === 'updateTemplate') {
+        const { id, name, description, category, status, content } = body.payload || {};
+        if (!id) throw new Error("Template id is required");
+
+        const connection = await getConnection();
+        const Template = connection.model('Template');
+        const updateData = { updatedAt: new Date() };
+        if (name !== undefined) updateData.name = name;
+        if (description !== undefined) updateData.description = description;
+        if (category !== undefined) updateData.category = category;
+        if (status !== undefined) updateData.status = status;
+        if (content !== undefined) updateData.content = content;
+
+        const result = await Template.findByIdAndUpdate(id, updateData, { new: true }).lean();
+        if (!result) throw new Error("Template not found");
+
+        return {
+            message: 'Template updated successfully',
+            id: result._id,
+            data: result
+        };
+    }
+
+    // Delete a template
+    if (action === 'deleteTemplate') {
+        const { id } = body.payload || {};
+        if (!id) throw new Error("Template id is required");
+
+        const connection = await getConnection();
+        const Template = connection.model('Template');
+        const result = await Template.findByIdAndDelete(id);
+        if (!result) throw new Error("Template not found");
+
+        return {
+            message: 'Template deleted successfully',
+            id: id
+        };
     }
 
     throw new Error("Unknown action or missing Data.recordId in payload");

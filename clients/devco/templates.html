@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devco | Templates</title>
+    <meta name="description" content="Manage proposal templates">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes modal {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-modal {
+            animation: modal 0.2s ease-out;
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel" src="components.js"></script>
+
+    <script type="text/babel">
+        const { Header, Button, Card, StatCard, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, Loading, EmptyState, Modal, Input, SearchInput, IconButton } = window.DevcoComponents;
+
+        function TemplatesApp() {
+            const [templates, setTemplates] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [search, setSearch] = React.useState('');
+            const [modalOpen, setModalOpen] = React.useState(false);
+            const [editingTemplate, setEditingTemplate] = React.useState(null);
+            const [formData, setFormData] = React.useState({
+                name: '',
+                description: '',
+                category: '',
+                status: 'draft'
+            });
+
+            React.useEffect(() => {
+                loadTemplates();
+            }, []);
+
+            const loadTemplates = async () => {
+                setLoading(true);
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'getTemplates' })
+                    });
+                    const result = await response.json();
+                    setTemplates(result.success && result.result ? result.result : []);
+                } catch (error) {
+                    console.error('Error loading templates:', error);
+                    setTemplates([]);
+                }
+                setLoading(false);
+            };
+
+            const filteredTemplates = templates.filter(t =>
+                (t.name || '').toLowerCase().includes(search.toLowerCase()) ||
+                (t.description || '').toLowerCase().includes(search.toLowerCase()) ||
+                (t.category || '').toLowerCase().includes(search.toLowerCase())
+            );
+
+            const totalTemplates = templates.length;
+            const activeTemplates = templates.filter(t => t.status === 'active').length;
+            const draftTemplates = templates.filter(t => t.status === 'draft').length;
+
+            const openAddModal = () => {
+                setEditingTemplate(null);
+                setFormData({ name: '', description: '', category: '', status: 'draft' });
+                setModalOpen(true);
+            };
+
+            const openEditModal = (template) => {
+                setEditingTemplate(template);
+                setFormData({ ...template });
+                setModalOpen(true);
+            };
+
+            const saveTemplate = async () => {
+                const action = editingTemplate ? 'updateTemplate' : 'addTemplate';
+                const payload = editingTemplate
+                    ? { id: editingTemplate._id, ...formData }
+                    : formData;
+
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action, payload })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        setModalOpen(false);
+                        loadTemplates();
+                    } else {
+                        alert('Error: ' + (result.error || 'Failed to save'));
+                    }
+                } catch (error) {
+                    console.error('Error saving:', error);
+                    alert('Error saving template');
+                }
+            };
+
+            const deleteTemplate = async (id) => {
+                if (!confirm('Delete this template?')) return;
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'deleteTemplate',
+                            payload: { id }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success) loadTemplates();
+                } catch (error) {
+                    console.error('Error deleting:', error);
+                }
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <Header activePage="templates" />
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {/* Page Header */}
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">Templates</h1>
+                                <p className="text-gray-500 text-sm mt-1">Manage proposal templates</p>
+                            </div>
+                            <Button onClick={openAddModal}>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <path d="M12 5v14M5 12h14"></path>
+                                </svg>
+                                New Template
+                            </Button>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <StatCard icon="📄" value={totalTemplates} label="Total Templates" color="blue" />
+                            <StatCard icon="✅" value={activeTemplates} label="Active" color="green" />
+                            <StatCard icon="📝" value={draftTemplates} label="Draft" color="purple" />
+                        </div>
+
+                        {/* Templates Table */}
+                        <Card className="overflow-hidden">
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                                <h2 className="text-lg font-bold text-gray-900">All Templates</h2>
+                                <SearchInput
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    placeholder="Search templates..."
+                                    className="w-64"
+                                />
+                            </div>
+
+                            {loading ? (
+                                <Loading text="Loading templates..." />
+                            ) : filteredTemplates.length === 0 ? (
+                                <EmptyState
+                                    icon="📄"
+                                    title="No templates yet"
+                                    message="Create your first template to get started"
+                                    action={
+                                        <Button onClick={openAddModal}>
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                                <path d="M12 5v14M5 12h14"></path>
+                                            </svg>
+                                            Create Template
+                                        </Button>
+                                    }
+                                />
+                            ) : (
+                                <Table>
+                                    <TableHead>
+                                        <tr>
+                                            <TableHeader>Name</TableHeader>
+                                            <TableHeader>Description</TableHeader>
+                                            <TableHeader>Category</TableHeader>
+                                            <TableHeader>Status</TableHeader>
+                                            <TableHeader>Created</TableHeader>
+                                            <TableHeader className="text-right">Actions</TableHeader>
+                                        </tr>
+                                    </TableHead>
+                                    <TableBody>
+                                        {filteredTemplates.map(template => (
+                                            <TableRow key={template._id}>
+                                                <TableCell>
+                                                    <span className="font-semibold text-gray-900">{template.name || '--'}</span>
+                                                </TableCell>
+                                                <TableCell>{template.description || '--'}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant="info">{template.category || 'General'}</Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant={template.status === 'active' ? 'success' : 'warning'}>
+                                                        {template.status === 'active' ? '✓ Active' : '◐ Draft'}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {template.createdAt ? new Date(template.createdAt).toLocaleDateString() : '--'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <IconButton
+                                                            onClick={() => openEditModal(template)}
+                                                            title="Edit"
+                                                            icon={
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                                </svg>
+                                                            }
+                                                        />
+                                                        <IconButton
+                                                            onClick={() => deleteTemplate(template._id)}
+                                                            variant="danger"
+                                                            title="Delete"
+                                                            icon={
+                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                                                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                </svg>
+                                                            }
+                                                        />
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </Card>
+                    </main>
+
+                    {/* Add/Edit Modal */}
+                    <Modal
+                        isOpen={modalOpen}
+                        onClose={() => setModalOpen(false)}
+                        title={editingTemplate ? 'Edit Template' : 'Create New Template'}
+                        footer={
+                            <>
+                                <Button variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
+                                <Button onClick={saveTemplate}>Save Template</Button>
+                            </>
+                        }
+                    >
+                        <div className="space-y-4">
+                            <Input
+                                label="Template Name"
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                placeholder="Enter template name"
+                            />
+                            <Input
+                                label="Description"
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                placeholder="Brief description of this template"
+                            />
+                            <div className="grid grid-cols-2 gap-4">
+                                <Input
+                                    label="Category"
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    placeholder="e.g., Excavation"
+                                />
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
+                                    <select
+                                        value={formData.status}
+                                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                        className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-gray-50/50"
+                                    >
+                                        <option value="draft">Draft</option>
+                                        <option value="active">Active</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal>
+                </div>
+            );
+        }
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<TemplatesApp />);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devco | Estimates</title>
+    <meta name="description" content="View and manage all estimates">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        @keyframes modal {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-modal {
+            animation: modal 0.2s ease-out;
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel" src="components.js"></script>
+
+    <script type="text/babel">
+        const { Header, Button, Card, StatCard, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, Loading, EmptyState, SearchInput } = window.DevcoComponents;
+
+        function EstimatesApp() {
+            const [estimates, setEstimates] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [search, setSearch] = React.useState('');
+
+            React.useEffect(() => {
+                loadEstimates();
+            }, []);
+
+            const loadEstimates = async () => {
+                setLoading(true);
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'getEstimates' })
+                    });
+                    const result = await response.json();
+                    setEstimates(result.success && result.result ? result.result : []);
+                } catch (error) {
+                    console.error('Error loading estimates:', error);
+                    setEstimates([]);
+                }
+                setLoading(false);
+            };
+
+            const filteredEstimates = estimates.filter(e =>
+                (e.proposalNo || '').toLowerCase().includes(search.toLowerCase()) ||
+                (e.customerName || '').toLowerCase().includes(search.toLowerCase()) ||
+                (e.estimate || '').toLowerCase().includes(search.toLowerCase())
+            );
+
+            const totalEstimates = estimates.length;
+            const withServices = estimates.filter(e =>
+                e.directionalDrilling || e.excavationBackfill || e.hydroExcavation ||
+                e.potholingCoring || e.asphaltConcrete
+            ).length;
+            const uniqueCustomers = new Set(estimates.map(e => e.customerId || e.customerName)).size;
+
+            const ServiceBadges = ({ estimate }) => {
+                const services = [];
+                if (estimate.directionalDrilling) services.push({ label: 'DD', variant: 'success' });
+                if (estimate.excavationBackfill) services.push({ label: 'EB', variant: 'info' });
+                if (estimate.hydroExcavation) services.push({ label: 'HE', variant: 'purple' });
+                if (estimate.potholingCoring) services.push({ label: 'PC', variant: 'warning' });
+                if (estimate.asphaltConcrete) services.push({ label: 'AC', variant: 'danger' });
+
+                if (services.length === 0) {
+                    return <span className="text-gray-400 text-xs">None</span>;
+                }
+
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {services.map(s => (
+                            <Badge key={s.label} variant={s.variant}>{s.label}</Badge>
+                        ))}
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <Header activePage="estimates" />
+
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {/* Page Header */}
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h1 className="text-2xl font-bold text-gray-900">Estimates</h1>
+                                <p className="text-gray-500 text-sm mt-1">View and manage all estimates</p>
+                            </div>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <StatCard icon="📋" value={totalEstimates} label="Total Estimates" color="blue" />
+                            <StatCard icon="✅" value={withServices} label="With Active Services" color="green" />
+                            <StatCard icon="👥" value={uniqueCustomers} label="Unique Customers" color="purple" />
+                        </div>
+
+                        {/* Estimates Table */}
+                        <Card className="overflow-hidden">
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                                <h2 className="text-lg font-bold text-gray-900">All Estimates</h2>
+                                <div className="flex items-center gap-3">
+                                    <SearchInput
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        placeholder="Search estimates..."
+                                        className="w-64"
+                                    />
+                                    <select className="px-3 py-2 text-xs border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                        <option>Sort by: Newest</option>
+                                        <option>Sort by: Oldest</option>
+                                        <option>Sort by: Customer</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {loading ? (
+                                <Loading text="Loading estimates..." />
+                            ) : filteredEstimates.length === 0 ? (
+                                <EmptyState
+                                    icon="📋"
+                                    title="No estimates found"
+                                    message="Estimates will appear here when synced from AppSheet"
+                                />
+                            ) : (
+                                <Table>
+                                    <TableHead>
+                                        <tr>
+                                            <TableHeader>Proposal No</TableHeader>
+                                            <TableHeader>Customer</TableHeader>
+                                            <TableHeader>Date</TableHeader>
+                                            <TableHeader>Bid Markup</TableHeader>
+                                            <TableHeader>Services</TableHeader>
+                                            <TableHeader className="text-right">Actions</TableHeader>
+                                        </tr>
+                                    </TableHead>
+                                    <TableBody>
+                                        {filteredEstimates.map(estimate => (
+                                            <TableRow
+                                                key={estimate._id}
+                                                className="cursor-pointer"
+                                                onClick={() => window.location.href = `view.html?id=${estimate._id}`}
+                                            >
+                                                <TableCell>
+                                                    <span className="font-medium text-gray-900">
+                                                        {estimate.proposalNo || estimate.estimate || '--'}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell>{estimate.customerName || '--'}</TableCell>
+                                                <TableCell>{estimate.date || '--'}</TableCell>
+                                                <TableCell>
+                                                    <Badge variant="info">{estimate.bidMarkUp || '--'}</Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <ServiceBadges estimate={estimate} />
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            window.location.href = `view.html?id=${estimate._id}`;
+                                                        }}
+                                                    >
+                                                        View →
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </Card>
+                    </main>
+                </div>
+            );
+        }
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<EstimatesApp />);
+    </script>
+</body>
+
+</html>
