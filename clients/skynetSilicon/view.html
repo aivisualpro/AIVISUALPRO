@@ -57,9 +57,34 @@
         }
 
         /* Section styling for better breaks */
-        .pdf-section {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            page-break-after: avoid;
+            margin-top: 1.5rem;
+        }
+
+        p {
+            page-break-inside: auto;
+            margin-bottom: 1rem;
+        }
+
+        ul,
+        ol {
+            page-break-inside: auto;
+        }
+
+        li {
             page-break-inside: avoid;
-            margin-bottom: 2rem;
+        }
+
+        img,
+        table,
+        .sig-box {
+            page-break-inside: avoid;
         }
 
         h2,
@@ -228,9 +253,7 @@
             document.getElementById('prop-date').innerText = new Date(proposalData.createdAt).toLocaleDateString();
             document.getElementById('prop-date').innerText = new Date(proposalData.createdAt).toLocaleDateString();
 
-            // Wrap content in a div that applies better page breaking if needed, 
-            // though html2pdf handles it via config, adding a class helps if we need fine control
-            document.getElementById('prop-body').innerHTML = `<div class="pdf-section">${proposalData.content}</div>`;
+            document.getElementById('prop-body').innerHTML = proposalData.content;
 
             // Signatures
             const sigs = proposalData.signatures;
@@ -302,7 +325,7 @@
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true }, // Higher scale = better quality
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                pagebreak: { mode: ['css', 'legacy'] }
             };
 
             // Start loading state
