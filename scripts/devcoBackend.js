@@ -56,6 +56,84 @@ async function getConnection() {
     return conn;
 }
 
+// AppSheet Configuration
+const APPSHEET_APP_ID = process.env.DEVCOAPPSHEET_APP_ID;
+const APPSHEET_API_KEY = process.env.DEVCOAPPSHEET_ACCESS;
+const APPSHEET_TABLE_NAME = "Estimates";
+
+// Helper function to convert boolean to Y/N for AppSheet
+function toYN(value) {
+    return value === true ? 'Y' : 'N';
+}
+
+// Helper function to update AppSheet
+async function updateAppSheet(data) {
+    if (!APPSHEET_APP_ID || !APPSHEET_API_KEY) {
+        console.log("AppSheet credentials not configured, skipping sync");
+        return { skipped: true, reason: "No AppSheet credentials" };
+    }
+
+    const APPSHEET_URL = `https://api.appsheet.com/api/v2/apps/${encodeURIComponent(APPSHEET_APP_ID)}/tables/${encodeURIComponent(APPSHEET_TABLE_NAME)}/Action`;
+
+    // Map MongoDB fields to AppSheet column names
+    // Ensure all values are strings to prevent AppSheet type validation errors
+    const appSheetRow = {
+        "Record_Id": String(data._id || ""),
+        "Estimate #": String(data.estimate || ""),
+        "Date": String(data.date || ""),
+        "Customer": String(data.customerId || ""),
+        "Proposal No": String(data.proposalNo || ""),
+        "Bid Mark UP Percentage": String(data.bidMarkUp || ""),
+        "Directional Drilling": toYN(data.directionalDrilling),
+        "Excavation & Backfill": toYN(data.excavationBackfill),
+        "Hydro-excavation": toYN(data.hydroExcavation),
+        "Potholing & Coring": toYN(data.potholingCoring),
+        "Asphalt & Concrete": toYN(data.asphaltConcrete),
+        "Fringe": String(data.fringe || "")
+    };
+
+    const requestBody = {
+        Action: "Edit",
+        Properties: {
+            Locale: "en-US",
+            Timezone: "Pacific Standard Time"
+        },
+        Rows: [appSheetRow]
+    };
+
+    console.log("Devco Backend - Sending to AppSheet:", JSON.stringify(requestBody, null, 2));
+
+    try {
+        const response = await fetch(APPSHEET_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "ApplicationAccessKey": APPSHEET_API_KEY
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const text = await response.text();
+        let parsed;
+        try {
+            parsed = JSON.parse(text);
+        } catch {
+            parsed = text;
+        }
+
+        if (!response.ok) {
+            console.error("AppSheet Error:", response.status, parsed);
+            return { success: false, error: parsed, status: response.status };
+        }
+
+        console.log("Devco Backend - AppSheet response:", parsed);
+        return { success: true, response: parsed };
+    } catch (error) {
+        console.error("AppSheet Error:", error.message);
+        return { success: false, error: error.message };
+    }
+}
+
 export default async function (body) {
     console.log("Devco Backend - Received body:", JSON.stringify(body, null, 2));
 
@@ -121,6 +199,54 @@ export default async function (body) {
         const connection = await getConnection();
         const Estimate = connection.model('Estimate');
         return await Estimate.findById(id);
+    }
+
+    if (action === 'updateEstimate') {
+        const payload = body.payload || {};
+        const { id } = payload;
+        if (!id) throw new Error("Missing id in payload");
+
+        const connection = await getConnection();
+        const Estimate = connection.model('Estimate');
+
+        // Get existing record first
+        const existing = await Estimate.findById(id);
+        if (!existing) throw new Error("Estimate not found");
+
+        // Prepare update data - only update provided fields
+        const updateData = {
+            updatedAt: new Date()
+        };
+
+        // Map of field names to update
+        const fields = ['estimate', 'date', 'customerId', 'customerName', 'proposalNo', 'bidMarkUp', 'fringe'];
+        const booleanFields = ['directionalDrilling', 'excavationBackfill', 'hydroExcavation', 'potholingCoring', 'asphaltConcrete'];
+
+        fields.forEach(field => {
+            if (payload[field] !== undefined) {
+                updateData[field] = payload[field];
+            }
+        });
+
+        booleanFields.forEach(field => {
+            if (payload[field] !== undefined) {
+                updateData[field] = payload[field] === true || payload[field] === 'true';
+            }
+        });
+
+        // Update MongoDB
+        const result = await Estimate.findByIdAndUpdate(id, updateData, { new: true });
+
+        // Sync to AppSheet
+        const appSheetResult = await updateAppSheet(result);
+
+        console.log("Devco Backend - Updated estimate:", result._id);
+        return {
+            message: 'Estimate updated successfully',
+            id: result._id,
+            data: result,
+            appSheet: appSheetResult
+        };
     }
 
     if (action === 'deleteEstimate') {

@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimate Details | Devco Proposals</title>
+    <meta name="description" content="View and edit estimate details for Devco proposals">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --gray-100: #f8fafc;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Animated background */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .bg-shapes .shape:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-shapes .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            right: -80px;
+            animation-delay: -5s;
+        }
+
+        .bg-shapes .shape:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            bottom: -50px;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(10deg);
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--white), var(--gray-100));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-text {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--white);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        /* Main Card */
+        .main-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl), 0 0 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Card Header */
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 32px;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .estimate-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .estimate-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .estimate-id {
+            font-size: 14px;
+            opacity: 0.9;
+            font-family: 'Monaco', 'Consolas', monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        /* Card Body */
+        .card-body {
+            padding: 32px;
+        }
+
+        /* Customer Section */
+        .customer-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--white) 100%);
+            border-radius: 16px;
+            margin-bottom: 32px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .customer-avatar {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: var(--white);
+            font-weight: 700;
+            flex-shrink: 0;
+            box-shadow: var(--shadow);
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .customer-info p {
+            font-size: 14px;
+            color: var(--gray-500);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Details Grid */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .detail-item {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .detail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-light);
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Editable Input Styles */
+        .detail-input {
+            width: 100%;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 8px 12px;
+            background: var(--gray-100);
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .detail-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .edit-mode .detail-value {
+            display: none;
+        }
+
+        .edit-mode .detail-input {
+            display: block;
+        }
+
+        /* Services Section */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, var(--gray-200), transparent);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--white);
+            border-radius: 12px;
+            border: 2px solid var(--gray-200);
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .edit-mode .service-item {
+            cursor: pointer;
+        }
+
+        .edit-mode .service-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.02);
+        }
+
+        .service-item.active {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02));
+        }
+
+        .service-item.inactive {
+            opacity: 0.6;
+        }
+
+        .service-status {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .service-item.active .service-status {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .service-item.inactive .service-status {
+            background: var(--gray-200);
+            color: var(--gray-400);
+        }
+
+        .service-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+
+        /* Timestamps */
+        .timestamps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 16px;
+        }
+
+        .timestamp-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--gray-500);
+        }
+
+        .timestamp-item svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-edit {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-edit:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: var(--white);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow-xl);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: var(--gray-600);
+        }
+
+        /* Error State */
+        .error {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            color: var(--gray-500);
+            margin-bottom: 24px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        /* Saving Overlay */
+        .saving-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .saving-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .saving-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .saving-box .loading-spinner {
+            margin-bottom: 16px;
+        }
+
+        .saving-box p {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .card-header {
+                padding: 24px;
+            }
+
+            .header-row {
+                flex-direction: column;
+            }
+
+            .estimate-title {
+                font-size: 24px;
+            }
+
+            .card-body {
+                padding: 24px;
+            }
+
+            .customer-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">📋</div>
+                <span class="logo-text">Devco Proposals</span>
+            </div>
+            <p class="header-subtitle">Estimate Details & Project Overview</p>
+        </header>
+
+        <main class="main-card" id="mainCard">
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading estimate details...</p>
+            </div>
+
+            <!-- Error State (hidden by default) -->
+            <div class="error" id="errorState" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <h2 class="error-title">Estimate Not Found</h2>
+                <p class="error-message" id="errorMessage">The requested estimate could not be found.</p>
+                <a href="javascript:location.reload()" class="btn btn-primary">
+                    🔄 Try Again
+                </a>
+            </div>
+
+            <!-- Content (hidden by default) -->
+            <div id="contentState" style="display: none;">
+                <div class="card-header">
+                    <div class="header-row">
+                        <div class="header-left">
+                            <div class="estimate-badge">
+                                📄 Estimate Document
+                            </div>
+                            <h1 class="estimate-title" id="proposalNo">--</h1>
+                            <span class="estimate-id">Record ID: <span id="recordId">--</span></span>
+                        </div>
+                        <button class="btn btn-edit" id="editBtn" onclick="toggleEditMode()">
+                            ✏️ Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body" id="cardBody">
+                    <!-- Customer Section -->
+                    <div class="customer-section">
+                        <div class="customer-avatar" id="customerInitials">--</div>
+                        <div class="customer-info">
+                            <h3>
+                                <span class="detail-value" id="customerName">--</span>
+                                <input type="text" class="detail-input" id="customerNameInput"
+                                    placeholder="Customer Name">
+                            </h3>
+                            <p>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                Customer ID:
+                                <span class="detail-value" id="customerId">--</span>
+                                <input type="text" class="detail-input" id="customerIdInput" placeholder="Customer ID"
+                                    style="width: auto; font-size: 14px; font-weight: 400;">
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                Date
+                            </div>
+                            <div class="detail-value" id="date">--</div>
+                            <input type="text" class="detail-input" id="dateInput" placeholder="e.g., 4/13/2025">
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                                Estimate
+                            </div>
+                            <div class="detail-value" id="estimate">--</div>
+                            <input type="text" class="detail-input" id="estimateInput" placeholder="Estimate #">
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                                Bid Markup
+                            </div>
+                            <div class="detail-value" id="bidMarkUp">--</div>
+                            <input type="text" class="detail-input" id="bidMarkUpInput" placeholder="e.g., 30%">
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                </svg>
+                                Fringe
+                            </div>
+                            <div class="detail-value" id="fringe">--</div>
+                            <input type="text" class="detail-input" id="fringeInput" placeholder="Fringe value">
+                        </div>
+                    </div>
+
+                    <!-- Services Section -->
+                    <h3 class="section-title">🛠️ Services Included</h3>
+                    <div class="services-grid" id="servicesGrid">
+                        <!-- Services will be injected here -->
+                    </div>
+
+                    <!-- Action Buttons (shown in edit mode) -->
+                    <div class="action-buttons" id="actionButtons" style="display: none;">
+                        <button class="btn btn-success" id="saveBtn" onclick="saveChanges()">
+                            💾 Save Changes
+                        </button>
+                        <button class="btn btn-secondary" onclick="cancelEdit()">
+                            ❌ Cancel
+                        </button>
+                    </div>
+
+                    <!-- Timestamps -->
+                    <div class="timestamps">
+                        <div class="timestamp-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Created: <strong id="createdAt">--</strong>
+                        </div>
+                        <div class="timestamp-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Updated: <strong id="updatedAt">--</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>© 2025 Devco Proposals. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span id="toastIcon">✅</span>
+        <span id="toastMessage">Changes saved successfully!</span>
+    </div>
+
+    <!-- Saving Overlay -->
+    <div class="saving-overlay" id="savingOverlay">
+        <div class="saving-box">
+            <div class="loading-spinner"></div>
+            <p>Saving changes...</p>
+        </div>
+    </div>
+
+    <script>
+        // Get record ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const recordId = urlParams.get('id');
+
+        // DOM Elements
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const contentState = document.getElementById('contentState');
+        const errorMessage = document.getElementById('errorMessage');
+        const cardBody = document.getElementById('cardBody');
+        const editBtn = document.getElementById('editBtn');
+        const actionButtons = document.getElementById('actionButtons');
+        const toast = document.getElementById('toast');
+        const savingOverlay = document.getElementById('savingOverlay');
+
+        // Current data
+        let currentData = null;
+        let isEditMode = false;
+
+        // Services configuration
+        const services = [
+            { key: 'directionalDrilling', label: 'Directional Drilling', icon: '🔧' },
+            { key: 'excavationBackfill', label: 'Excavation & Backfill', icon: '🏗️' },
+            { key: 'hydroExcavation', label: 'Hydro Excavation', icon: '💧' },
+            { key: 'potholingCoring', label: 'Potholing & Coring', icon: '🕳️' },
+            { key: 'asphaltConcrete', label: 'Asphalt & Concrete', icon: '🛤️' }
+        ];
+
+        // Format date helper
+        function formatDate(dateStr) {
+            if (!dateStr) return '--';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Get initials from name
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.split(' ');
+            if (parts.length >= 2) {
+                return parts[0][0] + parts[parts.length - 1][0];
+            }
+            return name.substring(0, 2).toUpperCase();
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toastIcon = document.getElementById('toastIcon');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastIcon.textContent = type === 'success' ? '✅' : '❌';
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Toggle edit mode
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+
+            if (isEditMode) {
+                cardBody.classList.add('edit-mode');
+                editBtn.innerHTML = '👁️ View';
+                actionButtons.style.display = 'flex';
+
+                // Populate inputs with current values
+                document.getElementById('customerNameInput').value = currentData.customerName || '';
+                document.getElementById('customerIdInput').value = currentData.customerId || '';
+                document.getElementById('dateInput').value = currentData.date || '';
+                document.getElementById('estimateInput').value = currentData.estimate || '';
+                document.getElementById('bidMarkUpInput').value = currentData.bidMarkUp || '';
+                document.getElementById('fringeInput').value = currentData.fringe || '';
+            } else {
+                cardBody.classList.remove('edit-mode');
+                editBtn.innerHTML = '✏️ Edit';
+                actionButtons.style.display = 'none';
+            }
+        }
+
+        // Cancel edit
+        function cancelEdit() {
+            isEditMode = true; // Will be toggled to false
+            toggleEditMode();
+            renderServices(currentData); // Reset services
+        }
+
+        // Save changes
+        async function saveChanges() {
+            savingOverlay.classList.add('show');
+
+            // Collect updated data
+            const updatedData = {
+                id: recordId,
+                customerName: document.getElementById('customerNameInput').value,
+                customerId: document.getElementById('customerIdInput').value,
+                date: document.getElementById('dateInput').value,
+                estimate: document.getElementById('estimateInput').value,
+                bidMarkUp: document.getElementById('bidMarkUpInput').value,
+                fringe: document.getElementById('fringeInput').value,
+                directionalDrilling: currentData.directionalDrilling,
+                excavationBackfill: currentData.excavationBackfill,
+                hydroExcavation: currentData.hydroExcavation,
+                potholingCoring: currentData.potholingCoring,
+                asphaltConcrete: currentData.asphaltConcrete
+            };
+
+            try {
+                const response = await fetch('/webhook/devcoBackend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'updateEstimate',
+                        payload: updatedData
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to save changes');
+                }
+
+                // Update current data
+                currentData = result.result.data;
+                displayEstimate(currentData);
+
+                // Exit edit mode
+                isEditMode = true;
+                toggleEditMode();
+
+                showToast('Changes saved successfully! MongoDB & AppSheet updated.', 'success');
+            } catch (error) {
+                console.error('Save error:', error);
+                showToast('Failed to save changes: ' + error.message, 'error');
+            } finally {
+                savingOverlay.classList.remove('show');
+            }
+        }
+
+        // Toggle service
+        function toggleService(key) {
+            if (!isEditMode) return;
+            currentData[key] = !currentData[key];
+            renderServices(currentData);
+        }
+
+        // Render services grid
+        function renderServices(data) {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = '';
+
+            services.forEach(service => {
+                const isActive = data[service.key] === true;
+                const item = document.createElement('div');
+                item.className = `service-item ${isActive ? 'active' : 'inactive'}`;
+                item.onclick = () => toggleService(service.key);
+                item.innerHTML = `
+                    <div class="service-status">${isActive ? '✓' : '✗'}</div>
+                    <span class="service-name">${service.label}</span>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // Fetch and display data
+        async function fetchEstimate() {
+            if (!recordId) {
+                showError('No record ID provided in URL. Please add ?id=YOUR_RECORD_ID to the URL.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/webhook/devcoBackend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'getEstimateById',
+                        payload: { id: recordId }
+                    })
+                });
+
+                const result = await response.json();
+
+                if (!result.success || !result.result) {
+                    showError('Estimate not found. Please verify the record ID.');
+                    return;
+                }
+
+                currentData = result.result;
+                displayEstimate(currentData);
+            } catch (error) {
+                console.error('Error fetching estimate:', error);
+                showError('Failed to load estimate. Please try again later.');
+            }
+        }
+
+        // Show error state
+        function showError(message) {
+            loadingState.style.display = 'none';
+            contentState.style.display = 'none';
+            errorState.style.display = 'block';
+            errorMessage.textContent = message;
+        }
+
+        // Display estimate data
+        function displayEstimate(data) {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'none';
+            contentState.style.display = 'block';
+
+            // Populate fields
+            document.getElementById('recordId').textContent = data._id || '--';
+            document.getElementById('proposalNo').textContent = data.proposalNo || data.estimate || '--';
+            document.getElementById('customerName').textContent = data.customerName || '--';
+            document.getElementById('customerId').textContent = data.customerId || '--';
+            document.getElementById('customerInitials').textContent = getInitials(data.customerName);
+            document.getElementById('date').textContent = data.date || '--';
+            document.getElementById('estimate').textContent = data.estimate || '--';
+            document.getElementById('bidMarkUp').textContent = data.bidMarkUp || '--';
+            document.getElementById('fringe').textContent = data.fringe || 'N/A';
+            document.getElementById('createdAt').textContent = formatDate(data.createdAt);
+            document.getElementById('updatedAt').textContent = formatDate(data.updatedAt);
+
+            // Render services
+            renderServices(data);
+
+            // Update page title
+            document.title = `${data.proposalNo || 'Estimate'} | Devco Proposals`;
+        }
+
+        // Initialize
+        fetchEstimate();
+    </script>
+</body>
+
+</html>
