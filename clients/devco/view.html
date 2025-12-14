@@ -354,21 +354,21 @@
 
                             <div className="flex items-center gap-4">
                                 <button
-                                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl shadow-sm transition-all"
+                                    className="flex items-center justify-start gap-2 w-48 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl shadow-sm transition-all"
                                     onClick={(e) => { e.stopPropagation(); onAdd(); }}
                                 >
                                     <Icon name="plus" size={16} />
                                     Add {title}
                                 </button>
-                                <span className="text-xl font-bold text-gray-900">{formatMoney(total)}</span>
+                                <span className="text-xl font-bold text-gray-900 w-32 text-right">{formatMoney(total)}</span>
                             </div>
                         </div>
 
                         {/* Progress Bar */}
                         <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
                             <div
-                                className={`h-full rounded-full transition-all duration-1000 ease-out bg-${color}-500`}
-                                style={{ width: `${percentage}%`, opacity: percentage > 0 ? 1 : 0 }}
+                                className="h-full rounded-full transition-all duration-1000 ease-out"
+                                style={{ width: `${percentage}%`, opacity: percentage > 0 ? 1 : 0, backgroundColor: color }}
                             ></div>
                         </div>
                     </div>
@@ -513,7 +513,7 @@
             );
         };
 
-        const LineItemsTable = ({ headers, items, fields, editableFields = [], onUpdateItem, onExplain, onDelete }) => {
+        const LineItemsTable = ({ headers, items, fields, editableFields = [], onUpdateItem, onExplain, onDelete, sectionId, suppliers = [], uoms = [] }) => {
             // Safe Icon resolution
             const Icon = window.DevcoComponents?.Icon || window.Icon || (({ name }) => <span className="text-xs">{name}</span>);
 
@@ -527,6 +527,21 @@
 
             return (
                 <div className="overflow-x-auto">
+                    {sectionId === 'Equipment' && (
+                        <datalist id="equipment-suppliers">
+                            {suppliers.map(s => <option key={s} value={s} />)}
+                        </datalist>
+                    )}
+                    {sectionId === 'Material' && (
+                        <>
+                            <datalist id="material-suppliers">
+                                {suppliers.map(s => <option key={s} value={s} />)}
+                            </datalist>
+                            <datalist id="material-uoms">
+                                {uoms.map(u => <option key={u} value={u} />)}
+                            </datalist>
+                        </>
+                    )}
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">
@@ -578,12 +593,51 @@
                                         return (
                                             <td key={j} className="px-3 py-2 text-[11px] text-gray-700 whitespace-nowrap">
                                                 {isEditable ? (
-                                                    <input
-                                                        type="text"
-                                                        defaultValue={val}
-                                                        onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
-                                                        className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
-                                                    />
+                                                    field === 'uom' && sectionId === 'Equipment' ? (
+                                                        <select
+                                                            value={val || 'Daily'}
+                                                            onChange={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                            className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                        >
+                                                            <option value="Daily">Daily</option>
+                                                            <option value="Weekly">Weekly</option>
+                                                            <option value="Monthly">Monthly</option>
+                                                        </select>
+                                                    ) : field === 'uom' && sectionId === 'Material' ? (
+                                                        <input
+                                                            type="text"
+                                                            list="material-uoms"
+                                                            defaultValue={val}
+                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                            className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                            placeholder="UOM"
+                                                        />
+                                                    ) : field === 'supplier' && sectionId === 'Equipment' ? (
+                                                        <input
+                                                            type="text"
+                                                            list="equipment-suppliers"
+                                                            defaultValue={val}
+                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                            className="w-24 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                            placeholder="Select..."
+                                                        />
+                                                    ) : field === 'supplier' && sectionId === 'Material' ? (
+                                                        <input
+                                                            type="text"
+                                                            list="material-suppliers"
+                                                            defaultValue={val}
+                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                            className="w-24 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                            placeholder="Select..."
+                                                        />
+                                                    ) : (
+                                                        <input
+                                                            type="text"
+                                                            defaultValue={val}
+                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                            className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                        />
+                                                    )
                                                 ) : (
                                                     <span>{displayVal}</span>
                                                 )}
@@ -612,6 +666,7 @@
             const [estimate, setEstimate] = React.useState(null);
             const [laborCatalog, setLaborCatalog] = React.useState([]);
             const [equipmentCatalog, setEquipmentCatalog] = React.useState([]);
+            const [materialCatalog, setMaterialCatalog] = React.useState([]);
             const [fringeConstants, setFringeConstants] = React.useState([]); // Added Fringe Constants State
             const [loading, setLoading] = React.useState(true);
             const [editing, setEditing] = React.useState(true);
@@ -655,6 +710,7 @@
                 }
                 loadLaborCatalog();
                 loadEquipmentCatalog();
+                loadMaterialCatalog();
                 loadFringeConstants(); // Load fringe constants
             }, [estimateId]);
 
@@ -785,6 +841,25 @@
                     }
                 } catch (error) {
                     console.error('Error loading equipment catalog:', error);
+                }
+            };
+
+            const loadMaterialCatalog = async () => {
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'getCatalogueItems',
+                            payload: { type: 'material' }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success && result.result) {
+                        setMaterialCatalog(result.result);
+                    }
+                } catch (error) {
+                    console.error('Error loading material catalog:', error);
                 }
             };
 
@@ -1063,7 +1138,7 @@
 
                 // Parse value if numeric field
                 let finalValue = value;
-                const isNumber = ['quantity', 'days', 'otPd', 'basePay'].includes(field);
+                const isNumber = ['quantity', 'days', 'otPd', 'basePay', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'cost'].includes(field);
                 if (isNumber) {
                     finalValue = parseFloat(value);
                     if (isNaN(finalValue)) finalValue = 0;
@@ -1146,149 +1221,192 @@
                 }
             };
 
-            const sections = React.useMemo(() => [
-                {
-                    id: 'Labor',
-                    title: 'Labor',
-                    key: 'labor',
-                    items: (estimate?.labor || [])
-                        .map(item => ({
-                            ...item,
-                            labor: item.labor || `${item.classification || ''}-${item.fringe || ''}`,
-                            total: calculateLaborTotal(item)
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Labor', 'Classification', 'Sub Classification', 'Base Pay', 'Quantity', 'Days', 'OT PD', 'W. Comp', 'Payroll Tax', 'Total'],
-                    fields: ['labor', 'classification', 'subClassification', 'basePay', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent', 'total'],
-                    formHeaders: ['Classification', 'Sub Classification', 'Fringe', 'Base Pay', 'Quantity', 'Days', 'OT PD', 'W. Comp %', 'Payroll Tax %'],
-                    formFields: ['classification', 'subClassification', 'fringe', 'basePay', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent'],
-                    color: 'blue'
-                },
-                {
-                    id: 'Equipment',
-                    title: 'Equipment',
-                    key: 'equipment',
-                    items: (estimate?.equipment || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Daily Cost', 'Weekly Cost', 'Monthly Cost', 'Fuel Additive', 'Total'],
-                    fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'total'],
-                    color: 'orange'
-                },
-                {
-                    id: 'Material',
-                    title: 'Material',
-                    key: 'material',
-                    items: (estimate?.material || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Material', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes', 'Total'],
-                    fields: ['material', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes', 'total'],
-                    color: 'emerald'
-                },
-                {
-                    id: 'Tools',
-                    title: 'Tools',
-                    key: 'tool',
-                    items: (estimate?.tools || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Tool', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes', 'Total'],
-                    fields: ['tool', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes', 'total'],
-                    color: 'purple'
-                },
-                {
-                    id: 'Overhead',
-                    title: 'Overhead',
-                    key: 'overhead',
-                    items: (estimate?.overhead || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Overhead', 'Classification', 'Sub Classification', 'UOM', 'Days', 'Hours', 'Hourly Rate', 'Daily Rate', 'Total'],
-                    fields: ['overhead', 'classification', 'subClassification', 'uom', 'days', 'hours', 'hourlyRate', 'dailyRate', 'total'],
-                    color: 'red'
-                },
-                {
-                    id: 'Subcontractor',
-                    title: 'Subcontractor',
-                    key: 'subcontractor',
-                    items: (estimate?.subcontractor || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Subcontractor', 'Classification', 'Sub Classification', 'UOM', 'Notes', 'Cost', 'Total'],
-                    fields: ['subcontractor', 'classification', 'subClassification', 'uom', 'notes', 'cost', 'total'],
-                    color: 'indigo'
-                },
-                {
-                    id: 'Disposal',
-                    title: 'Disposal',
-                    key: 'disposal',
-                    items: (estimate?.disposal || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost', 'Total'],
-                    fields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'quantity', 'cost', 'total'],
-                    color: 'yellow'
-                },
-                {
-                    id: 'Miscellaneous',
-                    title: 'Miscellaneous',
-                    key: 'miscellaneous',
-                    items: (estimate?.miscellaneous || [])
-                        .map(item => ({
-                            ...item,
-                            total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                        }))
-                        .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                    headers: ['Item', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost', 'Total'],
-                    fields: ['item', 'classification', 'subClassification', 'uom', 'quantity', 'cost', 'total'],
-                    color: 'pink'
-                }
-            ], [estimate, fringeConstants]);
+            const sections = React.useMemo(() => {
+                const defaultColors = {
+                    Labor: '#4F7E17',
+                    Equipment: '#0000FF',
+                    Material: '#F88702',
+                    Tools: '#800080',
+                    Overhead: '#F0C400',
+                    Subcontractor: '#7B4019',
+                    Disposal: '#000000',
+                    Miscellaneous: '#CD0302'
+                };
+
+                const getColor = (name) => {
+                    const constant = fringeConstants.find(c => c.description === name || c.description === `${name} Color`);
+                    return (constant && constant.color) ? constant.color : (defaultColors[name] || '#cbd5e1');
+                };
+
+                return [
+                    {
+                        id: 'Labor',
+                        title: 'Labor',
+                        key: 'labor',
+                        items: (estimate?.labor || [])
+                            .map(item => ({
+                                ...item,
+                                labor: item.labor || `${item.classification || ''}-${item.fringe || ''}`,
+                                total: calculateLaborTotal(item)
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Labor', 'Classification', 'Sub Classification', 'Base Pay', 'Quantity', 'Days', 'OT PD', 'W. Comp', 'Payroll Tax', 'Total'],
+                        fields: ['labor', 'classification', 'subClassification', 'basePay', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent', 'total'],
+                        formHeaders: ['Classification', 'Sub Classification', 'Fringe', 'Base Pay', 'Quantity', 'Days', 'OT PD', 'W. Comp %', 'Payroll Tax %'],
+                        formFields: ['classification', 'subClassification', 'fringe', 'basePay', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent'],
+                        color: getColor('Labor')
+                    },
+                    {
+                        id: 'Equipment',
+                        title: 'Equipment',
+                        key: 'equipment',
+                        items: (estimate?.equipment || [])
+                            .map(item => {
+                                const qty = item.quantity || 0;
+                                const uom = item.uom || 'Daily';
+                                let calculatedTotal = 0;
+                                if (uom === 'Daily') calculatedTotal = (item.dailyCost || 0) * qty;
+                                else if (uom === 'Weekly') calculatedTotal = (item.weeklyCost || 0) * qty;
+                                else if (uom === 'Monthly') calculatedTotal = (item.monthlyCost || 0) * qty;
+
+                                return {
+                                    ...item,
+                                    total: item.total ?? calculatedTotal
+                                };
+                            })
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Quantity', 'UOM', 'Daily Cost', 'Weekly Cost', 'Monthly Cost', 'Fuel Additive', 'Total'],
+                        fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'quantity', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'total'],
+                        color: getColor('Equipment')
+                    },
+                    {
+                        id: 'Material',
+                        title: 'Material',
+                        key: 'material',
+                        items: (estimate?.material || [])
+                            .map(item => ({
+                                ...item,
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Material', 'Classification', 'Sub Classification', 'Supplier', 'Quantity', 'UOM', 'Cost', 'Taxes', 'Total'],
+                        fields: ['material', 'classification', 'subClassification', 'supplier', 'quantity', 'uom', 'cost', 'taxes', 'total'],
+                        color: getColor('Material')
+                    },
+                    {
+                        id: 'Tools',
+                        title: 'Tools',
+                        key: 'tool',
+                        items: (estimate?.tools || [])
+                            .map(item => ({
+                                ...item,
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Tool', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes', 'Total'],
+                        fields: ['tool', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes', 'total'],
+                        color: getColor('Tools')
+                    },
+                    {
+                        id: 'Overhead',
+                        title: 'Overhead',
+                        key: 'overhead',
+                        items: (estimate?.overhead || [])
+                            .map(item => ({
+                                ...item,
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Overhead', 'Classification', 'Sub Classification', 'UOM', 'Days', 'Hours', 'Hourly Rate', 'Daily Rate', 'Total'],
+                        fields: ['overhead', 'classification', 'subClassification', 'uom', 'days', 'hours', 'hourlyRate', 'dailyRate', 'total'],
+                        color: getColor('Overhead')
+                    },
+                    {
+                        id: 'Subcontractor',
+                        title: 'Subcontractor',
+                        key: 'subcontractor',
+                        items: (estimate?.subcontractor || [])
+                            .map(item => ({
+                                ...item,
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Subcontractor', 'Classification', 'Sub Classification', 'UOM', 'Notes', 'Cost', 'Total'],
+                        fields: ['subcontractor', 'classification', 'subClassification', 'uom', 'notes', 'cost', 'total'],
+                        color: getColor('Subcontractor')
+                    },
+                    {
+                        id: 'Disposal',
+                        title: 'Disposal',
+                        key: 'disposal',
+                        items: (estimate?.disposal || [])
+                            .map(item => ({
+                                ...item,
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost', 'Total'],
+                        fields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'quantity', 'cost', 'total'],
+                        color: getColor('Disposal')
+                    },
+                    {
+                        id: 'Miscellaneous',
+                        title: 'Miscellaneous',
+                        key: 'miscellaneous',
+                        items: (estimate?.miscellaneous || [])
+                            .map(item => ({
+                                ...item,
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
+                            }))
+                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                        headers: ['Item', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost', 'Total'],
+                        fields: ['item', 'classification', 'subClassification', 'uom', 'quantity', 'cost', 'total'],
+                        color: getColor('Miscellaneous')
+                    }
+                ];
+            }, [estimate, fringeConstants]);
 
             // --- Chart & Header Data Preparation ---
             const Icon = window.DevcoComponents?.Icon || window.Icon || (({ name }) => <span className="text-xs">{name}</span>);
 
+            const uniqueEquipmentSuppliers = React.useMemo(() => {
+                return [...new Set(equipmentCatalog.map(i => i.supplier).filter(Boolean))].sort();
+            }, [equipmentCatalog]);
+
+            const uniqueMaterialSuppliers = React.useMemo(() => {
+                return [...new Set(materialCatalog.map(i => i.supplier).filter(Boolean))].sort();
+            }, [materialCatalog]);
+
+            const uniqueMaterialUOMs = React.useMemo(() => {
+                return [...new Set(materialCatalog.map(i => i.uom).filter(Boolean))].sort();
+            }, [materialCatalog]);
+
             const chartData = React.useMemo(() => {
                 try {
-                    const colors = {
-                        Labor: '#3b82f6', // blue-500
-                        Equipment: '#f59e0b', // amber-500
-                        Material: '#10b981', // emerald-500
-                        Subcontractor: '#8b5cf6', // violet-500
-                        Tools: '#f43f5e', // rose-500
-                        Overhead: '#64748b', // slate-500
-                        Disposal: '#ef4444', // red-500
-                        Miscellaneous: '#ec4899' // pink-500
-                    };
-
                     if (!sections) return { slices: [], total: 0 };
 
                     const data = sections.map(s => {
                         const items = s.items || estimate[s.key] || [];
                         const value = items.reduce((sum, i) => sum + (i.total || 0), 0);
-                        return { id: s.id, label: s.title, value, color: colors[s.id] || '#cbd5e1' };
-                    }); // Removed filter to show all rings
+                        return { id: s.id, label: s.title, value, color: s.color || '#cbd5e1' };
+                    });
 
-                    const total = data.reduce((sum, d) => sum + d.value, 0);
+                    // Calculate Subtotal and Markup
+                    const subtotal = data.reduce((sum, d) => sum + d.value, 0);
+                    const markupPct = parseFloat(estimate?.markup || 0);
+                    const markupAmount = subtotal * (markupPct / 100);
+
+                    // Add Markup Slice
+                    if (markupAmount > 0) {
+                        data.push({
+                            id: 'Markup',
+                            label: 'Markup',
+                            value: markupAmount,
+                            color: '#a855f7' // Purple 500
+                        });
+                    }
+
+                    const total = subtotal + markupAmount;
                     return { slices: data, total };
                 } catch (err) {
                     console.error("Chart Data Error:", err);
@@ -1485,12 +1603,40 @@
                 </div>
             );
 
+            const HeaderActions = () => {
+                const allExpanded = sections && sections.length > 0 && sections.every(s => openSections[s.id]);
+
+                const handleToggleAll = () => {
+                    if (allExpanded) {
+                        setOpenSections({});
+                    } else {
+                        const allOpen = {};
+                        if (sections) sections.forEach(s => allOpen[s.id] = true);
+                        setOpenSections(allOpen);
+                    }
+                };
+
+                return (
+                    <div className="flex items-center gap-1">
+                        <button
+                            onClick={handleToggleAll}
+                            className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title={allExpanded ? "Collapse All" : "Expand All"}
+                        >
+                            <Icon name={allExpanded ? "chevrons-up" : "chevrons-down"} size={20} />
+                        </button>
+                    </div>
+                );
+            };
+
             return (
-                <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ background: '#f0f2f5' }}>
+                <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
                     <Header
                         activePage="estimates"
                         rightContent={
                             <div className="flex items-center gap-2">
+                                <HeaderActions />
+                                <div className="h-6 w-px bg-gray-200 mx-2"></div>
                                 <button
                                     onClick={() => loadEstimate(true)}
                                     className="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-transparent hover:border-blue-100"
@@ -1521,72 +1667,32 @@
                             {/* Detailed Header Card */}
 
 
-                            <div className="bg-[#eef2f6] rounded-[40px] shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] p-6 mb-6 flex flex-col xl:flex-row gap-8 xl:justify-start items-stretch">
+                            <div className="bg-[#eef2f6] rounded-[40px] shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] p-8 mb-6">
+                                {/* 4-Column Grid Layout */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
 
-                                {/* LEFT COLUMN: Project Details */}
-                                <div className="xl:w-auto xl:max-w-[560px] flex flex-col gap-8">
-
-                                    {/* 1. Header Row: Customer | Date, Project Title - using grid for alignment */}
-                                    <div className="grid grid-cols-[240px_1fr] gap-4 border-b border-slate-200/50 pb-4">
-                                        {/* Customer - same width as Services column below */}
+                                    {/* PART 1: Customer + Services */}
+                                    <div className="flex flex-col gap-6 p-4 rounded-2xl bg-white/30 shadow-[inset_2px_2px_6px_#d1d9e6,inset_-2px_-2px_6px_#ffffff]">
+                                        {/* Customer */}
                                         <div>
-                                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 block">Customer</label>
-                                            <div className="text-4xl font-black text-slate-800 tracking-tight truncate" title={formData.customerName || 'No Customer'}>
+                                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Customer</label>
+                                            <div className="text-2xl font-black text-slate-800 tracking-tight truncate" title={formData.customerName || 'No Customer'}>
                                                 {formData.customerName || 'No Customer'}
                                             </div>
                                         </div>
 
-                                        {/* Date + Project Title - aligns with Markup column */}
-                                        <div className="flex items-end gap-8">
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Date</label>
-                                                <div className="text-xl font-bold text-slate-600">{formData.date || '-'}</div>
-                                            </div>
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Project Title</label>
-                                                <div className="text-xl font-bold text-slate-600">{formData.estimate || '-'}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* 2. Sub-Content: Services & Financials - same grid layout */}
-                                    <div className="grid grid-cols-[240px_1fr] gap-4 items-start mt-6">
-
-                                        {/* COL 1: Services (3 Top, 2 Bottom) */}
+                                        {/* Services */}
                                         <div>
-                                            <div className="mb-4">
-                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block">Services</label>
-                                            </div>
-                                            <div className="grid grid-cols-3 gap-6 max-w-[240px]">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 block">Services</label>
+                                            <div className="grid grid-cols-3 gap-3">
                                                 {[
-                                                    { id: 'directionalDrilling', label: 'Directional Drilling', icon: <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" /> },
-                                                    { id: 'excavationBackfill', label: 'Excavation & Backfill', icon: <path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607zM16 16l4 4" /> },
+                                                    { id: 'directionalDrilling', label: 'Directional Drilling', icon: <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25M12 11l-2.5-1.25M12 16l-5-2.5M12 16l5-2.5M2 17l10 5 10-5" /> },
+                                                    { id: 'excavationBackfill', label: 'Excavation & Backfill', icon: <path d="M2 22h20M2 12l2-2 3 3 5-5 3 3 5-5 2 2" strokeLinecap="round" strokeLinejoin="round" /> },
                                                     { id: 'hydroExcavation', label: 'Hydro-excavation', icon: <path d="M12 2.69l5.74 8.2a8 8 0 1 1-11.48 0L12 2.69z" /> },
                                                     { id: 'potholingCoring', label: 'Potholing & Coring', icon: <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-7a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" /> },
-                                                    { id: 'asphaltConcrete', label: 'Asphalt & Concrete', icon: <path d="M3 21h18v-8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8zM3 10h18M3 6h18" /> },
+                                                    { id: 'asphaltConcrete', label: 'Asphalt & Concrete', icon: <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zm0-4h16M4 14h16M4 10h16M4 6h16" /> },
                                                     { id: 'status', label: formData.status === 'confirmed' ? 'Confirmed' : 'Draft', isStatus: true, icon: <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> }
-                                                ].map((s, idx) => {
-                                                    // Improved Shovel
-                                                    if (s.id === 'excavationBackfill') {
-                                                        s.icon = <path d="M9.5 14.5L3 21M3 21h4M3 21v-4M21 3l-6.5 6.5M21 3l-5 5m5-5l-1-1M10 14L4 20M2 22h4l6-6-4-4-6 6v4z" strokeLinecap="round" strokeLinejoin="round" />
-                                                        // Actually simpler shovel:
-                                                        s.icon = <path d="M9 22H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1zm8-18l-5 5m5-5l-1-1M10 14L4 20" strokeLinecap="round" />
-                                                        // Let's use generic sleek icons
-                                                        s.icon = <path d="M2 22h20M2 12l2-2 3 3 5-5 3 3 5-5 2 2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        // Backfill/Mound
-                                                    }
-
-                                                    // Drilling
-                                                    if (s.id === 'directionalDrilling') {
-                                                        s.icon = <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25M12 11l-2.5-1.25M12 16l-5-2.5M12 16l5-2.5M2 17l10 5 10-5" />
-                                                    }
-
-                                                    // Road
-                                                    if (s.id === 'asphaltConcrete') {
-                                                        s.icon = <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2zm0-4h16M4 14h16M4 10h16M4 6h16" />
-                                                    }
-
-                                                    // Status icon - special handling
+                                                ].map((s) => {
                                                     const isConfirmed = s.isStatus && formData.status === 'confirmed';
                                                     const isActive = s.isStatus ? isConfirmed : formData[s.id];
 
@@ -1595,20 +1701,20 @@
                                                             key={s.id}
                                                             onClick={() => s.isStatus ? toggleStatus() : toggleService(s.id)}
                                                             className={`
-                                                                group relative w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300
+                                                                group relative w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300
                                                                 ${isActive
                                                                     ? s.isStatus
-                                                                        ? 'shadow-[inset_6px_6px_12px_#b8e0c8,inset_-6px_-6px_12px_#ffffff] text-emerald-600 bg-emerald-50/50'
-                                                                        : 'shadow-[inset_6px_6px_12px_#d1d9e6,inset_-6px_-6px_12px_#ffffff] text-blue-600'
-                                                                    : 'shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] hover:shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] hover:-translate-y-1 text-slate-400'}
+                                                                        ? 'shadow-[inset_4px_4px_8px_#b8e0c8,inset_-4px_-4px_8px_#ffffff] text-emerald-600 bg-emerald-50/50'
+                                                                        : 'shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] text-blue-600'
+                                                                    : 'shadow-[6px_6px_12px_#d1d9e6,-6px_-6px_12px_#ffffff] hover:shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] hover:-translate-y-0.5 text-slate-400'}
                                                             `}
                                                         >
-                                                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                                 {s.icon}
                                                             </svg>
 
                                                             {/* Custom Tooltip */}
-                                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                                                            <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white text-[9px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
                                                                 {s.label}
                                                                 <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
                                                             </div>
@@ -1617,207 +1723,264 @@
                                                 })}
                                             </div>
                                         </div>
+                                    </div>
 
-                                        {/* COL 2: Financials (Stacked) */}
-                                        <div className="w-full max-w-[320px] space-y-6">
-                                            {/* Markup */}
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Markup</label>
-                                                <div className="relative shadow-[inset_6px_6px_10px_#d1d9e6,inset_-6px_-6px_10px_#ffffff] rounded-[20px] p-1 bg-[#eef2f6] h-14 flex items-center">
-                                                    <input
-                                                        type="number"
-                                                        value={formData.bidMarkUp || ''}
-                                                        onChange={e => setFormData({ ...formData, bidMarkUp: e.target.value })}
-                                                        className="w-full bg-transparent text-2xl font-bold text-slate-700 h-full px-6 outline-none text-left"
-                                                        placeholder="0"
-                                                    />
-                                                    <span className="absolute right-6 text-xl font-bold text-slate-400">%</span>
-                                                </div>
+                                    {/* PART 2: Date/Project Title + Markup/Fringe */}
+                                    <div className="flex flex-col gap-5 p-4 rounded-2xl bg-white/30 shadow-[inset_2px_2px_6px_#d1d9e6,inset_-2px_-2px_6px_#ffffff]">
+                                        {/* Date & Project Title (inline) */}
+                                        <div className="flex gap-4">
+                                            <div className="flex-1">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Date</label>
+                                                <div className="text-lg font-bold text-slate-600">{formData.date || '-'}</div>
                                             </div>
+                                            <div className="flex-1">
+                                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Project Title</label>
+                                                <div className="text-lg font-bold text-slate-600 truncate" title={formData.estimate || '-'}>{formData.estimate || '-'}</div>
+                                            </div>
+                                        </div>
 
-                                            {/* Fringe */}
-                                            <div>
-                                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Fringe</label>
-                                                <div className="relative shadow-[inset_6px_6px_10px_#d1d9e6,inset_-6px_-6px_10px_#ffffff] rounded-[20px] p-1 bg-[#eef2f6] h-14 flex items-center">
-                                                    <select
-                                                        value={formData.fringe || ''}
-                                                        onChange={e => setFormData({ ...formData, fringe: e.target.value })}
-                                                        className="w-full appearance-none bg-transparent text-xl font-bold text-slate-700 h-full px-6 outline-none cursor-pointer text-left"
-                                                    >
-                                                        <option value="">None</option>
-                                                        <option value="HDD Public">HDD Public</option>
-                                                        <option value="HDD Private">HDD Private</option>
-                                                        <option value="Light Commercial">Light Commercial</option>
-                                                    </select>
-                                                    <div className="absolute right-6 pointer-events-none text-slate-400">
-                                                        <Icon name="chevron-down" size={20} />
-                                                    </div>
+                                        {/* Markup */}
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Markup</label>
+                                            <div className="relative shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-2xl p-1 bg-[#eef2f6] h-12 flex items-center">
+                                                <input
+                                                    type="number"
+                                                    value={formData.bidMarkUp || ''}
+                                                    onChange={e => setFormData({ ...formData, bidMarkUp: e.target.value })}
+                                                    className="w-full bg-transparent text-xl font-bold text-slate-700 h-full px-4 outline-none text-left"
+                                                    placeholder="0"
+                                                />
+                                                <span className="absolute right-4 text-lg font-bold text-slate-400">%</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Fringe */}
+                                        <div>
+                                            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">Fringe Rate</label>
+                                            <div className="relative shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-2xl p-1 bg-[#eef2f6] h-12 flex items-center">
+                                                <select
+                                                    value={formData.fringe || ''}
+                                                    onChange={e => setFormData({ ...formData, fringe: e.target.value })}
+                                                    className="w-full appearance-none bg-transparent text-lg font-bold text-slate-700 h-full px-4 outline-none cursor-pointer text-left"
+                                                >
+                                                    <option value="">None</option>
+                                                    <option value="HDD Public">HDD Public</option>
+                                                    <option value="HDD Private">HDD Private</option>
+                                                    <option value="Light Commercial">Light Commercial</option>
+                                                </select>
+                                                <div className="absolute right-4 pointer-events-none text-slate-400">
+                                                    <Icon name="chevron-down" size={18} />
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* RIGHT COLUMN: Neumorphic Chart + Legend */}
-                                <div className="w-full xl:w-[500px] border-t xl:border-t-0 xl:border-l border-slate-300/30 pt-10 xl:pt-0 xl:pl-6 flex flex-col items-start justify-center">
-                                    <div className="flex items-center gap-8">
-                                        {/* Chart */}
-                                        <div className="relative w-64 h-64 rounded-full shadow-[inset_10px_10px_20px_#d1d9e6,inset_-10px_-10px_20px_#ffffff] flex items-center justify-center bg-[#eef2f6]">
+                                    {/* PART 3: Chart */}
+                                    <div className="flex flex-col p-4 rounded-2xl bg-white/30 shadow-[inset_2px_2px_6px_#d1d9e6,inset_-2px_-2px_6px_#ffffff]">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 block text-center">Cost Breakdown</label>
 
-                                            {/* Center Raised Platform */}
-                                            <div className="absolute z-10 w-32 h-32 rounded-full shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] bg-[#eef2f6] flex flex-col items-center justify-center">
-                                                <span className="text-slate-500 font-bold text-xs mb-1">Total</span>
-                                                <span className="text-slate-800 font-black text-xl tracking-tight">${chartData.total.toLocaleString()}</span>
-                                            </div>
-
-                                            {/* Dynamic Rings */}
-                                            <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+                                        {/* Semi-Circle Arc Chart */}
+                                        <div className="relative w-full flex justify-center items-start" style={{ height: '120px' }}>
+                                            <svg viewBox="0 0 200 105" className="w-full max-w-[220px]" style={{ overflow: 'visible' }}>
                                                 {(() => {
-                                                    if (chartData.slices.length === 0) return <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="6" opacity="0.5" />;
+                                                    const sortedSlices = chartData.slices.filter(s => s.value > 0).sort((a, b) => b.value - a.value);
 
-                                                    return chartData.slices.sort((a, b) => b.value - a.value).map((slice, idx) => {
-                                                        const baseRadius = 48.5;
-                                                        const gap = 3;
-                                                        const radius = baseRadius - (idx * gap);
+                                                    // Empty state
+                                                    if (sortedSlices.length === 0) {
+                                                        return <path d="M 10 100 A 90 90 0 0 1 190 100" fill="none" stroke="#e2e8f0" strokeWidth="22" strokeLinecap="round" />;
+                                                    }
 
-                                                        if (radius < 26) return null;
+                                                    const centerX = 100;
+                                                    const centerY = 100;
+                                                    const radius = 75;
+                                                    const strokeWidth = 24;
+                                                    const gapAngle = 4; // Gap between segments in degrees
+                                                    const totalGap = gapAngle * (sortedSlices.length - 1);
+                                                    const availableAngle = 180 - totalGap;
 
-                                                        const circumference = 2 * Math.PI * radius;
+                                                    let currentAngle = 180; // Start from left
+
+                                                    return sortedSlices.map((slice, idx) => {
                                                         const percent = chartData.total > 0 ? slice.value / chartData.total : 0;
-                                                        const targetDash = Math.max(percent * circumference, 0.1);
-                                                        const strokeDasharray = `${chartAnimate ? targetDash : 0} ${circumference}`;
+                                                        const sliceAngle = percent * availableAngle;
+
+                                                        // Skip if segment is too small
+                                                        if (sliceAngle < 2) return null;
+
+                                                        const startAngle = currentAngle;
+                                                        const endAngle = currentAngle - sliceAngle;
+
+                                                        // Convert to radians
+                                                        const startRad = (startAngle * Math.PI) / 180;
+                                                        const endRad = (endAngle * Math.PI) / 180;
+
+                                                        // Calculate arc endpoints
+                                                        const x1 = centerX + radius * Math.cos(startRad);
+                                                        const y1 = centerY - radius * Math.sin(startRad);
+                                                        const x2 = centerX + radius * Math.cos(endRad);
+                                                        const y2 = centerY - radius * Math.sin(endRad);
+
+                                                        const largeArc = sliceAngle > 180 ? 1 : 0;
+                                                        const pathD = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`;
+
+                                                        // Update angle for next segment (include gap)
+                                                        currentAngle = endAngle - gapAngle;
 
                                                         return (
-                                                            <React.Fragment key={slice.id}>
-                                                                <circle
-                                                                    cx="50" cy="50" r={radius}
-                                                                    fill="none"
-                                                                    stroke="#e2e8f0"
-                                                                    strokeWidth="2.5"
-                                                                    strokeLinecap="round"
-                                                                    opacity="0.5"
-                                                                />
-                                                                <circle
-                                                                    cx="50" cy="50" r={radius}
-                                                                    fill="none"
-                                                                    stroke={slice.color}
-                                                                    strokeWidth="2.5"
-                                                                    strokeLinecap="round"
-                                                                    strokeDasharray={strokeDasharray}
-                                                                    strokeDashoffset="0"
-                                                                    className="transition-all duration-1000 ease-out"
-                                                                    style={{ transitionProperty: 'stroke-dasharray' }}
-                                                                />
-                                                            </React.Fragment>
+                                                            <path
+                                                                key={slice.id}
+                                                                d={pathD}
+                                                                fill="none"
+                                                                stroke={slice.color}
+                                                                strokeWidth={strokeWidth}
+                                                                strokeLinecap="round"
+                                                                className="transition-all duration-700 ease-out"
+                                                                style={{
+                                                                    opacity: chartAnimate ? 1 : 0,
+                                                                    transform: chartAnimate ? 'scale(1)' : 'scale(0.9)',
+                                                                    transformOrigin: 'center',
+                                                                    transitionDelay: `${idx * 120}ms`
+                                                                }}
+                                                            />
                                                         );
                                                     });
                                                 })()}
                                             </svg>
+
+                                            {/* Center Total - positioned at bottom center of the arc */}
+                                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center">
+                                                <div className="text-[10px] text-blue-400 font-medium">Total</div>
+                                                <div className="text-xl font-black text-slate-800">${chartData.total.toLocaleString()}</div>
+                                            </div>
                                         </div>
 
-                                        {/* Compact Legend */}
-                                        <div className="w-[140px]">
-                                            <div className="grid grid-cols-1 gap-1">
-                                                {chartData.slices.filter(s => s.value > 0).sort((a, b) => b.value - a.value).slice(0, 6).map(slice => {
-                                                    const percent = chartData.total > 0 ? ((slice.value / chartData.total) * 100).toFixed(0) : 0;
+                                        {/* Legend */}
+                                        <div className="w-full mt-2 space-y-1 flex-1 overflow-y-auto max-h-[100px]">
+                                            {chartData.slices.filter(s => s.value > 0).sort((a, b) => b.value - a.value).slice(0, 6).map(slice => {
+                                                const percent = chartData.total > 0 ? ((slice.value / chartData.total) * 100).toFixed(1) : 0;
+                                                return (
+                                                    <div key={slice.id} className="flex items-center justify-between py-0.5 px-1 hover:bg-white/50 rounded transition-colors">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: slice.color }}></div>
+                                                            <span className="text-[11px] font-medium text-slate-600">{slice.label}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-[10px] font-medium text-slate-400">{percent}%</span>
+                                                            <span className="text-[11px] font-bold text-slate-800">${slice.value.toLocaleString()}</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* PART 4: Version History */}
+                                    <div className="flex flex-col p-4 rounded-2xl bg-white/30 shadow-[inset_2px_2px_6px_#d1d9e6,inset_-2px_-2px_6px_#ffffff] overflow-hidden">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <label className="text-sm font-bold text-slate-400 uppercase tracking-widest">Version History</label>
+                                            {versionHistory.length > 0 && (
+                                                <span className="text-[10px] bg-blue-100 text-blue-600 px-2.5 py-1 rounded-full font-bold">{versionHistory.length} versions</span>
+                                            )}
+                                        </div>
+
+                                        {versionHistory.length > 1 ? (
+                                            <div className="relative flex flex-col gap-0 flex-1 overflow-y-auto overflow-x-hidden max-h-[220px] custom-scrollbar">
+                                                {[...versionHistory].reverse().map((v, idx) => {
+                                                    const isCurrent = v._id === estimateId;
+                                                    const isLast = idx === versionHistory.length - 1;
+                                                    const versionNum = v.versionNumber || (versionHistory.length - idx);
                                                     return (
-                                                        <div key={slice.id} className="flex items-center gap-1.5 py-0.5">
-                                                            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: slice.color }}></div>
-                                                            <span className="text-[10px] font-medium text-slate-500 truncate flex-1">{slice.label}</span>
-                                                            <span className="text-[10px] font-bold text-slate-700">{percent}%</span>
+                                                        <div
+                                                            key={v._id}
+                                                            className={`relative flex items-start gap-3 py-2.5 px-2 -mx-2 cursor-pointer group rounded-lg transition-all duration-200 ${isCurrent ? 'bg-blue-50/80' : 'hover:bg-slate-50'}`}
+                                                            onClick={() => !isCurrent && (window.location.href = `view.html?id=${v._id}`)}
+                                                        >
+                                                            {/* Timeline connector */}
+                                                            <div className="flex flex-col items-center pt-0.5 flex-shrink-0">
+                                                                <div className={`relative w-6 h-6 rounded-full flex items-center justify-center ${isCurrent ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-md shadow-blue-500/30' : 'bg-slate-200 group-hover:bg-blue-300'} z-10 transition-all duration-200`}>
+                                                                    {isCurrent && (
+                                                                        <div className="absolute w-7 h-7 rounded-full bg-blue-400/30 animate-ping"></div>
+                                                                    )}
+                                                                    <span className={`text-[9px] font-black ${isCurrent ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}>V{versionNum}</span>
+                                                                </div>
+                                                                {!isLast && <div className="w-0.5 flex-1 bg-gradient-to-b from-slate-200 to-transparent mt-1"></div>}
+                                                            </div>
+                                                            {/* Content */}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-1.5 flex-wrap">
+                                                                    <span className={`text-[13px] font-bold truncate ${isCurrent ? 'text-blue-700' : 'text-slate-700'}`}>{v.estimate || 'Untitled'}</span>
+                                                                    {v.status === 'confirmed' && (
+                                                                        <span className="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full font-bold flex items-center gap-0.5">
+                                                                            <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                    <span className="text-[11px] text-slate-400">{v.date || '-'}</span>
+                                                                    <span className="text-[11px] text-slate-300">•</span>
+                                                                    <span className={`text-[13px] font-bold ${isCurrent ? 'text-blue-600' : 'text-slate-600'}`}>${(v.totalAmount || 0).toLocaleString()}</span>
+                                                                </div>
+                                                            </div>
+                                                            {/* Arrow for non-current */}
+                                                            {!isCurrent && (
+                                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center flex-shrink-0">
+                                                                    <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                                                    </svg>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     );
                                                 })}
                                             </div>
-                                        </div>
-
-                                        {/* Version Timeline - Enhanced */}
-                                        {versionHistory.length > 1 && (
-                                            <div className="flex-1 min-w-[200px] max-w-[280px] bg-white/40 rounded-2xl p-4 shadow-[inset_2px_2px_6px_#d1d9e6,inset_-2px_-2px_6px_#ffffff]">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Version History</label>
-                                                    <span className="text-[9px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">{versionHistory.length} versions</span>
-                                                </div>
-                                                <div className="relative flex flex-col gap-0 max-h-[200px] overflow-y-auto custom-scrollbar">
-                                                    {versionHistory.map((v, idx) => {
-                                                        const isCurrent = v._id === estimateId;
-                                                        const isLast = idx === versionHistory.length - 1;
-                                                        const versionNum = versionHistory.length - idx;
-                                                        return (
-                                                            <div
-                                                                key={v._id}
-                                                                className={`relative flex items-start gap-3 py-2.5 px-2 -mx-2 cursor-pointer group rounded-xl transition-all duration-200 ${isCurrent ? 'bg-blue-50/80' : 'hover:bg-slate-50'}`}
-                                                                onClick={() => !isCurrent && (window.location.href = `view.html?id=${v._id}`)}
-                                                            >
-                                                                {/* Timeline connector */}
-                                                                <div className="flex flex-col items-center pt-0.5">
-                                                                    <div className={`relative w-4 h-4 rounded-full flex items-center justify-center ${isCurrent ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-500/30' : 'bg-slate-200 group-hover:bg-blue-300'} z-10 transition-all duration-200`}>
-                                                                        {isCurrent && (
-                                                                            <div className="absolute w-6 h-6 rounded-full bg-blue-400/30 animate-ping"></div>
-                                                                        )}
-                                                                        <span className={`text-[8px] font-black ${isCurrent ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}>V{versionNum}</span>
-                                                                    </div>
-                                                                    {!isLast && <div className="w-0.5 flex-1 bg-gradient-to-b from-slate-200 to-transparent mt-1"></div>}
-                                                                </div>
-                                                                {/* Content */}
-                                                                <div className="flex-1 min-w-0">
-                                                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                                                        <span className={`text-[11px] font-bold truncate ${isCurrent ? 'text-blue-700' : 'text-slate-700'}`}>{v.estimate || 'Untitled'}</span>
-                                                                        {v.status === 'confirmed' && (
-                                                                            <span className="text-[8px] bg-emerald-500 text-white px-1.5 py-0.5 rounded-full font-bold flex items-center gap-0.5">
-                                                                                <svg className="w-2 h-2" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2 mt-1">
-                                                                        <span className="text-[10px] text-slate-400">{v.date || '-'}</span>
-                                                                        <span className="text-[10px] text-slate-300">•</span>
-                                                                        <span className={`text-[11px] font-bold ${isCurrent ? 'text-blue-600' : 'text-slate-600'}`}>${(v.totalAmount || 0).toLocaleString()}</span>
-                                                                    </div>
-                                                                </div>
-                                                                {/* Arrow for non-current */}
-                                                                {!isCurrent && (
-                                                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center">
-                                                                        <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                                                        </svg>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
+                                        ) : (
+                                            <div className="flex-1 flex items-center justify-center">
+                                                <div className="text-center text-slate-400">
+                                                    <svg className="w-10 h-10 mx-auto mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    <p className="text-xs font-medium">No version history</p>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
+
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Accordion Line Items */}
-                            <div className="w-full space-y-4 pb-20">
-                                {sections.map(section => (
-                                    <AccordionItem
-                                        key={section.id}
-                                        title={section.title}
-                                        isOpen={openSections[section.id]}
-                                        onToggle={() => toggleSection(section.id)}
+                        {/* Accordion Line Items */}
+                        <div className="w-full space-y-4 pb-20 md:px-8">
+                            {sections.map(section => (
+                                <AccordionItem
+                                    key={section.id}
+                                    title={section.title}
+                                    isOpen={openSections[section.id]}
+                                    onToggle={() => toggleSection(section.id)}
+                                    items={section.items || estimate[section.key] || []}
+                                    onAdd={() => setActiveSection(section)}
+                                    color={section.color}
+                                    grandTotal={chartData.total}
+                                >
+                                    <LineItemsTable
+                                        sectionId={section.id}
+                                        headers={section.headers}
                                         items={section.items || estimate[section.key] || []}
-                                        onAdd={() => setActiveSection(section)}
-                                        color={section.color}
-                                        grandTotal={chartData.total}
-                                    >
-                                        <LineItemsTable
-                                            headers={section.headers}
-                                            items={section.items || estimate[section.key] || []}
-                                            fields={section.fields}
-                                            editableFields={section.id === 'Labor' ? ['quantity', 'days', 'otPd', 'basePay'] : []}
-                                            onUpdateItem={(item, field, value) => handleItemUpdate(section, item, field, value)}
-                                            onExplain={section.id === 'Labor' ? handleExplain : undefined}
-                                            onDelete={(item) => handleDeleteItem(section, item)}
-                                        />
-                                    </AccordionItem>
-                                ))}
-                            </div>
+                                        fields={section.fields}
+                                        editableFields={
+                                            section.id === 'Labor' ? ['quantity', 'days', 'otPd', 'basePay'] :
+                                                section.id === 'Equipment' ? ['supplier', 'quantity', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost'] :
+                                                    section.id === 'Material' ? ['supplier', 'uom', 'cost', 'quantity'] :
+                                                        []
+                                        }
+                                        onUpdateItem={(item, field, value) => handleItemUpdate(section, item, field, value)}
+                                        onExplain={section.id === 'Labor' ? handleExplain : undefined}
+                                        onDelete={(item) => handleDeleteItem(section, item)}
+                                        suppliers={section.id === 'Equipment' ? uniqueEquipmentSuppliers : section.id === 'Material' ? uniqueMaterialSuppliers : []}
+                                        uoms={section.id === 'Material' ? uniqueMaterialUOMs : []}
+                                    />
+                                </AccordionItem>
+                            ))}
                         </div>
                     </main>
 
@@ -1856,7 +2019,7 @@
                         confirmText="Delete"
                         variant="danger"
                     />
-                </div>
+                </div >
             );
         }
 

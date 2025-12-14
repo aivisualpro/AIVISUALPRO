@@ -194,6 +194,7 @@ const ConstantItemSchema = new mongoose.Schema({
     description: { type: String },
     type: { type: String },
     value: { type: String }, // Storing as String to accommodate various types, can cast later if needed
+    color: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
@@ -425,10 +426,34 @@ export default async function (body) {
         // Find all estimates with the same proposal number
         const query = { proposalNo: proposalNo };
 
-        const estimates = await Estimate.find(query)
+        let estimates = await Estimate.find(query)
             .select('_id estimate date proposalNo createdAt customerName status')
-            .sort({ createdAt: -1 })
             .lean();
+
+        // Parse date string (M/D/YYYY or MM/DD/YYYY format) to Date object for sorting
+        const parseEstimateDate = (dateStr) => {
+            if (!dateStr) return new Date(0); // Put items without dates first
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                const month = parseInt(parts[0], 10) - 1; // Months are 0-indexed
+                const day = parseInt(parts[1], 10);
+                const year = parseInt(parts[2], 10);
+                return new Date(year, month, day);
+            }
+            return new Date(0);
+        };
+
+        // Sort by the estimate date field (oldest first = V1)
+        estimates.sort((a, b) => {
+            const dateA = parseEstimateDate(a.date);
+            const dateB = parseEstimateDate(b.date);
+            return dateA - dateB;
+        });
+
+        // Assign version numbers (oldest date = V1, newest date = highest version)
+        estimates.forEach((est, idx) => {
+            est.versionNumber = idx + 1;
+        });
 
         // For each estimate, calculate quick total from line items
         for (const est of estimates) {
