@@ -269,13 +269,13 @@ async function updateAppSheet(data) {
         "Date": String(data.date || ""),
         "Customer": String(data.customerId || ""),
         "Proposal No": String(data.proposalNo || ""),
-        "Bid Mark UP Percentage": String(data.bidMarkUp || "")
+        "Bid Mark UP Percentage": String(data.bidMarkUp || ""),
         // "Directional Drilling": toYN(data.directionalDrilling),
         // "Excavation & Backfill": toYN(data.excavationBackfill),
         // "Hydro-excavation": toYN(data.hydroExcavation),
         // "Potholing & Coring": toYN(data.potholingCoring),
         // "Asphalt & Concrete": toYN(data.asphaltConcrete),
-        // "Fringe": String(data.fringe || "")
+        "Fringe": String(data.fringe || "")
     };
 
     const requestBody = {
@@ -348,7 +348,7 @@ export default async function (body) {
             hydroExcavation: toBoolean(estimateData.hydroExcavation),
             potholingCoring: toBoolean(estimateData.potholingCoring),
             asphaltConcrete: toBoolean(estimateData.asphaltConcrete),
-            fringe: estimateData.fringe,
+            ...(estimateData.fringe !== undefined && { fringe: estimateData.fringe }),
             updatedAt: new Date()
         };
 
