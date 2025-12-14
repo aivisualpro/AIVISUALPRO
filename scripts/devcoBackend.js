@@ -26,6 +26,7 @@ const EstimateSchema = new mongoose.Schema({
     hydroExcavation: { type: Boolean, default: false },
     potholingCoring: { type: Boolean, default: false },
     asphaltConcrete: { type: Boolean, default: false },
+    status: { type: String, enum: ['draft', 'confirmed'], default: 'draft' },
     fringe: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
@@ -270,11 +271,11 @@ async function updateAppSheet(data) {
         "Customer": String(data.customerId || ""),
         "Proposal No": String(data.proposalNo || ""),
         "Bid Mark UP Percentage": String(data.bidMarkUp || ""),
-        // "Directional Drilling": toYN(data.directionalDrilling),
-        // "Excavation & Backfill": toYN(data.excavationBackfill),
-        // "Hydro-excavation": toYN(data.hydroExcavation),
-        // "Potholing & Coring": toYN(data.potholingCoring),
-        // "Asphalt & Concrete": toYN(data.asphaltConcrete),
+        "Directional Drilling": toYN(data.directionalDrilling),
+        "Excavation & Backfill": toYN(data.excavationBackfill),
+        "Hydro-excavation": toYN(data.hydroExcavation),
+        "Potholing & Coring": toYN(data.potholingCoring),
+        "Asphalt & Concrete": toYN(data.asphaltConcrete),
         "Fringe": String(data.fringe || "")
     };
 
@@ -387,6 +388,16 @@ export default async function (body) {
         const est = await Estimate.findById(id).lean();
 
         if (est) {
+            // Debug: Log service fields
+            console.log('getEstimateById - Service fields:', {
+                id: est._id,
+                directionalDrilling: est.directionalDrilling,
+                excavationBackfill: est.excavationBackfill,
+                hydroExcavation: est.hydroExcavation,
+                potholingCoring: est.potholingCoring,
+                asphaltConcrete: est.asphaltConcrete
+            });
+
             // Fetch and attach line items
             const fetchItems = async (model) => connection.model(model).find({ estimateId: id }).lean();
 
@@ -401,6 +412,52 @@ export default async function (body) {
         }
 
         return est;
+    }
+
+    // Get all estimates with the same Proposal Number (for version timeline)
+    if (action === 'getEstimatesByProposal') {
+        const { proposalNo, excludeId } = body.payload || {};
+        if (!proposalNo) throw new Error("Missing proposalNo in payload");
+
+        const connection = await getConnection();
+        const Estimate = connection.model('Estimate');
+
+        // Find all estimates with the same proposal number
+        const query = { proposalNo: proposalNo };
+
+        const estimates = await Estimate.find(query)
+            .select('_id estimate date proposalNo createdAt customerName status')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // For each estimate, calculate quick total from line items
+        for (const est of estimates) {
+            const fetchItems = async (model) => connection.model(model).find({ estimateId: est._id }).lean();
+
+            const labor = await fetchItems('EstimateLineItemsLabor');
+            const equipment = await fetchItems('EstimateLineItemsEquipment');
+            const material = await fetchItems('EstimateLineItemsMaterial');
+            const tools = await fetchItems('EstimateLineItemsTool');
+            const overhead = await fetchItems('EstimateLineItemsOverhead');
+            const subcontractor = await fetchItems('EstimateLineItemsSubcontractor');
+            const disposal = await fetchItems('EstimateLineItemsDisposal');
+            const miscellaneous = await fetchItems('EstimateLineItemsMiscellaneous');
+
+            // Calculate totals (simplified - using cost * quantity for most)
+            const calcTotal = (items) => items.reduce((sum, i) => sum + ((i.cost || i.dailyCost || 0) * (i.quantity || 1)), 0);
+
+            est.totalAmount =
+                calcTotal(labor) +
+                calcTotal(equipment) +
+                calcTotal(material) +
+                calcTotal(tools) +
+                calcTotal(overhead) +
+                calcTotal(subcontractor) +
+                calcTotal(disposal) +
+                calcTotal(miscellaneous);
+        }
+
+        return estimates;
     }
 
     if (action === 'updateEstimate') {
@@ -421,7 +478,7 @@ export default async function (body) {
         };
 
         // Map of field names to update
-        const fields = ['estimate', 'date', 'customerId', 'customerName', 'proposalNo', 'bidMarkUp', 'fringe'];
+        const fields = ['estimate', 'date', 'customerId', 'customerName', 'proposalNo', 'bidMarkUp', 'fringe', 'status'];
         const booleanFields = ['directionalDrilling', 'excavationBackfill', 'hydroExcavation', 'potholingCoring', 'asphaltConcrete'];
 
         fields.forEach(field => {
@@ -430,20 +487,37 @@ export default async function (body) {
             }
         });
 
+        // Debug: Log what boolean fields are in the payload
+        console.log('updateEstimate - Boolean fields in payload:', booleanFields.map(f => ({ field: f, value: payload[f], type: typeof payload[f] })));
+
         booleanFields.forEach(field => {
             if (payload[field] !== undefined) {
-                updateData[field] = payload[field] === true || payload[field] === 'true';
+                const newVal = payload[field] === true || payload[field] === 'true';
+                console.log(`updateEstimate - Setting ${field}: ${payload[field]} (${typeof payload[field]}) -> ${newVal}`);
+                updateData[field] = newVal;
             }
         });
 
+        console.log('updateEstimate - Update data being saved:', updateData);
+
         // Update MongoDB
         const result = await Estimate.findByIdAndUpdate(id, updateData, { new: true });
+
+        // Debug: Log the result's boolean fields
+        console.log('updateEstimate - Result from MongoDB:', {
+            directionalDrilling: result.directionalDrilling,
+            excavationBackfill: result.excavationBackfill,
+            hydroExcavation: result.hydroExcavation,
+            potholingCoring: result.potholingCoring,
+            asphaltConcrete: result.asphaltConcrete
+        });
 
         // Sync to AppSheet
         const appSheetResult = await updateAppSheet(result);
 
         console.log("Devco Backend - Updated estimate:", result._id);
         return {
+            success: true,
             message: 'Estimate updated successfully',
             id: result._id,
             data: result,
