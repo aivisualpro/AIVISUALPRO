@@ -27,7 +27,14 @@ const EstimateSchema = new mongoose.Schema({
     potholingCoring: { type: Boolean, default: false },
     asphaltConcrete: { type: Boolean, default: false },
     status: { type: String, enum: ['draft', 'confirmed'], default: 'draft' },
+    status: { type: String, enum: ['draft', 'confirmed'], default: 'draft' },
     fringe: { type: String },
+
+    // Financials
+    subTotal: { type: Number, default: 0 },
+    margin: { type: Number, default: 0 },
+    grandTotal: { type: Number, default: 0 },
+
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 }, {
@@ -199,6 +206,43 @@ const ConstantItemSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+// Helper to delete from AppSheet
+async function deleteFromAppSheet(id) {
+    if (!APPSHEET_APP_ID || !APPSHEET_API_KEY) return;
+
+    const APPSHEET_URL = `https://api.appsheet.com/api/v2/apps/${encodeURIComponent(APPSHEET_APP_ID)}/tables/${encodeURIComponent(APPSHEET_TABLE_NAME)}/Action`;
+
+    const requestBody = {
+        Action: "Delete",
+        Properties: {
+            Locale: "en-US",
+            Timezone: "Pacific Standard Time"
+        },
+        Rows: [{ "Record_Id": String(id) }]
+    };
+
+    try {
+        const response = await fetch(APPSHEET_URL, {
+            method: 'POST',
+            headers: {
+                'ApplicationAccessKey': APPSHEET_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            console.error(`AppSheet Delete Error: ${response.status} ${response.statusText}`);
+        } else {
+            console.log(`AppSheet record deleted: ${id}`);
+        }
+    } catch (error) {
+        console.error("AppSheet Delete Exception:", error);
+    }
+}
+
+// Main Request Handler if needed
+
 async function getConnection() {
     if (conn && conn.readyState === 1) return conn;
 
@@ -213,8 +257,9 @@ async function getConnection() {
         conn.once('error', reject);
     });
 
-    // Register models if not already registered
-    if (!conn.models.Estimate) conn.model('Estimate', EstimateSchema, 'estimatesdb');
+    // Force re-register Estimate with updated schema
+    if (conn.models.Estimate) delete conn.models.Estimate;
+    conn.model('Estimate', EstimateSchema, 'estimatesdb');
 
     // Catalogue models
     if (!conn.models.EquipmentItem) conn.model('EquipmentItem', EquipmentItemSchema, 'equipmentItems');
@@ -255,11 +300,103 @@ function toYN(value) {
 }
 
 // Helper function to update AppSheet
-async function updateAppSheet(data) {
+async function updateAppSheet(data, providedLineItems = null) {
     if (!APPSHEET_APP_ID || !APPSHEET_API_KEY) {
         console.log("AppSheet credentials not configured, skipping sync");
         return { skipped: true, reason: "No AppSheet credentials" };
     }
+
+    // Use provided line items (from payload) OR fetch from DB as fallback
+    let lineItems = {};
+    const connection = await getConnection();
+    const constants = await connection.model('ConstantItem').find({}).lean();
+
+    if (providedLineItems) {
+        // Use direct data to avoid race conditions
+        console.log("updateAppSheet: Using provided line items for calculation");
+        lineItems = {
+            labor: providedLineItems.labor || [],
+            equipment: providedLineItems.equipment || [],
+            material: providedLineItems.material || [],
+            tools: providedLineItems.tools || [],
+            overhead: providedLineItems.overhead || [],
+            subcontractor: providedLineItems.subcontractor || [],
+            disposal: providedLineItems.disposal || [],
+            miscellaneous: providedLineItems.miscellaneous || []
+        };
+    } else {
+        // Fallback to DB fetch
+        console.log("updateAppSheet: Fetching line items from DB");
+        const fetchItems = (modelName) => connection.model(modelName).find({ estimateId: data._id }).lean();
+        const [labor, equipment, material, tools, overhead, subcontractor, disposal, miscellaneous] = await Promise.all([
+            fetchItems('EstimateLineItemsLabor'),
+            fetchItems('EstimateLineItemsEquipment'),
+            fetchItems('EstimateLineItemsMaterial'),
+            fetchItems('EstimateLineItemsTool'),
+            fetchItems('EstimateLineItemsOverhead'),
+            fetchItems('EstimateLineItemsSubcontractor'),
+            fetchItems('EstimateLineItemsDisposal'),
+            fetchItems('EstimateLineItemsMiscellaneous')
+        ]);
+
+        lineItems = { labor, equipment, material, tools, overhead, subcontractor, disposal, miscellaneous };
+    }
+
+    const { labor, equipment, material, tools, overhead, subcontractor, disposal, miscellaneous } = lineItems;
+
+    // Helpers
+    const parseNum = (val) => parseFloat(String(val).replace(/[^0-9.-]+/g, "")) || 0;
+
+    const getFringeRate = (desc) => {
+        if (!desc) return 0;
+        const c = constants.find(conn => conn.description === desc);
+        return c ? (parseFloat(String(c.value).replace(/[^0-9.-]+/g, "")) || 0) : 0;
+    };
+
+    const calculateLaborTotal = (item) => {
+        const subClass = (item.subClassification || '').toLowerCase();
+        if (subClass === 'per diem' || subClass === 'hotel') {
+            return parseNum(item.basePay) * parseNum(item.quantity) * parseNum(item.days);
+        }
+        const basePay = parseNum(item.basePay);
+        const qty = parseNum(item.quantity);
+        const days = parseNum(item.days);
+        const otPd = parseNum(item.otPd);
+        const wCompPct = parseNum(item.wCompPercent);
+        const taxesPct = parseNum(item.payrollTaxesPercent);
+        const fringeRate = getFringeRate(item.fringe);
+        const totalHours = qty * days * 8;
+        const totalOtHours = qty * days * otPd;
+        const wCompTaxAmount = basePay * (wCompPct / 100);
+        const payrollTaxAmount = basePay * (taxesPct / 100);
+        const otPayrollTaxAmount = basePay * 1.5 * (taxesPct / 100);
+        const fringeAmount = fringeRate;
+        const baseRate = basePay + wCompTaxAmount + payrollTaxAmount + fringeAmount;
+        const otBasePay = basePay * 1.5;
+        const otRate = otBasePay + wCompTaxAmount + otPayrollTaxAmount + fringeAmount;
+        return (totalHours * baseRate) + (totalOtHours * otRate);
+    };
+
+    const calculateEquipmentTotal = (item) => {
+        const qty = item.quantity || 0;
+        const uom = item.uom || 'Daily';
+        if (uom === 'Daily') return (item.dailyCost || 0) * qty;
+        if (uom === 'Weekly') return (item.weeklyCost || 0) * qty;
+        if (uom === 'Monthly') return (item.monthlyCost || 0) * qty;
+        return (item.dailyCost || 0) * qty;
+    };
+
+    const simpleSum = (items) => items.reduce((sum, i) => sum + ((i.cost || 0) * (i.quantity || 1)), 0);
+
+    // Calculate Category Totals
+    const laborTotal = labor.reduce((sum, item) => sum + calculateLaborTotal(item), 0);
+    const equipmentTotal = equipment.reduce((sum, item) => sum + calculateEquipmentTotal(item), 0);
+    const materialTotal = simpleSum(material);
+    const toolsTotal = simpleSum(tools);
+    const overheadTotal = simpleSum(overhead);
+    const subcontractorTotal = simpleSum(subcontractor);
+    const disposalTotal = simpleSum(disposal);
+    const miscellaneousTotal = simpleSum(miscellaneous);
 
     const APPSHEET_URL = `https://api.appsheet.com/api/v2/apps/${encodeURIComponent(APPSHEET_APP_ID)}/tables/${encodeURIComponent(APPSHEET_TABLE_NAME)}/Action`;
 
@@ -277,7 +414,22 @@ async function updateAppSheet(data) {
         "Hydro-excavation": toYN(data.hydroExcavation),
         "Potholing & Coring": toYN(data.potholingCoring),
         "Asphalt & Concrete": toYN(data.asphaltConcrete),
-        "Fringe": String(data.fringe || "")
+        "Fringe": String(data.fringe || ""),
+
+        // Calculated Totals
+        "Labor": String(laborTotal.toFixed(2)),
+        "Equipment": String(equipmentTotal.toFixed(2)),
+        "Material": String(materialTotal.toFixed(2)),
+        "Tools": String(toolsTotal.toFixed(2)),
+        "Overhead": String(overheadTotal.toFixed(2)),
+        "Subcontractor": String(subcontractorTotal.toFixed(2)),
+        "Disposal": String(disposalTotal.toFixed(2)),
+        "Miscellaneous": String(miscellaneousTotal.toFixed(2)),
+
+        // Financials (from saved data)
+        "subTotal": String((data.subTotal || 0).toFixed(2)),
+        "margin": String((data.margin || 0).toFixed(2)),
+        "grandTotal": String((data.grandTotal || 0).toFixed(2))
     };
 
     const requestBody = {
@@ -400,16 +552,37 @@ export default async function (body) {
             });
 
             // Fetch and attach line items
-            const fetchItems = async (model) => connection.model(model).find({ estimateId: id }).lean();
+            // Fetch and attach line items in parallel
+            const fetchItems = (model) => connection.model(model).find({ estimateId: id }).lean();
 
-            est.labor = await fetchItems('EstimateLineItemsLabor');
-            est.equipment = await fetchItems('EstimateLineItemsEquipment');
-            est.material = await fetchItems('EstimateLineItemsMaterial');
-            est.tools = await fetchItems('EstimateLineItemsTool');
-            est.overhead = await fetchItems('EstimateLineItemsOverhead');
-            est.subcontractor = await fetchItems('EstimateLineItemsSubcontractor');
-            est.disposal = await fetchItems('EstimateLineItemsDisposal');
-            est.miscellaneous = await fetchItems('EstimateLineItemsMiscellaneous');
+            const [
+                labor,
+                equipment,
+                material,
+                tools,
+                overhead,
+                subcontractor,
+                disposal,
+                miscellaneous
+            ] = await Promise.all([
+                fetchItems('EstimateLineItemsLabor'),
+                fetchItems('EstimateLineItemsEquipment'),
+                fetchItems('EstimateLineItemsMaterial'),
+                fetchItems('EstimateLineItemsTool'),
+                fetchItems('EstimateLineItemsOverhead'),
+                fetchItems('EstimateLineItemsSubcontractor'),
+                fetchItems('EstimateLineItemsDisposal'),
+                fetchItems('EstimateLineItemsMiscellaneous')
+            ]);
+
+            est.labor = labor;
+            est.equipment = equipment;
+            est.material = material;
+            est.tools = tools;
+            est.overhead = overhead;
+            est.subcontractor = subcontractor;
+            est.disposal = disposal;
+            est.miscellaneous = miscellaneous;
         }
 
         return est;
@@ -427,7 +600,6 @@ export default async function (body) {
         const query = { proposalNo: proposalNo };
 
         let estimates = await Estimate.find(query)
-            .select('_id estimate date proposalNo createdAt customerName status')
             .lean();
 
         // Parse date string (M/D/YYYY or MM/DD/YYYY format) to Date object for sorting
@@ -455,32 +627,125 @@ export default async function (body) {
             est.versionNumber = idx + 1;
         });
 
-        // For each estimate, calculate quick total from line items
-        for (const est of estimates) {
-            const fetchItems = async (model) => connection.model(model).find({ estimateId: est._id }).lean();
+        // Fetch Fringe Constants once for labor calculations
+        const ConstantItem = connection.model('ConstantItem');
+        const fringeConstants = await ConstantItem.find({ $or: [{ type: 'constant' }, { type: 'Fringe' }] }).lean();
 
-            const labor = await fetchItems('EstimateLineItemsLabor');
-            const equipment = await fetchItems('EstimateLineItemsEquipment');
-            const material = await fetchItems('EstimateLineItemsMaterial');
-            const tools = await fetchItems('EstimateLineItemsTool');
-            const overhead = await fetchItems('EstimateLineItemsOverhead');
-            const subcontractor = await fetchItems('EstimateLineItemsSubcontractor');
-            const disposal = await fetchItems('EstimateLineItemsDisposal');
-            const miscellaneous = await fetchItems('EstimateLineItemsMiscellaneous');
+        const getFringeRate = (fringeDescription) => {
+            if (!fringeDescription) return 0;
+            const constant = fringeConstants.find(c => c.description === fringeDescription);
+            if (!constant || !constant.value) return 0;
+            return parseFloat(String(constant.value).replace(/[^0-9.-]+/g, "")) || 0;
+        };
 
-            // Calculate totals (simplified - using cost * quantity for most)
-            const calcTotal = (items) => items.reduce((sum, i) => sum + ((i.cost || i.dailyCost || 0) * (i.quantity || 1)), 0);
+        const calculateLaborTotal = (item) => {
+            const parseNum = (val) => parseFloat(String(val).replace(/[^0-9.-]+/g, "")) || 0;
+            const subClass = (item.subClassification || '').toLowerCase();
 
-            est.totalAmount =
-                calcTotal(labor) +
-                calcTotal(equipment) +
-                calcTotal(material) +
-                calcTotal(tools) +
-                calcTotal(overhead) +
-                calcTotal(subcontractor) +
-                calcTotal(disposal) +
-                calcTotal(miscellaneous);
-        }
+            // Special cases
+            if (subClass === 'per diem' || subClass === 'hotel') {
+                return parseNum(item.basePay) * parseNum(item.quantity) * parseNum(item.days);
+            }
+
+            const basePay = parseNum(item.basePay);
+            const qty = parseNum(item.quantity);
+            const days = parseNum(item.days);
+            const otPd = parseNum(item.otPd);
+            const wCompPct = parseNum(item.wCompPercent);
+            const taxesPct = parseNum(item.payrollTaxesPercent);
+            const fringeRate = getFringeRate(item.fringe);
+
+            const totalHours = qty * days * 8;
+            const totalOtHours = qty * days * otPd;
+
+            const wCompTaxAmount = basePay * (wCompPct / 100);
+            const payrollTaxAmount = basePay * (taxesPct / 100);
+            const otPayrollTaxAmount = basePay * 1.5 * (taxesPct / 100);
+            const fringeAmount = fringeRate;
+
+            const baseRate = basePay + wCompTaxAmount + payrollTaxAmount + fringeAmount;
+
+            // Spreadsheet Formula for OT Rate
+            const otBasePay = basePay * 1.5;
+            const otRate = otBasePay + wCompTaxAmount + otPayrollTaxAmount + fringeAmount;
+
+            return (totalHours * baseRate) + (totalOtHours * otRate);
+        };
+
+        const calculateEquipmentTotal = (item) => {
+            const qty = item.quantity || 0;
+            const uom = item.uom || 'Daily';
+            let calculatedTotal = 0;
+
+            if (uom === 'Daily') calculatedTotal = (item.dailyCost || 0) * qty;
+            else if (uom === 'Weekly') calculatedTotal = (item.weeklyCost || 0) * qty;
+            else if (uom === 'Monthly') calculatedTotal = (item.monthlyCost || 0) * qty;
+            else calculatedTotal = (item.dailyCost || 0) * qty; // Default
+
+            return calculatedTotal;
+        };
+
+        // For each estimate, calculate quick total from line items in parallel
+        await Promise.all(estimates.map(async (est) => {
+            const fetchItems = (model) => connection.model(model).find({ estimateId: est._id }).lean();
+
+            const [
+                labor,
+                equipment,
+                material,
+                tools,
+                overhead,
+                subcontractor,
+                disposal,
+                miscellaneous
+            ] = await Promise.all([
+                fetchItems('EstimateLineItemsLabor'),
+                fetchItems('EstimateLineItemsEquipment'),
+                fetchItems('EstimateLineItemsMaterial'),
+                fetchItems('EstimateLineItemsTool'),
+                fetchItems('EstimateLineItemsOverhead'),
+                fetchItems('EstimateLineItemsSubcontractor'),
+                fetchItems('EstimateLineItemsDisposal'),
+                fetchItems('EstimateLineItemsMiscellaneous')
+            ]);
+
+            // Calculate section totals using detailed logic
+            const laborTotal = labor.reduce((sum, item) => sum + (item.total || calculateLaborTotal(item)), 0);
+            const equipmentTotal = equipment.reduce((sum, item) => sum + (item.total || calculateEquipmentTotal(item)), 0);
+
+            // For other sections, fallback to simple cost * quantity if total is missing
+            const simpleCalc = (items) => items.reduce((sum, i) => sum + (i.total || ((i.cost || 0) * (i.quantity || 1))), 0);
+
+            const materialTotal = simpleCalc(material);
+            const toolsTotal = simpleCalc(tools);
+            const overheadTotal = simpleCalc(overhead);
+            const subcontractorTotal = simpleCalc(subcontractor);
+            const disposalTotal = simpleCalc(disposal);
+            const miscellaneousTotal = simpleCalc(miscellaneous);
+
+            const subtotal =
+                laborTotal +
+                equipmentTotal +
+                materialTotal +
+                toolsTotal +
+                overheadTotal +
+                subcontractorTotal +
+                disposalTotal +
+                miscellaneousTotal;
+
+            // Calculate Markup
+            const markupStr = est.bidMarkUp || '0%';
+            const markupPct = parseFloat(String(markupStr).replace(/[^0-9.-]+/g, "")) || 0;
+            const markupAmount = subtotal * (markupPct / 100);
+
+            // Use stored Grand Total if available, otherwise calculate it
+            // This ensures backward compatibility with older estimates while favoring new stored values
+            if (est.grandTotal !== undefined && est.grandTotal > 0) {
+                est.totalAmount = est.grandTotal;
+            } else {
+                est.totalAmount = subtotal + markupAmount;
+            }
+        }));
 
         return estimates;
     }
@@ -502,26 +767,50 @@ export default async function (body) {
             updatedAt: new Date()
         };
 
-        // Map of field names to update
-        const fields = ['estimate', 'date', 'customerId', 'customerName', 'proposalNo', 'bidMarkUp', 'fringe', 'status'];
-        const booleanFields = ['directionalDrilling', 'excavationBackfill', 'hydroExcavation', 'potholingCoring', 'asphaltConcrete'];
+        // Whitelist allowed fields to prevent overwriting critical metadata accidentally
+        const allowedFields = [
+            'estimate', 'date', 'customerId', 'customerName', 'proposalNo', 'bidMarkUp',
+            'directionalDrilling', 'excavationBackfill', 'hydroExcavation', 'potholingCoring', 'asphaltConcrete',
+            'status', 'fringe', 'subTotal', 'margin', 'grandTotal'
+        ];
 
-        fields.forEach(field => {
+        allowedFields.forEach(field => {
             if (payload[field] !== undefined) {
                 updateData[field] = payload[field];
             }
         });
 
-        // Debug: Log what boolean fields are in the payload
-        console.log('updateEstimate - Boolean fields in payload:', booleanFields.map(f => ({ field: f, value: payload[f], type: typeof payload[f] })));
+        // Update Line Items if provided in payload
+        const lineItemModels = {
+            labor: 'EstimateLineItemsLabor',
+            equipment: 'EstimateLineItemsEquipment',
+            material: 'EstimateLineItemsMaterial',
+            tools: 'EstimateLineItemsTool', // Note: key is 'tools' in payload, model alias is 'Tool' but collection is correct
+            overhead: 'EstimateLineItemsOverhead',
+            subcontractor: 'EstimateLineItemsSubcontractor',
+            disposal: 'EstimateLineItemsDisposal',
+            miscellaneous: 'EstimateLineItemsMiscellaneous'
+        };
 
-        booleanFields.forEach(field => {
-            if (payload[field] !== undefined) {
-                const newVal = payload[field] === true || payload[field] === 'true';
-                console.log(`updateEstimate - Setting ${field}: ${payload[field]} (${typeof payload[field]}) -> ${newVal}`);
-                updateData[field] = newVal;
+        await Promise.all(Object.keys(lineItemModels).map(async (key) => {
+            if (payload[key] && Array.isArray(payload[key])) {
+                const Model = connection.model(lineItemModels[key]);
+                // Delete existing items for this estimate
+                await Model.deleteMany({ estimateId: id });
+
+                // Prepare new items (ensure estimateId is attached)
+                const items = payload[key].map(item => ({
+                    ...item,
+                    estimateId: id,
+                    _id: undefined // Let Mongo generate new IDs for lines or keep if you strictly want to preserve
+                }));
+
+                if (items.length > 0) {
+                    await Model.insertMany(items);
+                }
             }
-        });
+        }));
+
 
         console.log('updateEstimate - Update data being saved:', updateData);
 
@@ -537,8 +826,9 @@ export default async function (body) {
             asphaltConcrete: result.asphaltConcrete
         });
 
-        // Sync to AppSheet
-        const appSheetResult = await updateAppSheet(result);
+        // Sync to AppSheet - Pass payload directly to ensure we use the FRESH line items
+        // This avoids race conditions where DB read might still see old deleted items
+        const appSheetResult = await updateAppSheet(result, payload);
 
         console.log("Devco Backend - Updated estimate:", result._id);
         return {
@@ -586,6 +876,9 @@ export default async function (body) {
         if (!result) {
             return { message: `No estimate found with id: ${idToUse}`, deleted: false };
         }
+
+        // Delete from AppSheet as well
+        await deleteFromAppSheet(idToUse);
 
         console.log(`Deleted estimate from AppSheet webhook: ${idToUse}`);
         return {
@@ -654,9 +947,39 @@ export default async function (body) {
 
         const connection = await getConnection();
         const Model = connection.model(catalogueModels[type]);
+
+        // Duplicate Check for Labor
+        if (type === 'labor') {
+            const normalize = (val) => String(val || '').trim().toLowerCase();
+            const composite = (d) => `${normalize(d.classification)}|${normalize(d.subClassification)}|${normalize(d.fringe)}`;
+
+            const targetKey = composite(data);
+
+            // Use lean() for better performance and simple objects
+            const allItems = await Model.find({}).lean();
+
+            const duplicate = allItems.find(item => {
+                // Determine if this is a different item
+                // For 'add', data._id is usually undefined, so it won't match item._id
+                // For 'update' (handled below, but reusing logic pattern), we check IDs
+                const isSelf = data._id && String(item._id) === String(data._id);
+                if (isSelf) return false;
+
+                return composite(item) === targetKey;
+            });
+
+            if (duplicate) {
+                return {
+                    success: false,
+                    error: `Duplicate Item: This combination already exists (matches item with ID: ${duplicate._id}).`
+                };
+            }
+        }
+
         const result = await Model.create(data);
 
         return {
+            success: true,
             message: 'Item added successfully',
             id: result._id,
             data: result
@@ -674,6 +997,30 @@ export default async function (body) {
 
         const connection = await getConnection();
         const Model = connection.model(catalogueModels[type]);
+
+        // Duplicate Check for Labor
+        if (type === 'labor') {
+            const normalize = (val) => String(val || '').trim().toLowerCase();
+            const composite = (d) => `${normalize(d.classification)}|${normalize(d.subClassification)}|${normalize(d.fringe)}`;
+
+            const targetKey = composite(data);
+
+            const allItems = await Model.find({}).lean();
+
+            const duplicate = allItems.find(item => {
+                // Exclude self from check
+                if (String(item._id) === String(id)) return false;
+
+                return composite(item) === targetKey;
+            });
+
+            if (duplicate) {
+                return {
+                    success: false,
+                    error: `Duplicate Item: This combination already exists (matches item with ID: ${duplicate._id}).`
+                };
+            }
+        }
 
         data.updatedAt = new Date();
         const result = await Model.findByIdAndUpdate(id, data, { new: true });

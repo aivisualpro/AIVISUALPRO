@@ -405,7 +405,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex items-center justify-between px-6 py-4" style={{ background: '#f9fafb' }}>
+        <div className="flex items-center justify-between px-4 py-2" style={{ background: '#f9fafb' }}>
             {/* Info */}
             <span className="text-sm text-gray-500">
                 Page {currentPage} of {totalPages}
@@ -417,7 +417,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 <button
                     onClick={() => onPageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     style={{ background: currentPage === 1 ? '#f3f4f6' : '#ffffff' }}
                 >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -428,12 +428,12 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 {/* Page Numbers */}
                 {getPageNumbers().map((page, i) => (
                     page === '...' ? (
-                        <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-sm text-gray-400">...</span>
+                        <span key={`ellipsis-${i}`} className="w-7 h-7 flex items-center justify-center text-sm text-gray-400">...</span>
                     ) : (
                         <button
                             key={page}
                             onClick={() => onPageChange(page)}
-                            className={`w-8 h-8 text-sm rounded-lg border transition-all ${currentPage === page
+                            className={`w-7 h-7 text-sm rounded-lg border transition-all ${currentPage === page
                                 ? 'bg-gray-900 text-white border-gray-900 font-medium'
                                 : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                                 }`}
@@ -447,7 +447,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                 <button
                     onClick={() => onPageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     style={{ background: currentPage === totalPages ? '#f3f4f6' : '#ffffff' }}
                 >
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -479,10 +479,13 @@ const IconButton = ({ icon, onClick, variant = 'default', title = '' }) => {
 };
 
 // ==================== SEARCHABLE SELECT COMPONENT ====================
-const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 'Select...' }) => {
+const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 'Select...', autoFocus, onKeyDown, onNext, ...props }) => {
     const [isOpen, setIsOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState('');
     const dropdownRef = React.useRef(null);
+    const triggerRef = React.useRef(null);
+    const justSelected = React.useRef(false);
+    const justFocused = React.useRef(false);
 
     const filteredOptions = options.filter(opt =>
         String(opt).toLowerCase().includes(searchTerm.toLowerCase())
@@ -491,6 +494,12 @@ const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 
     const isNewValue = searchTerm && !options.some(opt =>
         String(opt).toLowerCase() === searchTerm.toLowerCase()
     );
+
+    React.useEffect(() => {
+        if (autoFocus && triggerRef.current) {
+            triggerRef.current.focus();
+        }
+    }, [autoFocus]);
 
     React.useEffect(() => {
         const handleClickOutside = (e) => {
@@ -502,26 +511,86 @@ const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelect = (opt) => {
+    const handleSelect = (opt, source = 'click') => {
         onChange(opt);
         setSearchTerm('');
         setIsOpen(false);
+        justSelected.current = true;
+
+        if (source === 'key' && onNext) {
+            onNext();
+        } else if (triggerRef.current) {
+            triggerRef.current.focus();
+        }
     };
 
-    const handleAddNew = () => {
+    const handleAddNew = (source = 'click') => {
         if (searchTerm.trim()) {
             onChange(searchTerm.trim());
             setSearchTerm('');
             setIsOpen(false);
+            justSelected.current = true;
+
+            if (source === 'key' && onNext) {
+                onNext();
+            } else if (triggerRef.current) {
+                triggerRef.current.focus();
+            }
         }
+    };
+
+    const handleTriggerKeyDown = (e) => {
+        // Internal: Space/Down opens menu
+        if (e.key === ' ' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            setIsOpen(true);
+        }
+        // External: Propagate Enter/Tab/etc to parent
+        if (onKeyDown) {
+            onKeyDown(e);
+        }
+    };
+
+    const handleInputKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (filteredOptions.length > 0) {
+                handleSelect(filteredOptions[0], 'key');
+            } else {
+                handleAddNew('key');
+            }
+        }
+    };
+
+    const handleFocus = (e) => {
+        if (justSelected.current) {
+            justSelected.current = false;
+            return;
+        }
+        if (!isOpen) {
+            setIsOpen(true);
+            justFocused.current = true;
+            setTimeout(() => { justFocused.current = false; }, 200);
+        }
+        if (props.onFocus) props.onFocus(e);
+    };
+
+    const handleClick = () => {
+        if (justFocused.current) return;
+        setIsOpen(!isOpen);
     };
 
     return (
         <div className="relative" ref={dropdownRef}>
             {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
             <div
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm cursor-pointer flex items-center justify-between transition-all duration-300 bg-gray-50/50 hover:bg-white"
-                onClick={() => setIsOpen(!isOpen)}
+                ref={triggerRef}
+                tabIndex={0}
+                {...props}
+                onKeyDown={handleTriggerKeyDown}
+                onFocus={handleFocus}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm cursor-pointer flex items-center justify-between transition-all duration-300 bg-gray-50/50 hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                onClick={handleClick}
             >
                 <span className={value ? 'text-gray-900' : 'text-gray-400'}>
                     {value || placeholder}
@@ -538,6 +607,7 @@ const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={handleInputKeyDown}
                             placeholder="Type to search..."
                             className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors"
                             onClick={(e) => e.stopPropagation()}
@@ -559,7 +629,7 @@ const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 
                         )}
                         {isNewValue && (
                             <div
-                                onClick={handleAddNew}
+                                onClick={() => handleAddNew('click')}
                                 className="px-4 py-2 text-sm cursor-pointer text-indigo-600 hover:bg-indigo-50 font-medium border-t border-gray-50 flex items-center gap-2"
                             >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">

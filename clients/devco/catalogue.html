@@ -93,7 +93,31 @@
 
         // Main Catalogue App
         function CatalogueApp() {
-            const [category, setCategory] = React.useState('equipment');
+            // Get initial category from URL hash or default to 'labor'
+            const getInitialCategory = () => {
+                const hash = window.location.hash.slice(1);
+                const validCategories = ['labor', 'equipment', 'material', 'tool', 'overhead', 'subcontractor', 'disposal', 'miscellaneous'];
+                return validCategories.includes(hash) ? hash : 'labor';
+            };
+
+            const [category, setCategory] = React.useState(getInitialCategory);
+
+            // Sync category to URL hash and handle browser navigation
+            React.useEffect(() => {
+                window.location.hash = category;
+            }, [category]);
+
+            React.useEffect(() => {
+                const handleHashChange = () => {
+                    const hash = window.location.hash.slice(1);
+                    const validCategories = ['labor', 'equipment', 'material', 'tool', 'overhead', 'subcontractor', 'disposal', 'miscellaneous'];
+                    if (validCategories.includes(hash)) {
+                        setCategory(hash);
+                    }
+                };
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, []);
             const [items, setItems] = React.useState([]);
             const [allCounts, setAllCounts] = React.useState({});
             const [loading, setLoading] = React.useState(true);
@@ -104,7 +128,7 @@
             const [editingItem, setEditingItem] = React.useState(null);
             const [formData, setFormData] = React.useState({});
             const [currentPage, setCurrentPage] = React.useState(1);
-            const itemsPerPage = 10;
+            const itemsPerPage = 15;
             const [toasts, setToasts] = React.useState([]);
 
             // Fringe Constants State
@@ -141,9 +165,9 @@
             const categoryConfig = {
                 equipment: {
                     title: 'Equipment Items',
-                    headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Daily Cost', 'Weekly Cost', 'Monthly Cost', 'Fuel Additive'],
-                    fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost'],
-                    fieldTypes: { dailyCost: 'number', weeklyCost: 'number', monthlyCost: 'number', fuelAdditiveCost: 'number' }
+                    headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Daily Cost', 'Weekly Cost', 'Monthly Cost'],
+                    fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'dailyCost', 'weeklyCost', 'monthlyCost'],
+                    fieldTypes: { dailyCost: 'number', weeklyCost: 'number', monthlyCost: 'number' }
                 },
                 labor: {
                     title: 'Labor Items',
@@ -156,9 +180,9 @@
                 },
                 overhead: {
                     title: 'Overhead Items',
-                    headers: ['Overhead', 'Classification', 'Sub Classification', 'UOM', 'Days', 'Hours', 'Hourly Rate', 'Daily Rate'],
-                    fields: ['overhead', 'classification', 'subClassification', 'uom', 'days', 'hours', 'hourlyRate', 'dailyRate'],
-                    fieldTypes: { days: 'number', hours: 'number', hourlyRate: 'number', dailyRate: 'number' }
+                    headers: ['Overhead', 'Classification', 'Sub Classification', 'Hourly Cost', 'Daily Cost'],
+                    fields: ['overhead', 'classification', 'subClassification', 'hourlyRate', 'dailyRate'],
+                    fieldTypes: { hourlyRate: 'number', dailyRate: 'number' }
                 },
                 subcontractor: {
                     title: 'Subcontractor Items',
@@ -174,9 +198,9 @@
                 },
                 material: {
                     title: 'Material Items',
-                    headers: ['Material', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes'],
-                    fields: ['material', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes'],
-                    fieldTypes: { cost: 'number', quantity: 'number', taxes: 'number' }
+                    headers: ['Material', 'Classification', 'Sub Classification', 'Supplier', 'UOM', 'Cost', 'Taxes'],
+                    fields: ['material', 'classification', 'subClassification', 'supplier', 'uom', 'cost', 'taxes'],
+                    fieldTypes: { cost: 'number', taxes: 'number' }
                 },
                 miscellaneous: {
                     title: 'Miscellaneous Items',
@@ -288,10 +312,10 @@
             const getOptionsForField = (field) => {
                 const values = items
                     .map(item => item[field])
-                    .filter(Boolean)
-                    .filter((v, i, arr) => arr.indexOf(v) === i)
-                    .sort();
-                return values;
+                    .filter(val => val !== undefined && val !== null && val !== '');
+                const uniqueValues = [...new Set(values)].filter(v => v !== '-');
+                uniqueValues.sort();
+                return ['-', ...uniqueValues];
             };
 
             // Load all category counts on mount
@@ -495,29 +519,48 @@
 
             // Category tabs with counts
             const categoryTabs = [
-                { id: 'equipment', label: 'Equipment', count: allCounts.equipment || 0 },
                 { id: 'labor', label: 'Labor', count: allCounts.labor || 0 },
+                { id: 'equipment', label: 'Equipment', count: allCounts.equipment || 0 },
+                { id: 'material', label: 'Material', count: allCounts.material || 0 },
+                { id: 'tool', label: 'Tools', count: allCounts.tool || 0 },
                 { id: 'overhead', label: 'Overhead', count: allCounts.overhead || 0 },
                 { id: 'subcontractor', label: 'Subcontractor', count: allCounts.subcontractor || 0 },
                 { id: 'disposal', label: 'Disposal', count: allCounts.disposal || 0 },
-                { id: 'material', label: 'Material', count: allCounts.material || 0 },
-                { id: 'miscellaneous', label: 'Miscellaneous', count: allCounts.miscellaneous || 0 },
-                { id: 'tool', label: 'Tools', count: allCounts.tool || 0 }
+                { id: 'miscellaneous', label: 'Miscellaneous', count: allCounts.miscellaneous || 0 }
             ];
 
             // Open add modal
             const openAddModal = () => {
                 setEditingItem(null);
-                // Set defaults for labor category
+
+                // Initialize defaults
+                let defaults = {};
+
+                // Set default '-' for all dropdown fields in this category
+                if (categoryConfig[category]) {
+                    categoryConfig[category].fields.forEach(field => {
+                        if (dropdownFields.includes(field)) {
+                            defaults[field] = '-';
+                        }
+                    });
+                }
+
+                // Set specific defaults for labor category
                 if (category === 'labor') {
-                    setFormData({
+                    defaults = {
+                        ...defaults,
                         uom: 'Hourly',
                         wCompPercent: 12,
                         payrollTaxesPercent: 16
-                    });
-                } else {
-                    setFormData({});
+                    };
+                } else if (category === 'material') {
+                    defaults = {
+                        ...defaults,
+                        taxes: 7.8
+                    };
                 }
+
+                setFormData(defaults);
                 setModalOpen(true);
             };
 
@@ -615,7 +658,7 @@
 
                     <main className="flex-1 flex flex-col overflow-hidden">
                         {/* Category Tabs */}
-                        <div className="flex-shrink-0 px-6" style={{ background: '#f0f2f5' }}>
+                        <div className="flex-shrink-0 px-4" style={{ background: '#f0f2f5' }}>
                             <StatusTabs tabs={categoryTabs} activeTab={category} onChange={setCategory} />
                         </div>
 
@@ -642,7 +685,7 @@
                                             }}>
                                                 <tr>
                                                     <th
-                                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-14">
+                                                        className="px-4 py-1 text-left text-[11px] font-medium text-gray-500 uppercase tracking-wider w-14">
                                                         S.No
                                                     </th>
                                                     {config.headers.map((h, i) => {
@@ -650,7 +693,7 @@
                                                         const isSorted = sortField === field;
                                                         return (
                                                             <th key={h} onClick={() => handleSort(field)}
-                                                                className="px-4 py-3 text-left text-xs font-medium
+                                                                className="px-4 py-1 text-left text-[11px] font-medium
                                                             text-gray-500 uppercase tracking-wider whitespace-nowrap
                                                             cursor-pointer hover:bg-white select-none transition-colors"
                                                             >
@@ -672,7 +715,7 @@
                                                         );
                                                     })}
                                                     <th
-                                                        className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        className="px-4 py-1 text-right text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                                                         Actions
                                                     </th>
                                                 </tr>
@@ -684,7 +727,7 @@
                                                     <tr key={item._id}
                                                         className="hover:bg-gray-50/50 transition-colors">
                                                         <td
-                                                            className="px-4 py-3 text-sm text-gray-400 whitespace-nowrap font-medium">
+                                                            className="px-4 py-1 text-xs text-gray-400 whitespace-nowrap font-medium">
                                                             {(currentPage - 1) * itemsPerPage + index + 1}
                                                         </td>
                                                         {config.fields.map(field => {
@@ -718,15 +761,15 @@
 
                                                             return (
                                                                 <td key={field}
-                                                                    className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
+                                                                    className="px-4 py-1 text-xs text-gray-600 whitespace-nowrap">
                                                                     {displayValue}
                                                                 </td>
                                                             );
                                                         })}
-                                                        <td className="px-4 py-3 text-right">
+                                                        <td className="px-4 py-1 text-right">
                                                             <div className="flex items-center justify-end gap-2">
                                                                 <button onClick={() => openEditModal(item)}
-                                                                    className="w-8 h-8 flex items-center justify-center
+                                                                    className="w-7 h-7 flex items-center justify-center
                                                                     text-gray-400 hover:text-gray-700 hover:bg-gray-100
                                                                     rounded-lg border border-transparent
                                                                     hover:border-gray-200 transition-all"
@@ -743,7 +786,7 @@
                                                                     </svg>
                                                                 </button>
                                                                 <button onClick={() => deleteItem(item._id)}
-                                                                    className="w-8 h-8 flex items-center justify-center
+                                                                    className="w-7 h-7 flex items-center justify-center
                                                                     text-gray-400 hover:text-red-600 hover:bg-red-50
                                                                     rounded-lg border border-transparent
                                                                     hover:border-red-200 transition-all"
@@ -852,6 +895,32 @@
                                             const isNumber = config.fieldTypes?.[field] === 'number';
                                             const label = config.headers[i];
 
+                                            const focusNextField = (currentIndex) => {
+                                                const visibleFields = config.fields.filter(f => !f.startsWith('_'));
+                                                const currentVisibleIndex = visibleFields.indexOf(field);
+                                                const isLast = currentVisibleIndex === visibleFields.length - 1;
+
+                                                if (isLast) {
+                                                    saveItem();
+                                                } else {
+                                                    let nextIndex = currentIndex + 1;
+                                                    let nextEl = null;
+                                                    while (nextIndex < config.fields.length && !nextEl) {
+                                                        nextEl = document.getElementById(`field-input-${nextIndex}`);
+                                                        nextIndex++;
+                                                    }
+                                                    if (nextEl) nextEl.focus();
+                                                }
+                                            };
+
+                                            // Enter key navigation handler for Trigger/Inputs
+                                            const handleFieldKeyDown = (e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    focusNextField(i);
+                                                }
+                                            };
+
                                             // Special handling for Fringe in Labor category
                                             if (category === 'labor' && field === 'fringe') {
                                                 return (
@@ -860,8 +929,12 @@
                                                             className="block text-sm font-medium text-gray-600 mb-2">{label}</label>
                                                         <SearchableSelect value={formData[field] || ''} onChange={(val) =>
                                                             handleFringeChange(val)}
-                                                            options={fringeConstants.map(c => c.description)}
+                                                            options={['-', ...fringeConstants.map(c => c.description)]}
                                                             placeholder="Select or add fringe..."
+                                                            autoFocus={i === 0}
+                                                            id={`field-input-${i}`}
+                                                            onKeyDown={handleFieldKeyDown}
+                                                            onNext={() => focusNextField(i)}
                                                         />
                                                     </div>
                                                 );
@@ -876,6 +949,10 @@
                                                         <SearchableSelect value={formData[field] || ''} onChange={(val) =>
                                                             setFormData({ ...formData, [field]: val })}
                                                             options={getOptionsForField(field)}
+                                                            autoFocus={i === 0}
+                                                            id={`field-input-${i}`}
+                                                            onKeyDown={handleFieldKeyDown}
+                                                            onNext={() => focusNextField(i)}
                                                         />
                                                     ) : (
                                                         <input type={isNumber ? 'number' : 'text'} value={formData[field] || ''
@@ -889,6 +966,9 @@
                                                             style={{
                                                                 background: '#ffffff'
                                                             }}
+                                                            autoFocus={i === 0}
+                                                            id={`field-input-${i}`}
+                                                            onKeyDown={handleFieldKeyDown}
                                                         />
                                                     )}
                                                 </div>

@@ -69,7 +69,7 @@
     <script type="text/babel" src="components.js"></script>
 
     <script type="text/babel">
-        const { Header, Button, Card, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, Loading, EmptyState, Modal, ConfirmModal, Input, SearchInput, Pagination, SearchableSelect, Toast, ToastContainer } = window.DevcoComponents;
+        const { Header, Button, Card, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, Loading, EmptyState, Modal, ConfirmModal, Input, SearchInput, StatusTabs, Pagination, SearchableSelect, Toast, ToastContainer } = window.DevcoComponents;
 
         // Initialize Lucide Icons
         React.useEffect && lucide.createIcons();
@@ -82,7 +82,7 @@
             const [editingItem, setEditingItem] = React.useState(null);
             const [formData, setFormData] = React.useState({});
             const [currentPage, setCurrentPage] = React.useState(1);
-            const itemsPerPage = 10;
+            const itemsPerPage = 15;
             const [toasts, setToasts] = React.useState([]);
             const [deleteId, setDeleteId] = React.useState(null);
             const [activeTab, setActiveTab] = React.useState('All');
@@ -135,12 +135,36 @@
                 setLoading(false);
             };
 
-            // Compute unique types for dropdown
+            // Compute unique types for dropdown (including defaults)
             const typeOptions = React.useMemo(() => {
                 const defaults = ['Number', 'Text', 'Percentage', 'Currency'];
                 const existing = items.map(i => i.type).filter(Boolean);
                 return [...new Set([...defaults, ...existing])].sort();
             }, [items]);
+
+            // Compute types for tabs (only existing data)
+            const usedTypes = React.useMemo(() => {
+                return [...new Set(items.map(i => i.type).filter(Boolean))].sort();
+            }, [items]);
+
+            // Generate tabs with counts
+            const tabs = React.useMemo(() => {
+                const counts = items.reduce((acc, item) => {
+                    if (item.type) {
+                        acc[item.type] = (acc[item.type] || 0) + 1;
+                    }
+                    return acc;
+                }, {});
+
+                return [
+                    { id: 'All', label: 'All', count: items.length },
+                    ...usedTypes.map(type => ({
+                        id: type,
+                        label: type,
+                        count: counts[type] || 0
+                    }))
+                ];
+            }, [items, usedTypes]);
 
             // First filter by search
             const searchFiltered = items.filter(item =>
@@ -308,37 +332,30 @@
                                 />
                             ) : (
                                 <div className="flex-1 flex flex-col overflow-hidden">
-                                    <div className="px-6 py-4 border-b border-gray-100 flex gap-2 overflow-x-auto no-scrollbar">
-                                        {['All', ...typeOptions].map(type => (
-                                            <button
-                                                key={type}
-                                                onClick={() => { setActiveTab(type); setCurrentPage(1); }}
-                                                className={`px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-all ${activeTab === type
-                                                        ? 'bg-indigo-50 text-indigo-600'
-                                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                                                    }`}
-                                            >
-                                                {type}
-                                            </button>
-                                        ))}
+                                    <div className="px-4" style={{ background: '#f0f2f5' }}>
+                                        <StatusTabs
+                                            tabs={tabs}
+                                            activeTab={activeTab}
+                                            onChange={(id) => { setActiveTab(id); setCurrentPage(1); }}
+                                        />
                                     </div>
                                     <div className="flex-1 overflow-auto" style={{ background: '#f9fafb' }}>
                                         <table className="w-full" style={{ background: '#ffffff' }}>
                                             <thead className="border-b border-gray-200 sticky top-0 z-10" style={{ background: '#f9fafb' }}>
                                                 <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-4 py-1 text-left text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                                                         Description
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-4 py-1 text-left text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                                                         Type
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-4 py-1 text-left text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                                                         Value
                                                     </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-4 py-1 text-left text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                                                         Color
                                                     </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    <th className="px-4 py-1 text-right text-[11px] font-medium text-gray-500 uppercase tracking-wider">
                                                         Actions
                                                     </th>
                                                 </tr>
@@ -346,16 +363,16 @@
                                             <tbody className="divide-y divide-gray-100" style={{ background: '#ffffff' }}>
                                                 {paginatedItems.map((item, index) => (
                                                     <tr key={item._id} className="hover:bg-gray-50/50 transition-colors">
-                                                        <td className="px-6 py-3 text-sm text-gray-900 font-medium">
+                                                        <td className="px-4 py-1 text-xs text-gray-900 font-medium">
                                                             {item.description}
                                                         </td>
-                                                        <td className="px-6 py-3 text-sm text-gray-600">
+                                                        <td className="px-4 py-1 text-xs text-gray-600">
                                                             <Badge variant="info">{item.type || 'Text'}</Badge>
                                                         </td>
-                                                        <td className="px-6 py-3 text-sm text-gray-600 font-mono">
+                                                        <td className="px-4 py-1 text-xs text-gray-600 font-mono">
                                                             {item.value}
                                                         </td>
-                                                        <td className="px-6 py-3 text-sm text-gray-600">
+                                                        <td className="px-4 py-1 text-xs text-gray-600">
                                                             {item.color ? (
                                                                 <div className="flex items-center gap-2">
                                                                     <div className="w-6 h-6 rounded border border-gray-200" style={{ backgroundColor: item.color }}></div>
@@ -365,11 +382,11 @@
                                                                 <span className="text-gray-400">-</span>
                                                             )}
                                                         </td>
-                                                        <td className="px-6 py-3 text-right">
+                                                        <td className="px-4 py-1 text-right">
                                                             <div className="flex items-center justify-end gap-2">
                                                                 <button
                                                                     onClick={() => openEditModal(item)}
-                                                                    className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+                                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg border border-transparent hover:border-gray-200 transition-all"
                                                                     title="Edit"
                                                                 >
                                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -379,7 +396,7 @@
                                                                 </button>
                                                                 <button
                                                                     onClick={() => deleteItem(item._id)}
-                                                                    className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 transition-all"
+                                                                    className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 transition-all"
                                                                     title="Delete"
                                                                 >
                                                                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
