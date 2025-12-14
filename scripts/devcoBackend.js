@@ -73,6 +73,7 @@ const LaborItemSchema = new mongoose.Schema({
 
 // 2a. Estimate Line Items Labor Schema (New)
 const EstimateLineItemsLaborSchema = new mongoose.Schema({
+    estimateId: { type: String, required: true, index: true },
     labor: { type: String },
     classification: { type: String },
     subClassification: { type: String },
@@ -165,6 +166,17 @@ const ToolItemSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+
+// 8a. Estimate Line Items Schemas (derived from Catalogue Schemas)
+// We use .obj to clone the fields and add estimateId
+const EstimateLineItemsEquipmentSchema = new mongoose.Schema({ ...EquipmentItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+const EstimateLineItemsOverheadSchema = new mongoose.Schema({ ...OverheadItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+const EstimateLineItemsSubcontractorSchema = new mongoose.Schema({ ...SubcontractorItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+const EstimateLineItemsDisposalSchema = new mongoose.Schema({ ...DisposalItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+const EstimateLineItemsMaterialSchema = new mongoose.Schema({ ...MaterialItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+const EstimateLineItemsMiscellaneousSchema = new mongoose.Schema({ ...MiscellaneousItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+const EstimateLineItemsToolSchema = new mongoose.Schema({ ...ToolItemSchema.obj, estimateId: { type: String, required: true, index: true } });
+
 // 9. Template Schema
 const TemplateSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -210,6 +222,13 @@ async function getConnection() {
     conn.model('LaborItem', LaborItemSchema, 'laborItems');
 
     if (!conn.models.EstimateLineItemsLabor) conn.model('EstimateLineItemsLabor', EstimateLineItemsLaborSchema, 'estimateLineItemsLabor');
+    if (!conn.models.EstimateLineItemsEquipment) conn.model('EstimateLineItemsEquipment', EstimateLineItemsEquipmentSchema, 'estimateLineItemsEquipment');
+    if (!conn.models.EstimateLineItemsOverhead) conn.model('EstimateLineItemsOverhead', EstimateLineItemsOverheadSchema, 'estimateLineItemsOverhead');
+    if (!conn.models.EstimateLineItemsSubcontractor) conn.model('EstimateLineItemsSubcontractor', EstimateLineItemsSubcontractorSchema, 'estimateLineItemsSubcontractor');
+    if (!conn.models.EstimateLineItemsDisposal) conn.model('EstimateLineItemsDisposal', EstimateLineItemsDisposalSchema, 'estimateLineItemsDisposal');
+    if (!conn.models.EstimateLineItemsMaterial) conn.model('EstimateLineItemsMaterial', EstimateLineItemsMaterialSchema, 'estimateLineItemsMaterial');
+    if (!conn.models.EstimateLineItemsMiscellaneous) conn.model('EstimateLineItemsMiscellaneous', EstimateLineItemsMiscellaneousSchema, 'estimateLineItemsMiscellaneous');
+    if (!conn.models.EstimateLineItemsTool) conn.model('EstimateLineItemsTool', EstimateLineItemsToolSchema, 'estimateLineItemsTool');
 
     if (!conn.models.OverheadItem) conn.model('OverheadItem', OverheadItemSchema, 'overheadItems');
     if (!conn.models.SubcontractorItem) conn.model('SubcontractorItem', SubcontractorItemSchema, 'subcontractorItems');
@@ -250,13 +269,13 @@ async function updateAppSheet(data) {
         "Date": String(data.date || ""),
         "Customer": String(data.customerId || ""),
         "Proposal No": String(data.proposalNo || ""),
-        "Bid Mark UP Percentage": String(data.bidMarkUp || ""),
-        "Directional Drilling": toYN(data.directionalDrilling),
-        "Excavation & Backfill": toYN(data.excavationBackfill),
-        "Hydro-excavation": toYN(data.hydroExcavation),
-        "Potholing & Coring": toYN(data.potholingCoring),
-        "Asphalt & Concrete": toYN(data.asphaltConcrete),
-        "Fringe": String(data.fringe || "")
+        "Bid Mark UP Percentage": String(data.bidMarkUp || "")
+        // "Directional Drilling": toYN(data.directionalDrilling),
+        // "Excavation & Backfill": toYN(data.excavationBackfill),
+        // "Hydro-excavation": toYN(data.hydroExcavation),
+        // "Potholing & Coring": toYN(data.potholingCoring),
+        // "Asphalt & Concrete": toYN(data.asphaltConcrete),
+        // "Fringe": String(data.fringe || "")
     };
 
     const requestBody = {
@@ -365,7 +384,23 @@ export default async function (body) {
 
         const connection = await getConnection();
         const Estimate = connection.model('Estimate');
-        return await Estimate.findById(id);
+        const est = await Estimate.findById(id).lean();
+
+        if (est) {
+            // Fetch and attach line items
+            const fetchItems = async (model) => connection.model(model).find({ estimateId: id }).lean();
+
+            est.labor = await fetchItems('EstimateLineItemsLabor');
+            est.equipment = await fetchItems('EstimateLineItemsEquipment');
+            est.material = await fetchItems('EstimateLineItemsMaterial');
+            est.tools = await fetchItems('EstimateLineItemsTool');
+            est.overhead = await fetchItems('EstimateLineItemsOverhead');
+            est.subcontractor = await fetchItems('EstimateLineItemsSubcontractor');
+            est.disposal = await fetchItems('EstimateLineItemsDisposal');
+            est.miscellaneous = await fetchItems('EstimateLineItemsMiscellaneous');
+        }
+
+        return est;
     }
 
     if (action === 'updateEstimate') {
@@ -474,6 +509,13 @@ export default async function (body) {
         miscellaneous: 'MiscellaneousItem',
         tool: 'ToolItem',
         estimateLineItemsLabor: 'EstimateLineItemsLabor',
+        estimateLineItemsEquipment: 'EstimateLineItemsEquipment',
+        estimateLineItemsOverhead: 'EstimateLineItemsOverhead',
+        estimateLineItemsSubcontractor: 'EstimateLineItemsSubcontractor',
+        estimateLineItemsDisposal: 'EstimateLineItemsDisposal',
+        estimateLineItemsMaterial: 'EstimateLineItemsMaterial',
+        estimateLineItemsMiscellaneous: 'EstimateLineItemsMiscellaneous',
+        estimateLineItemsTool: 'EstimateLineItemsTool',
         constant: 'ConstantItem'
     };
 

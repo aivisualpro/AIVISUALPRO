@@ -74,29 +74,51 @@
 
 
 
-        const AddItemModal = ({ section, isOpen, onClose, onSave, items = [] }) => {
+        const AddItemModal = ({ section, isOpen, onClose, onSave, items = [], catalog = [], fringe }) => {
+            const { Modal, Input, SearchableSelect, Button, EmptyState, Badge } = window.DevcoComponents;
+            const [mode, setMode] = React.useState('manual');
             const [formData, setFormData] = React.useState({});
+            const [selectedItems, setSelectedItems] = React.useState(new Set());
+            const [searchTerm, setSearchTerm] = React.useState('');
             const [saving, setSaving] = React.useState(false);
 
             React.useEffect(() => {
                 if (isOpen) {
                     setFormData({});
+                    setSelectedItems(new Set());
+                    setSearchTerm('');
+                    setMode(catalog && catalog.length > 0 ? 'catalog' : 'manual');
                 }
-            }, [isOpen]);
+            }, [isOpen, catalog]);
+
+            // Catalog Logic (Moved up before conditional return)
+            const filteredCatalog = React.useMemo(() => {
+                let filtered = (catalog || []).filter(item => {
+                    const searchStr = searchTerm.toLowerCase();
+                    const text = Object.values(item).filter(v => typeof v === 'string' || typeof v === 'number').join(' ').toLowerCase();
+                    return text.includes(searchStr);
+                });
+
+                // Prioritize items matching the Estimate Fringe
+                if (section?.id === 'Labor' && fringe) {
+                    filtered.sort((a, b) => {
+                        const aMatch = String(a.fringe || '').trim().toLowerCase() === String(fringe).trim().toLowerCase();
+                        const bMatch = String(b.fringe || '').trim().toLowerCase() === String(fringe).trim().toLowerCase();
+                        if (aMatch && !bMatch) return -1;
+                        if (!aMatch && bMatch) return 1;
+                        return 0;
+                    });
+                }
+                return filtered;
+            }, [catalog, searchTerm, section?.id, fringe]);
 
             if (!isOpen || !section) return null;
 
+            // Manual Logic
             const dropdownFields = ['classification', 'subClassification', 'supplier', 'fringe', 'uom'];
+            const getOptions = (field) => items.map(item => item[field]).filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i).sort();
 
-            const getOptions = (field) => {
-                return items
-                    .map(item => item[field])
-                    .filter(Boolean)
-                    .filter((v, i, arr) => arr.indexOf(v) === i)
-                    .sort();
-            };
-
-            const handleSubmit = async (e) => {
+            const handleManualSubmit = async (e) => {
                 e.preventDefault();
                 setSaving(true);
                 await onSave(section, formData);
@@ -108,66 +130,176 @@
                 setFormData(prev => ({ ...prev, [field]: value }));
             };
 
+            const toggleSelection = (item) => {
+                const newSet = new Set(selectedItems);
+                if (newSet.has(item)) newSet.delete(item);
+                else newSet.add(item);
+                setSelectedItems(newSet);
+            };
+
+            const handleAddSelected = async () => {
+                if (selectedItems.size === 0) return;
+                setSaving(true);
+                const promises = Array.from(selectedItems).map(item => {
+                    // Remove _id to avoid duplicate key error. Backend must generate new ID.
+                    const { _id, ...itemData } = item;
+                    return onSave(section, {
+                        ...itemData,
+                        quantity: 1, // Default quantity
+                        days: item.days || 1,
+                        hours: item.hours || 8
+                    });
+                });
+                await Promise.all(promises);
+                setSaving(false);
+                onClose();
+            };
+
             const fieldsToRender = section.formFields || section.fields;
             const headersToRender = section.formHeaders || section.headers;
 
+            // Footer for Modal
+            const footerContent = mode === 'catalog' ? (
+                <>
+                    <div className="flex-1 text-left text-sm text-gray-500">
+                        {selectedItems.size} items selected
+                    </div>
+                    <Button onClick={() => setMode('manual')} variant="ghost">Manual Entry</Button>
+                    <Button onClick={onClose} variant="secondary">Cancel</Button>
+                    <Button
+                        onClick={handleAddSelected}
+                        disabled={selectedItems.size === 0 || saving}
+                    >
+                        {saving ? 'Adding...' : 'Add Selected'}
+                    </Button>
+                </>
+            ) : (
+                <>
+                    {catalog && catalog.length > 0 && (
+                        <Button onClick={() => setMode('catalog')} variant="ghost" className="mr-auto">Back to Catalog</Button>
+                    )}
+                    <Button onClick={onClose} variant="secondary">Cancel</Button>
+                    <Button onClick={handleManualSubmit} disabled={saving}>
+                        {saving ? 'Saving...' : 'Save Item'}
+                    </Button>
+                </>
+            );
+
+            // Catalog Table Columns (Dynamic but prioritized)
+            const getCatalogColumns = () => {
+                if (filteredCatalog.length === 0) return [];
+                const first = filteredCatalog[0];
+                // Prioritize common fields
+                const priority = ['classification', 'item', 'name', 'type', 'description', 'rate', 'cost', 'price', 'basePay'];
+                const keys = Object.keys(first).filter(k => !['_id', 'createdAt', 'updatedAt', '__v'].includes(k));
+                return keys.sort((a, b) => {
+                    const idxA = priority.indexOf(a);
+                    const idxB = priority.indexOf(b);
+                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                    if (idxA !== -1) return -1;
+                    if (idxB !== -1) return 1;
+                    return a.localeCompare(b);
+                }).slice(0, 4); // Limit columns
+            };
+            const displayCols = getCatalogColumns();
+
             return (
-                <Modal isOpen={isOpen} onClose={onClose} title={`Add ${section.title}`}>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {fieldsToRender.map((field, idx) => {
-                                const label = headersToRender[idx];
-                                const isNumber = ['cost', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent', 'basePay', 'taxes', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'hourlyRate', 'dailyRate'].includes(field);
-                                const isDropdown = dropdownFields.includes(field);
+                <Modal isOpen={isOpen} onClose={onClose} title={`Add ${section.title}`} footer={footerContent}>
+                    {mode === 'catalog' ? (
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                    placeholder="Search catalog..."
+                                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                />
+                                <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+                            </div>
 
-                                // Skip calculated field 'labor' in 'Labor' section (if present in list)
-                                if (section.id === 'Labor' && field === 'labor') return null;
-                                // Skip 'total' field in all sections
-                                if (field === 'total') return null;
-
-                                return (
-                                    <div key={field} className="col-span-1">
-                                        {isDropdown ? (
-                                            <SearchableSelect
-                                                label={label}
-                                                value={formData[field] || ''}
-                                                onChange={val => handleChange(field, val)}
-                                                options={getOptions(field)}
-                                                placeholder={`Select or type ${label}`}
-                                            />
-                                        ) : (
-                                            <Input
-                                                label={label}
-                                                type={isNumber ? "number" : "text"}
-                                                step={isNumber ? "0.01" : undefined}
-                                                value={formData[field] || ''}
-                                                onChange={e => handleChange(field, e.target.value)}
-                                                required={field === 'classification' || field === 'equipmentMachine' || field === 'item'}
-                                                placeholder={`Enter ${label}`}
-                                            />
+                            <div className="max-h-[50vh] overflow-y-auto border border-gray-100 rounded-xl">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-gray-50 text-gray-500 font-medium sticky top-0 z-10">
+                                        <tr>
+                                            <th className="p-3 w-10">
+                                                <input type="checkbox" className="rounded border-gray-300"
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) setSelectedItems(new Set(filteredCatalog));
+                                                        else setSelectedItems(new Set());
+                                                    }}
+                                                    checked={filteredCatalog.length > 0 && selectedItems.size === filteredCatalog.length}
+                                                />
+                                            </th>
+                                            {displayCols.map(col => <th key={col} className="p-3 capitalize">{col.replace(/([A-Z])/g, ' $1').trim()}</th>)}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {filteredCatalog.map((item, idx) => {
+                                            const isSuggested = section?.id === 'Labor' && fringe && String(item.fringe || '').trim().toLowerCase() === String(fringe).trim().toLowerCase();
+                                            return (
+                                                <tr key={item._id || idx} className={`cursor-pointer transition-colors ${selectedItems.has(item) ? 'bg-indigo-100' : (isSuggested ? 'bg-blue-50' : 'hover:bg-gray-50')}`} onClick={() => toggleSelection(item)}>
+                                                    <td className="p-3">
+                                                        <input type="checkbox" checked={selectedItems.has(item)} onChange={() => { }} className="rounded border-gray-300 pointer-events-none" />
+                                                    </td>
+                                                    {displayCols.map((col, cIdx) => (
+                                                        <td key={col} className="p-3 text-gray-700">
+                                                            {typeof item[col] === 'number' && ['cost', 'rate', 'price', 'basePay'].some(k => col.toLowerCase().includes(k))
+                                                                ? `$${item[col].toLocaleString()}`
+                                                                : item[col]}
+                                                            {isSuggested && cIdx === 0 && (
+                                                                <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 border border-blue-200">
+                                                                    Suggested
+                                                                </span>
+                                                            )}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            );
+                                        })}
+                                        {filteredCatalog.length === 0 && (
+                                            <tr><td colSpan={displayCols.length + 1} className="p-8 text-center text-gray-400">No items found</td></tr>
                                         )}
-                                    </div>
-                                )
-                            })}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                disabled={saving}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg shadow-sm transition-colors disabled:opacity-50"
-                                disabled={saving}
-                            >
-                                {saving ? 'Saving...' : 'Save Item'}
-                            </button>
-                        </div>
-                    </form>
+                    ) : (
+                        <form className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {fieldsToRender.map((field, idx) => {
+                                    const label = headersToRender[idx];
+                                    const isNumber = ['cost', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent', 'basePay', 'taxes', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'hourlyRate', 'dailyRate'].includes(field);
+                                    const isDropdown = dropdownFields.includes(field);
+
+                                    if (section.id === 'Labor' && field === 'labor') return null;
+                                    if (field === 'total') return null;
+
+                                    return (
+                                        <div key={field} className="col-span-1">
+                                            {isDropdown ? (
+                                                <SearchableSelect
+                                                    label={label}
+                                                    value={formData[field] || ''}
+                                                    onChange={val => handleChange(field, val)}
+                                                    options={getOptions(field)}
+                                                    placeholder={`Select or type ${label}`}
+                                                />
+                                            ) : (
+                                                <Input
+                                                    label={label}
+                                                    type={isNumber ? "number" : "text"}
+                                                    value={formData[field] || ''}
+                                                    onChange={e => handleChange(field, e.target.value)}
+                                                    placeholder={`Enter ${label}`}
+                                                />
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </form>
+                    )}
                 </Modal>
             );
         };
@@ -260,12 +392,7 @@
                 >
                     <div className="space-y-6">
                         {/* Formula Reference */}
-                        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                            <h3 className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-2">Calculation Formula</h3>
-                            <div className="text-xs text-blue-900 font-mono bg-white/50 p-2 rounded border border-blue-200">
-                                (Total Hours × Base Rate) + (Total OT Hours × OT Rate)
-                            </div>
-                        </div>
+                        {/* Formula Reference Removed */}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Column 1: Hours & Base Rate */}
@@ -373,7 +500,10 @@
             );
         };
 
-        const LineItemsTable = ({ headers, items, fields, editableFields = [], onUpdateItem, onExplain }) => {
+        const LineItemsTable = ({ headers, items, fields, editableFields = [], onUpdateItem, onExplain, onDelete }) => {
+            // Safe Icon resolution
+            const Icon = window.DevcoComponents?.Icon || window.Icon || (({ name }) => <span className="text-xs">{name}</span>);
+
             if (!items || items.length === 0) {
                 return (
                     <div className="p-8 text-center text-gray-400 text-sm italic">
@@ -393,6 +523,7 @@
                                         {header}
                                     </th>
                                 ))}
+                                <th className="px-3 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-10 text-center"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
@@ -404,8 +535,8 @@
                                     {fields.map((field, j) => {
                                         const isEditable = editableFields.includes(field);
                                         const val = item[field];
-
                                         let displayVal = val || (val === 0 ? 0 : '--');
+
                                         if (typeof val === 'number') {
                                             const lowerField = field.toLowerCase();
                                             if (lowerField.includes('percent')) {
@@ -413,6 +544,22 @@
                                             } else if (lowerField.includes('cost') || lowerField.includes('pay') || lowerField.includes('rate') || lowerField === 'total') {
                                                 displayVal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
                                             }
+                                        }
+
+                                        // Clickable Total Logic
+                                        if (field === 'total' && onExplain) {
+                                            return (
+                                                <td key={j} className="px-3 py-2 text-[11px] whitespace-nowrap">
+                                                    <div
+                                                        onClick={(e) => { e.stopPropagation(); onExplain(item); }}
+                                                        className="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-center gap-1"
+                                                        title="View Calculation Breakdown"
+                                                    >
+                                                        {displayVal}
+                                                        <Icon name="info" size={10} className="opacity-50" />
+                                                    </div>
+                                                </td>
+                                            );
                                         }
 
                                         return (
@@ -425,27 +572,20 @@
                                                         className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
                                                     />
                                                 ) : (
-                                                    <div className="flex items-center gap-2">
-                                                        {displayVal}
-                                                        {field === 'total' && onExplain && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={(e) => { e.stopPropagation(); onExplain(item); }}
-                                                                className="ml-2 text-blue-600 hover:text-blue-800 transition-colors focus:outline-none flex-shrink-0"
-                                                                title="View Calculation"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                    <circle cx="12" cy="12" r="10"></circle>
-                                                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                                                                    <path d="M12 17h.01"></path>
-                                                                </svg>
-                                                            </button>
-                                                        )}
-                                                    </div>
+                                                    <span>{displayVal}</span>
                                                 )}
                                             </td>
                                         );
                                     })}
+                                    <td className="px-3 py-2 text-center">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDelete && onDelete(item); }}
+                                            className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
+                                            title="Delete Item"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -455,17 +595,30 @@
         };
 
         function ViewApp() {
+            const { ToastContainer, ConfirmModal } = window.DevcoComponents;
             const [estimate, setEstimate] = React.useState(null);
             const [laborCatalog, setLaborCatalog] = React.useState([]);
             const [equipmentCatalog, setEquipmentCatalog] = React.useState([]);
             const [fringeConstants, setFringeConstants] = React.useState([]); // Added Fringe Constants State
             const [loading, setLoading] = React.useState(true);
-            const [editing, setEditing] = React.useState(false);
+            const [editing, setEditing] = React.useState(true);
             const [formData, setFormData] = React.useState({});
             const [saving, setSaving] = React.useState(false);
             const [activeSection, setActiveSection] = React.useState(null); // State to control AddItemModal
             const [explanationItem, setExplanationItem] = React.useState(null); // State for calculation explanation
             const [breakdownData, setBreakdownData] = React.useState(null);
+
+            // Notification & Confirmation State
+            const [toasts, setToasts] = React.useState([]);
+            const [confirmConfig, setConfirmConfig] = React.useState({ isOpen: false });
+
+            const addToast = (message, type = 'info') => {
+                const id = Date.now();
+                setToasts(prev => [...prev, { id, message, type }]);
+                // Auto-remove handled by ToastContainer usually, but just in case
+            };
+
+            const removeToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
             const [openSections, setOpenSections] = React.useState({
                 Labor: true,
                 Equipment: true,
@@ -637,8 +790,8 @@
                 }
             };
 
-            const loadEstimate = async () => {
-                setLoading(true);
+            const loadEstimate = async (silent = false) => {
+                if (!silent) setLoading(true);
                 try {
                     const response = await fetch('/webhook/devcoBackend', {
                         method: 'POST',
@@ -650,51 +803,71 @@
                     });
                     const result = await response.json();
                     if (result.success && result.result) {
-                        setEstimate(result.result);
-                        setFormData(result.result);
+                        const loadedData = result.result;
+                        // Clean numeric fields
+                        if (loadedData.bidMarkUp) loadedData.bidMarkUp = String(loadedData.bidMarkUp).replace(/[^0-9.]/g, '');
+
+                        setEstimate(loadedData);
+                        setFormData(loadedData);
                     }
                 } catch (error) {
                     console.error('Error loading estimate:', error);
                 }
-                setLoading(false);
+                if (!silent) setLoading(false);
             };
 
             const saveEstimate = async () => {
-                setSaving(true);
+                // Allow saving if recordId OR _id OR estimateId exists
+                if (!formData.recordId && !formData._id && !estimateId) return;
+
+                // Format Payload
+                const payload = {
+                    id: estimateId || formData._id || formData.recordId,
+                    ...formData,
+                    // Ensure markup is saved as "24%" string to prevent backend from treating "24" as "2400%"
+                    bidMarkUp: formData.bidMarkUp ? `${String(formData.bidMarkUp).replace(/[%]/g, '')}%` : '0%'
+                };
+
                 try {
                     const response = await fetch('/webhook/devcoBackend', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             action: 'updateEstimate',
-                            payload: { id: estimateId, ...formData }
+                            payload: payload
                         })
                     });
-                    const result = await response.json();
-                    if (result.success) {
-                        setEstimate(result.result.data || result.result);
-                        setEditing(false);
-                        loadEstimate(); // Reload
-                    } else {
-                        alert('Error: ' + (result.error || 'Failed to save'));
-                    }
+
+                    // Update local estimate state without reloading
+                    setEstimate(prev => ({ ...prev, ...formData }));
+
                 } catch (error) {
                     console.error('Error saving:', error);
-                    alert('Error saving estimate');
                 }
-                setSaving(false);
             };
+
+            // Auto-save effect
+            React.useEffect(() => {
+                // Ensure we have an ID to save to
+                if (loading || (!formData.recordId && !formData._id && !estimateId)) return;
+
+                const timer = setTimeout(() => {
+                    saveEstimate();
+                }, 1000);
+
+                return () => clearTimeout(timer);
+            }, [formData]);
 
             const handleSaveItem = async (section, data) => {
                 const typeMap = {
                     'Labor': 'estimateLineItemsLabor',
-                    'Equipment': 'equipment',
-                    'Material': 'material',
-                    'Tools': 'tool',
-                    'Overhead': 'overhead',
-                    'Subcontractor': 'subcontractor',
-                    'Disposal': 'disposal',
-                    'Miscellaneous': 'miscellaneous'
+                    'Equipment': 'estimateLineItemsEquipment',
+                    'Material': 'estimateLineItemsMaterial',
+                    'Tools': 'estimateLineItemsTool',
+                    'Overhead': 'estimateLineItemsOverhead',
+                    'Subcontractor': 'estimateLineItemsSubcontractor',
+                    'Disposal': 'estimateLineItemsDisposal',
+                    'Miscellaneous': 'estimateLineItemsMiscellaneous'
                 };
 
                 const type = typeMap[section.id];
@@ -719,6 +892,9 @@
                     if (section.id === 'Labor') {
                         processedData.labor = `${processedData.classification || ''}${processedData.fringe ? '-' + processedData.fringe : ''}`;
                     }
+
+                    // Link to current estimate
+                    processedData.estimateId = estimate._id;
 
                     const response = await fetch('/webhook/devcoBackend', {
                         method: 'POST',
@@ -757,9 +933,12 @@
                         }
 
                         // Refresh appropriate catalog
+                        // Refresh estimate to show new item
+                        loadEstimate(true);
+
+                        // Also refresh catalogs if needed (unlikely for specific line items but safe to keep)
                         if (section.id === 'Labor') loadLaborCatalog();
                         else if (section.id === 'Equipment') loadEquipmentCatalog();
-                        // For others, we might need to reload estimate or handle differently if they are not catalog-backed in UI
                     } else {
                         console.error('Failed to add item:', result.error);
                         alert('Failed to save item. Please try again.');
@@ -770,12 +949,63 @@
                 }
             };
 
+            const handleDeleteItem = (section, item) => {
+                setConfirmConfig({
+                    isOpen: true,
+                    title: 'Delete Item',
+                    message: `Are you sure you want to delete this ${section.id === 'Labor' ? item.labor : (item.item || item.classification || 'item')}?`,
+                    onConfirm: async () => {
+                        const typeMap = {
+                            'Labor': 'estimateLineItemsLabor',
+                            'Equipment': 'estimateLineItemsEquipment',
+                            'Material': 'estimateLineItemsMaterial',
+                            'Tools': 'estimateLineItemsTool',
+                            'Overhead': 'estimateLineItemsOverhead',
+                            'Subcontractor': 'estimateLineItemsSubcontractor',
+                            'Disposal': 'estimateLineItemsDisposal',
+                            'Miscellaneous': 'estimateLineItemsMiscellaneous'
+                        };
+                        const type = typeMap[section.id];
+
+                        // Optimistic Update
+                        setEstimate(prev => ({
+                            ...prev,
+                            [section.key]: (prev[section.key] || []).filter(i => i._id !== item._id)
+                        }));
+
+                        try {
+                            await fetch('/webhook/devcoBackend', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    action: 'deleteCatalogueItem',
+                                    payload: { type: type, id: item._id }
+                                })
+                            });
+                            addToast('Item deleted successfully', 'success');
+                            loadEstimate(true);
+                        } catch (e) {
+                            console.error('Error deleting item', e);
+                            addToast('Failed to delete item', 'error');
+                            loadEstimate(true); // Revert
+                        }
+                    }
+                });
+            };
+
             const handleItemUpdate = async (section, item, field, value) => {
                 const typeMap = {
                     'Labor': 'estimateLineItemsLabor',
+                    'Equipment': 'estimateLineItemsEquipment',
+                    'Material': 'estimateLineItemsMaterial',
+                    'Tools': 'estimateLineItemsTool',
+                    'Overhead': 'estimateLineItemsOverhead',
+                    'Subcontractor': 'estimateLineItemsSubcontractor',
+                    'Disposal': 'estimateLineItemsDisposal',
+                    'Miscellaneous': 'estimateLineItemsMiscellaneous'
                 };
                 const type = typeMap[section.id];
-                if (!type) return; // Only support Labor for now
+                if (!type) return;
 
                 // Parse value if numeric field
                 let finalValue = value;
@@ -784,6 +1014,15 @@
                     finalValue = parseFloat(value);
                     if (isNaN(finalValue)) finalValue = 0;
                 }
+
+                // Optimistic Update
+                setEstimate(prev => {
+                    const currentItems = prev[section.key] || [];
+                    const updatedItems = currentItems.map(i =>
+                        i._id === item._id ? { ...i, [field]: finalValue } : i
+                    );
+                    return { ...prev, [section.key]: updatedItems };
+                });
 
                 try {
                     await fetch('/webhook/devcoBackend', {
@@ -799,10 +1038,11 @@
                         })
                     });
 
-                    // Reload to reflect changes
-                    if (section.id === 'Labor') loadLaborCatalog();
+                    // Reload to reflect changes silently
+                    loadEstimate(true);
                 } catch (e) {
                     console.error("Error updating item:", e);
+                    loadEstimate(true); // Revert/Refresh on error
                 }
             };
 
@@ -818,10 +1058,10 @@
                     id: 'Labor',
                     title: 'Labor',
                     key: 'labor',
-                    items: laborCatalog
+                    items: (estimate?.labor || [])
                         .map(item => ({
                             ...item,
-                            labor: `${item.classification || ''}-${item.fringe || ''}`,
+                            labor: item.labor || `${item.classification || ''}-${item.fringe || ''}`,
                             total: calculateLaborTotal(item)
                         }))
                         .sort((a, b) => (b.total || 0) - (a.total || 0)),
@@ -835,7 +1075,7 @@
                     id: 'Equipment',
                     title: 'Equipment',
                     key: 'equipment',
-                    items: (equipmentCatalog || [])
+                    items: (estimate?.equipment || [])
                         .map(item => ({
                             ...item,
                             total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
@@ -863,7 +1103,7 @@
                     id: 'Tools',
                     title: 'Tools',
                     key: 'tool',
-                    items: (estimate?.tool || [])
+                    items: (estimate?.tools || [])
                         .map(item => ({
                             ...item,
                             total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
@@ -931,6 +1171,46 @@
                 }
             ];
 
+            // --- Chart & Header Data Preparation ---
+            const Icon = window.DevcoComponents?.Icon || window.Icon || (({ name }) => <span className="text-xs">{name}</span>);
+
+            const chartData = React.useMemo(() => {
+                try {
+                    const colors = {
+                        Labor: '#3b82f6', // blue-500
+                        Equipment: '#f59e0b', // amber-500
+                        Material: '#10b981', // emerald-500
+                        Subcontractor: '#8b5cf6', // violet-500
+                        Tools: '#f43f5e', // rose-500
+                        Overhead: '#64748b', // slate-500
+                        Disposal: '#ef4444', // red-500
+                        Miscellaneous: '#ec4899' // pink-500
+                    };
+
+                    if (!sections) return { slices: [], total: 0 };
+
+                    const data = sections.map(s => {
+                        const items = s.items || estimate[s.key] || [];
+                        const value = items.reduce((sum, i) => sum + (i.total || 0), 0);
+                        return { id: s.id, label: s.title, value, color: colors[s.id] || '#cbd5e1' };
+                    }).filter(d => d.value > 0);
+
+                    const total = data.reduce((sum, d) => sum + d.value, 0);
+                    return { slices: data, total };
+                } catch (err) {
+                    console.error("Chart Data Error:", err);
+                    return { slices: [], total: 0 };
+                }
+            }, [sections, estimate]);
+
+            const servicesList = [
+                { id: 'directionalDrilling', label: 'Drilling', color: 'emerald', icon: <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /> },
+                { id: 'excavationBackfill', label: 'Excavation', color: 'blue', icon: <path d="M2 12h20M2 12l5-9M7 3h10M17 3l5 9" /> },
+                { id: 'hydroExcavation', label: 'Hydro', color: 'cyan', icon: <path d="M12 2.69l5.74 8.2a8 8 0 1 1-11.48 0L12 2.69z" /> },
+                { id: 'potholingCoring', label: 'Potholing', color: 'amber', icon: <circle cx="12" cy="12" r="10" /> },
+                { id: 'asphaltConcrete', label: 'Asphalt', color: 'stone', icon: <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /> }
+            ];
+
             if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-gray-50"><Loading text="Loading estimate..." /></div>;
             if (!estimate) return (
                 <div className="h-screen w-screen flex flex-col bg-gray-50">
@@ -948,203 +1228,147 @@
                     <main className="flex-1 overflow-y-auto">
                         <div className="max-w-[95%] mx-auto px-4 py-8">
                             {/* Detailed Header Card */}
-                            <div className={`bg-white rounded-xl shadow-sm border ${editing ? 'border-indigo-500 ring-4 ring-indigo-50/50' : 'border-gray-200'} p-6 mb-8 transition-all`}>
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-4 w-full">
-                                        <button
-                                            onClick={() => window.location.href = 'estimates.html'}
-                                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700 h-10 w-10 flex items-center justify-center flex-shrink-0"
-                                        >
-                                            <Icon name="arrow-left" size={24} />
-                                        </button>
-                                        <div className="flex-1">
-                                            {editing ? (
-                                                <div className="space-y-4">
-                                                    <div className="flex gap-4">
-                                                        <input
-                                                            type="text"
-                                                            value={formData.estimate || ''}
-                                                            onChange={e => setFormData({ ...formData, estimate: e.target.value })}
-                                                            className="text-2xl font-bold text-gray-900 border-b-2 border-indigo-200 focus:border-indigo-500 outline-none bg-transparent px-1 placeholder-gray-300 w-full"
-                                                            placeholder="Estimate Name"
-                                                        />
-                                                    </div>
-                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                        <div className="space-y-1">
-                                                            <label className="text-xs font-semibold text-gray-400 uppercase">Date</label>
-                                                            <input
-                                                                type="text"
-                                                                value={formData.date || ''}
-                                                                onChange={e => setFormData({ ...formData, date: e.target.value })}
-                                                                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none"
-                                                                placeholder="Date"
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-1">
-                                                            <label className="text-xs font-semibold text-gray-400 uppercase">Customer</label>
-                                                            <input
-                                                                type="text"
-                                                                value={formData.customerName || ''}
-                                                                onChange={e => setFormData({ ...formData, customerName: e.target.value })}
-                                                                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none"
-                                                                placeholder="Customer Name"
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-1">
-                                                            <label className="text-xs font-semibold text-gray-400 uppercase">Proposal No</label>
-                                                            <input
-                                                                type="text"
-                                                                value={formData.proposalNo || ''}
-                                                                onChange={e => setFormData({ ...formData, proposalNo: e.target.value })}
-                                                                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none"
-                                                                placeholder="Proposal No"
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-1">
-                                                            <label className="text-xs font-semibold text-gray-400 uppercase">Revision</label>
-                                                            <input
-                                                                type="number"
-                                                                value={formData.revision || 1}
-                                                                onChange={e => setFormData({ ...formData, revision: parseInt(e.target.value) || 1 })}
-                                                                className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none"
-                                                                placeholder="Rev"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                                                        Estimate #{estimate.estimate || 'N/A'}
-                                                        <Badge variant="info">{estimate.status || 'Draft'}</Badge>
-                                                    </h1>
-                                                    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-2 text-sm text-gray-500">
-                                                        <span className="flex items-center gap-2">
-                                                            <Icon name="calendar" size={14} />
-                                                            {estimate.date || 'No Date'}
-                                                        </span>
-                                                        <span className="flex items-center gap-2">
-                                                            <Icon name="user" size={14} />
-                                                            {estimate.customerName || 'Unknown Customer'}
-                                                        </span>
-                                                        <span className="flex items-center gap-2">
-                                                            <Icon name="file-text" size={14} />
-                                                            Proposal: {estimate.proposalNo || 'N/A'}
-                                                        </span>
-                                                        <span className="flex items-center gap-2">
-                                                            <Icon name="hash" size={14} />
-                                                            Rev: {estimate.revision || 1}
-                                                        </span>
-                                                    </div>
-                                                </>
-                                            )}
+
+
+                            <div className="bg-[#eef2f6] rounded-[40px] shadow-[12px_12px_24px_#d1d9e6,-12px_-12px_24px_#ffffff] p-10 mb-12 flex flex-col xl:flex-row gap-12 items-stretch min-h-[400px]">
+
+                                {/* LEFT COLUMN: Project Details */}
+                                <div className="flex-1 flex flex-col gap-8">
+
+                                    {/* 1. Header Row: Title, Date, Customer */}
+                                    <div className="flex items-end gap-12 border-b border-slate-200/50 pb-8">
+                                        {/* Title */}
+                                        <div className="flex-1 min-w-[200px]">
+                                            <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 ml-1">Project Title</label>
+                                            <div className="text-4xl font-black text-slate-800 tracking-tight truncate" title={formData.estimate || 'Untitled'}>
+                                                {formData.estimate || 'Untitled Project'}
+                                            </div>
+                                        </div>
+
+                                        {/* Date */}
+                                        <div className="min-w-[120px]">
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Date</label>
+                                            <div className="text-xl font-bold text-slate-600">{formData.date || '-'}</div>
+                                        </div>
+
+                                        {/* Customer */}
+                                        <div className="min-w-[150px]">
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Customer</label>
+                                            <div className="text-xl font-bold text-slate-600">{formData.customerName || '-'}</div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-3 pl-4">
-                                        {editing ? (
-                                            <>
-                                                <Button variant="secondary" onClick={() => {
-                                                    setFormData(estimate);
-                                                    setEditing(false);
-                                                }}>
-                                                    Cancel
-                                                </Button>
-                                                <Button onClick={saveEstimate} disabled={saving}>
-                                                    {saving ? 'Saving...' : 'Save'}
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Button variant="secondary" onClick={() => window.print()}>
-                                                    <Icon name="printer" size={16} className="mr-2" /> Print
-                                                </Button>
-                                                <Button onClick={() => setEditing(true)}>
-                                                    <Icon name="pencil" size={16} className="mr-2" /> Edit
-                                                </Button>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
 
-                                <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Financials</h3>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <div className="text-sm text-gray-500 mb-1">Bid Markup</div>
-                                                {editing ? (
-                                                    <div className="flex items-center">
-                                                        <input
-                                                            type="number"
-                                                            value={formData.bidMarkUp || ''}
-                                                            onChange={e => setFormData({ ...formData, bidMarkUp: e.target.value })}
-                                                            className="w-20 font-semibold text-gray-900 border-b border-gray-300 focus:border-indigo-500 outline-none px-1"
-                                                        />
-                                                        <span className="ml-1 text-gray-500">%</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-lg font-semibold text-gray-900">{estimate.bidMarkUp || '0'}%</div>
-                                                )}
+                                    {/* 2. Sub-Content: Services (Left) & Financials (Right) */}
+                                    <div className="flex flex-col md:flex-row gap-12 items-start mt-4">
+
+                                        {/* COL 1: Services (3 Top, 2 Bottom) */}
+                                        <div className="flex-1">
+                                            <div className="mb-4">
+                                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest block ml-1">Services</label>
                                             </div>
+                                            <div className="grid grid-cols-3 gap-6 max-w-[240px]">
+                                                {[
+                                                    { id: 'directionalDrilling', label: 'Drilling', icon: <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /> },
+                                                    { id: 'excavationBackfill', label: 'Excavation', icon: <path d="M2 12h20M2 12l5-9M7 3h10M17 3l5 9" /> },
+                                                    { id: 'hydroExcavation', label: 'Hydro', icon: <path d="M12 2.69l5.74 8.2a8 8 0 1 1-11.48 0L12 2.69z" /> },
+                                                    { id: 'potholingCoring', label: 'Potholing', icon: <circle cx="12" cy="12" r="10" /> },
+                                                    { id: 'asphaltConcrete', label: 'Asphalt', icon: <rect x="2" y="2" width="20" height="20" rx="5" ry="5" /> }
+                                                ].map(s => (
+                                                    <div
+                                                        key={s.id}
+                                                        onClick={() => setFormData({ ...formData, [s.id]: !formData[s.id] })}
+                                                        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ${formData[s.id] ? 'shadow-[inset_5px_5px_10px_#d1d9e6,inset_-5px_-5px_10px_#ffffff] text-slate-700 scale-95' : 'shadow-[8px_8px_16px_#d1d9e6,-8px_-8px_16px_#ffffff] hover:shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] hover:-translate-y-1 text-slate-400'}`}
+                                                        title={s.label}
+                                                    >
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">{s.icon}</svg>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* COL 2: Financials (Stacked) */}
+                                        <div className="flex-1 w-full space-y-6">
+                                            {/* Markup */}
                                             <div>
-                                                <div className="text-sm text-gray-500 mb-1">Fringe Rate</div>
-                                                {editing ? (
+                                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block ml-1">Markup</label>
+                                                <div className="relative shadow-[inset_6px_6px_10px_#d1d9e6,inset_-6px_-6px_10px_#ffffff] rounded-[20px] p-1 bg-[#eef2f6] h-14 flex items-center">
+                                                    <input
+                                                        type="number"
+                                                        value={formData.bidMarkUp || ''}
+                                                        onChange={e => setFormData({ ...formData, bidMarkUp: e.target.value })}
+                                                        className="w-full bg-transparent text-2xl font-bold text-slate-700 h-full pl-6 pr-10 outline-none text-center"
+                                                        placeholder="0"
+                                                    />
+                                                    <span className="absolute right-6 text-xl font-bold text-slate-400">%</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Fringe */}
+                                            <div>
+                                                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 block ml-1">Fringe</label>
+                                                <div className="relative shadow-[inset_6px_6px_10px_#d1d9e6,inset_-6px_-6px_10px_#ffffff] rounded-[20px] p-1 bg-[#eef2f6] h-14 flex items-center">
                                                     <select
                                                         value={formData.fringe || ''}
                                                         onChange={e => setFormData({ ...formData, fringe: e.target.value })}
-                                                        className="font-semibold text-gray-900 border-b border-gray-300 focus:border-indigo-500 outline-none bg-transparent py-0.5"
+                                                        className="w-full appearance-none bg-transparent text-xl font-bold text-slate-700 h-full pl-6 pr-10 outline-none cursor-pointer"
                                                     >
-                                                        <option value="">Select Fringe...</option>
+                                                        <option value="">None</option>
                                                         <option value="HDD Public">HDD Public</option>
                                                         <option value="HDD Private">HDD Private</option>
                                                         <option value="Light Commercial">Light Commercial</option>
                                                     </select>
-                                                ) : (
-                                                    <div className="text-lg font-semibold text-gray-900">{estimate.fringe || 'None'}</div>
-                                                )}
+                                                    <div className="absolute right-6 pointer-events-none text-slate-400">
+                                                        <Icon name="chevron-down" size={20} />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Selected Services</h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {[
-                                                { id: 'directionalDrilling', label: 'Directional Drilling' },
-                                                { id: 'excavationBackfill', label: 'Excavation & Backfill' },
-                                                { id: 'hydroExcavation', label: 'Hydro-excavation' },
-                                                { id: 'potholingCoring', label: 'Potholing & Coring' },
-                                                { id: 'asphaltConcrete', label: 'Asphalt & Concrete' }
-                                            ].map(s => {
-                                                const isActive = editing ? formData[s.id] : estimate[s.id];
-                                                return (editing || isActive) ? (
-                                                    <button
-                                                        key={s.id}
-                                                        onClick={() => editing && setFormData({ ...formData, [s.id]: !formData[s.id] })}
-                                                        disabled={!editing}
-                                                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-all ${isActive
-                                                            ? 'bg-blue-50 text-blue-700 border border-blue-100 opacity-100'
-                                                            : editing
-                                                                ? 'bg-gray-50 text-gray-400 border border-transparent hover:bg-gray-100 opacity-60'
-                                                                : 'hidden'
-                                                            }`}
-                                                    >
-                                                        {s.label}
-                                                        {editing && (
-                                                            <div className={`ml-1.5 w-1.5 h-1.5 rounded-full ${isActive ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
-                                                        )}
-                                                    </button>
-                                                ) : null;
-                                            })}
-                                            {!editing && [
-                                                { id: 'directionalDrilling', label: 'Directional Drilling' },
-                                                { id: 'excavationBackfill', label: 'Excavation & Backfill' },
-                                                { id: 'hydroExcavation', label: 'Hydro-excavation' },
-                                                { id: 'potholingCoring', label: 'Potholing & Coring' },
-                                                { id: 'asphaltConcrete', label: 'Asphalt & Concrete' }
-                                            ].filter(s => estimate[s.id]).length === 0 && (
-                                                    <span className="text-sm text-gray-400 italic">No services selected</span>
-                                                )}
+                                </div>
+
+                                {/* RIGHT COLUMN: Neumorphic Chart */}
+                                <div className="w-full xl:w-[450px] border-t xl:border-t-0 xl:border-l border-slate-300/30 pt-10 xl:pt-0 xl:pl-10 flex flex-col items-center justify-center">
+
+
+                                    <div className="relative w-72 h-72 rounded-full shadow-[inset_10px_10px_20px_#d1d9e6,inset_-10px_-10px_20px_#ffffff] flex items-center justify-center p-8 bg-[#eef2f6]">
+
+                                        {/* Center Raised Platform */}
+                                        <div className="absolute z-10 w-40 h-40 rounded-full shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] bg-[#eef2f6] flex flex-col items-center justify-center">
+                                            <span className="text-slate-500 font-bold text-lg mb-1">Total</span>
+                                            <span className="text-slate-800 font-black text-3xl tracking-tight">${chartData.total.toLocaleString()}</span>
                                         </div>
+
+                                        {/* Dynamic Rings */}
+                                        <svg viewBox="0 0 100 100" className="w-full h-full rotate-[-90deg] overflow-visible">
+                                            {(() => {
+                                                if (chartData.slices.length === 0) return <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="6" opacity="0.5" />;
+
+                                                let accumulatedPercent = 0;
+                                                const radius = 42; // Larger radius to sit in the track
+                                                const circumference = 2 * Math.PI * radius;
+
+                                                return chartData.slices.map((slice, idx) => {
+                                                    const percent = slice.value / chartData.total;
+                                                    const strokeDasharray = `${percent * circumference} ${circumference}`;
+                                                    const strokeDashoffset = -accumulatedPercent * circumference;
+                                                    accumulatedPercent += percent;
+
+                                                    return (
+                                                        <circle
+                                                            key={slice.id}
+                                                            cx="50" cy="50" r={radius}
+                                                            fill="none"
+                                                            stroke={slice.color}
+                                                            strokeWidth="6"
+                                                            strokeLinecap="round"
+                                                            strokeDasharray={strokeDasharray}
+                                                            strokeDashoffset={strokeDashoffset}
+                                                            className="transition-all duration-1000 ease-out opacity-80 hover:opacity-100 hover:stroke-[8]"
+                                                        />
+                                                    );
+                                                });
+                                            })()}
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
@@ -1168,6 +1392,7 @@
                                             editableFields={section.id === 'Labor' ? ['quantity', 'days', 'otPd', 'basePay'] : []}
                                             onUpdateItem={(item, field, value) => handleItemUpdate(section, item, field, value)}
                                             onExplain={section.id === 'Labor' ? handleExplain : undefined}
+                                            onDelete={(item) => handleDeleteItem(section, item)}
                                         />
                                     </AccordionItem>
                                 ))}
@@ -1179,6 +1404,12 @@
                         isOpen={!!activeSection}
                         section={activeSection}
                         items={activeSection ? (activeSection.id === 'Labor' ? activeSection.items : (activeSection.id === 'Equipment' ? activeSection.items : (estimate[activeSection.key] || []))) : []}
+                        catalog={activeSection ? (
+                            activeSection.id === 'Labor' ? laborCatalog :
+                                activeSection.id === 'Equipment' ? equipmentCatalog :
+                                    []
+                        ) : []}
+                        fringe={formData.fringe}
                         onClose={() => setActiveSection(null)}
                         onSave={handleSaveItem}
                     />
@@ -1188,6 +1419,21 @@
                         item={explanationItem}
                         breakdown={breakdownData}
                         onClose={() => setExplanationItem(null)}
+                    />
+
+                    {/* Notifications & Modals */}
+                    <ToastContainer toasts={toasts} removeToast={removeToast} />
+                    <ConfirmModal
+                        isOpen={confirmConfig.isOpen}
+                        onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+                        onConfirm={() => {
+                            if (confirmConfig.onConfirm) confirmConfig.onConfirm();
+                            setConfirmConfig({ ...confirmConfig, isOpen: false });
+                        }}
+                        title={confirmConfig.title}
+                        message={confirmConfig.message}
+                        confirmText="Delete"
+                        variant="danger"
                     />
                 </div>
             );
