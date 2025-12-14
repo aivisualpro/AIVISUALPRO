@@ -55,12 +55,29 @@ const EquipmentItemSchema = new mongoose.Schema({
 });
 
 // 2. Labor Items Schema
+// 2. Labor Items Schema
 const LaborItemSchema = new mongoose.Schema({
     classification: { type: String },
     subClassification: { type: String },
     fringe: { type: String },
     uom: { type: String },
     cost: { type: Number, default: 0 },
+    quantity: { type: Number, default: 0 },
+    days: { type: Number, default: 0 },
+    otPd: { type: Number, default: 0 },
+    wCompPercent: { type: Number, default: 0 },
+    payrollTaxesPercent: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
+// 2a. Estimate Line Items Labor Schema (New)
+const EstimateLineItemsLaborSchema = new mongoose.Schema({
+    labor: { type: String },
+    classification: { type: String },
+    subClassification: { type: String },
+    fringe: { type: String },
+    basePay: { type: Number, default: 0 },
     quantity: { type: Number, default: 0 },
     days: { type: Number, default: 0 },
     otPd: { type: Number, default: 0 },
@@ -159,6 +176,15 @@ const TemplateSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+// 10. Constants Items Schema
+const ConstantItemSchema = new mongoose.Schema({
+    description: { type: String },
+    type: { type: String },
+    value: { type: String }, // Storing as String to accommodate various types, can cast later if needed
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+});
+
 async function getConnection() {
     if (conn && conn.readyState === 1) return conn;
 
@@ -176,12 +202,14 @@ async function getConnection() {
     // Register models if not already registered
     if (!conn.models.Estimate) conn.model('Estimate', EstimateSchema, 'estimatesdb');
 
-    // Catalogue models - delete and re-register LaborItem to ensure updated schema
+    // Catalogue models
     if (!conn.models.EquipmentItem) conn.model('EquipmentItem', EquipmentItemSchema, 'equipmentItems');
 
-    // Force re-register LaborItem with updated schema (includes cost field)
+    // Force re-register LaborItem with updated schema
     if (conn.models.LaborItem) delete conn.models.LaborItem;
     conn.model('LaborItem', LaborItemSchema, 'laborItems');
+
+    if (!conn.models.EstimateLineItemsLabor) conn.model('EstimateLineItemsLabor', EstimateLineItemsLaborSchema, 'estimateLineItemsLabor');
 
     if (!conn.models.OverheadItem) conn.model('OverheadItem', OverheadItemSchema, 'overheadItems');
     if (!conn.models.SubcontractorItem) conn.model('SubcontractorItem', SubcontractorItemSchema, 'subcontractorItems');
@@ -190,6 +218,7 @@ async function getConnection() {
     if (!conn.models.MiscellaneousItem) conn.model('MiscellaneousItem', MiscellaneousItemSchema, 'miscellaneousItems');
     if (!conn.models.ToolItem) conn.model('ToolItem', ToolItemSchema, 'toolItems');
     if (!conn.models.Template) conn.model('Template', TemplateSchema, 'templates');
+    if (!conn.models.ConstantItem) conn.model('ConstantItem', ConstantItemSchema, 'constantItems');
 
     return conn;
 }
@@ -443,7 +472,9 @@ export default async function (body) {
         disposal: 'DisposalItem',
         material: 'MaterialItem',
         miscellaneous: 'MiscellaneousItem',
-        tool: 'ToolItem'
+        tool: 'ToolItem',
+        estimateLineItemsLabor: 'EstimateLineItemsLabor',
+        constant: 'ConstantItem'
     };
 
     // Get all items for a catalogue type
@@ -455,7 +486,8 @@ export default async function (body) {
 
         const connection = await getConnection();
         const Model = connection.model(catalogueModels[type]);
-        return await Model.find().sort({ classification: 1, subClassification: 1 });
+        // Special sorting for constants if needed, otherwise default
+        return await Model.find().sort({ description: 1 });
     }
 
     // Get summary/counts for all catalogue types (for dashboard)

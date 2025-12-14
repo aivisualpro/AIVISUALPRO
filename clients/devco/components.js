@@ -2,67 +2,76 @@
 // Using React via CDN - no build step required
 
 // ==================== HEADER COMPONENT ====================
-const Header = ({ activePage }) => {
+const Header = ({ activePage, rightContent }) => {
     const navItems = [
-        { id: 'catalogue', label: 'Catalogue', href: 'catalogue.html', icon: '📦' },
-        { id: 'templates', label: 'Templates', href: 'templates.html', icon: '📄' },
-        { id: 'estimates', label: 'Estimates', href: 'estimates.html', icon: '📊' }
+        { id: 'catalogue', label: 'Catalogue', href: 'catalogue.html', icon: 'package' },
+        { id: 'templates', label: 'Templates', href: 'templates.html', icon: 'file-text' },
+        { id: 'estimates', label: 'Estimates', href: 'estimates.html', icon: 'calculator' },
+        { id: 'constants', label: 'Constants', href: 'constants.html', icon: 'sliders' }
     ];
 
+    // Lucide-style icon SVGs
+    const icons = {
+        'package': <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m7.5 4.27 9 5.15" /><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" /><path d="m3.3 7 8.7 5 8.7-5" /><path d="M12 22V12" /></svg>,
+        'file-text': <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" /><path d="M14 2v4a2 2 0 0 0 2 2h4" /><path d="M10 9H8" /><path d="M16 13H8" /><path d="M16 17H8" /></svg>,
+        'calculator': <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="16" height="20" x="4" y="2" rx="2" /><line x1="8" x2="16" y1="6" y2="6" /><line x1="16" x2="16" y1="14" y2="18" /><path d="M16 10h.01" /><path d="M12 10h.01" /><path d="M8 10h.01" /><path d="M12 14h.01" /><path d="M8 14h.01" /><path d="M12 18h.01" /><path d="M8 18h.01" /></svg>,
+        'sliders': <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 21v-7" /><path d="M4 10V3" /><path d="M12 21v-9" /><path d="M12 8V3" /><path d="M20 21v-5" /><path d="M20 12V3" /><path d="M1 14h6" /><path d="M9 8h6" /><path d="M17 16h6" /></svg>
+    };
+
     return (
-        <header className="bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 sticky top-0 z-50 shadow-xl">
+        <header
+            className="sticky top-0 z-50"
+            style={{
+                background: '#f0f2f5',
+            }}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo & Nav */}
-                    <div className="flex items-center gap-8">
-                        <a href="index.html" className="flex items-center gap-3 group">
-                            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-xl shadow-lg group-hover:bg-white/30 transition-all duration-300 group-hover:scale-105">
-                                📋
-                            </div>
-                            <span className="text-xl font-bold text-white tracking-tight">Devco</span>
+                    <div className="flex items-center gap-6">
+                        <a href="index.html" className="flex items-center group">
+                            <span
+                                className="text-xl font-bold tracking-tight px-4 py-2 rounded-xl transition-all duration-300"
+                                style={{
+                                    background: '#f0f2f5',
+                                    boxShadow: '3px 3px 6px #d1d5db, -3px -3px 6px #ffffff',
+                                    color: '#1f2937'
+                                }}
+                            >
+                                DEVCO Estimates
+                            </span>
                         </a>
-                        <nav className="hidden md:flex items-center gap-1">
+                        <nav className="hidden md:flex items-center gap-2">
                             {navItems.map(item => (
                                 <a
                                     key={item.id}
                                     href={item.href}
-                                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2
-                                        ${activePage === item.id
-                                            ? 'bg-white/25 text-white shadow-lg'
-                                            : 'text-white/80 hover:text-white hover:bg-white/10'
-                                        }`}
+                                    className="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2"
+                                    style={activePage === item.id ? {
+                                        background: '#1f2937',
+                                        boxShadow: '2px 2px 4px #d1d5db, -2px -2px 4px #ffffff',
+                                        color: '#ffffff'
+                                    } : {
+                                        background: '#f0f2f5',
+                                        boxShadow: '2px 2px 4px #d1d5db, -2px -2px 4px #ffffff',
+                                        color: '#6b7280'
+                                    }}
                                 >
-                                    <span>{item.icon}</span>
+                                    {icons[item.icon]}
                                     {item.label}
                                 </a>
                             ))}
                         </nav>
                     </div>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-4">
-                        <div className="relative group">
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="w-48 px-4 py-2 pl-10 bg-white/15 border border-white/20 rounded-xl text-white placeholder-white/60 text-sm focus:outline-none focus:ring-2 focus:ring-white/40 focus:bg-white/25 transition-all duration-300"
-                            />
-                            <svg className="absolute left-3 top-2.5 w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.35-4.35" strokeWidth="2" strokeLinecap="round"></path>
-                            </svg>
+                    {/* Right Actions - Render custom content if provided */}
+                    {rightContent && (
+                        <div className="flex items-center gap-4">
+                            {rightContent}
                         </div>
-                        <div className="relative group">
-                            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-indigo-400 rounded-full flex items-center justify-center text-sm font-bold text-white cursor-pointer shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 ring-2 ring-white/20">
-                                DC
-                            </div>
-                            {/* Dropdown would go here */}
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
-            {/* Gradient border bottom */}
-            <div className="h-1 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400"></div>
         </header>
     );
 };
@@ -254,6 +263,16 @@ const EmptyState = ({ icon = '📦', title, message, action }) => (
 
 // ==================== MODAL COMPONENT ====================
 const Modal = ({ isOpen, onClose, title, children, footer }) => {
+    React.useEffect(() => {
+        const handleEsc = (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     return (
@@ -336,27 +355,29 @@ const Tabs = ({ tabs, activeTab, onChange }) => (
     </div>
 );
 
-// ==================== STATUS TABS COMPONENT (Text style like reference) ====================
+// ==================== STATUS TABS COMPONENT (Neumorphic Design) ====================
 const StatusTabs = ({ tabs, activeTab, onChange }) => (
-    <div className="flex items-center gap-6 border-b border-gray-200 mb-4">
+    <div className="flex items-center gap-2 py-3">
         {tabs.map(tab => (
             <button
                 key={tab.id}
                 onClick={() => onChange(tab.id)}
-                className={`pb-3 text-sm font-medium transition-colors relative whitespace-nowrap
-                    ${activeTab === tab.id
-                        ? 'text-indigo-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
+                className="h-9 px-4 text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center rounded-xl"
+                style={activeTab === tab.id ? {
+                    background: '#1f2937',
+                    boxShadow: '2px 2px 4px #d1d5db, -2px -2px 4px #ffffff',
+                    color: '#ffffff'
+                } : {
+                    background: '#f0f2f5',
+                    boxShadow: '2px 2px 4px #d1d5db, -2px -2px 4px #ffffff',
+                    color: '#6b7280'
+                }}
             >
                 {tab.label}
                 {tab.count !== undefined && (
-                    <span className={`ml-1.5 ${activeTab === tab.id ? 'text-indigo-600' : 'text-gray-400'}`}>
+                    <span className="ml-1.5" style={{ color: activeTab === tab.id ? '#9ca3af' : '#9ca3af' }}>
                         ({tab.count})
                     </span>
-                )}
-                {activeTab === tab.id && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full"></div>
                 )}
             </button>
         ))}
@@ -384,51 +405,56 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex items-center justify-end gap-1 px-4 py-3 border-t border-gray-100">
-            <button
-                onClick={() => onPageChange(1)}
-                disabled={currentPage === 1}
-                className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                First
-            </button>
-            <button
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                ‹
-            </button>
-            {getPageNumbers().map((page, i) => (
-                page === '...' ? (
-                    <span key={`ellipsis-${i}`} className="px-2 text-xs text-gray-400">...</span>
-                ) : (
-                    <button
-                        key={page}
-                        onClick={() => onPageChange(page)}
-                        className={`w-7 h-7 text-xs rounded transition-colors ${currentPage === page
-                            ? 'bg-indigo-600 text-white font-medium'
-                            : 'text-gray-600 hover:bg-gray-100'
-                            }`}
-                    >
-                        {page}
-                    </button>
-                )
-            ))}
-            <button
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                ›
-            </button>
-            <button
-                onClick={() => onPageChange(totalPages)}
-                disabled={currentPage === totalPages}
-                className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                Last
-            </button>
+        <div className="flex items-center justify-between px-6 py-4" style={{ background: '#f9fafb' }}>
+            {/* Info */}
+            <span className="text-sm text-gray-500">
+                Page {currentPage} of {totalPages}
+            </span>
+
+            {/* Navigation */}
+            <div className="flex items-center gap-1">
+                {/* Previous */}
+                <button
+                    onClick={() => onPageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    style={{ background: currentPage === 1 ? '#f3f4f6' : '#ffffff' }}
+                >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </button>
+
+                {/* Page Numbers */}
+                {getPageNumbers().map((page, i) => (
+                    page === '...' ? (
+                        <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-sm text-gray-400">...</span>
+                    ) : (
+                        <button
+                            key={page}
+                            onClick={() => onPageChange(page)}
+                            className={`w-8 h-8 text-sm rounded-lg border transition-all ${currentPage === page
+                                ? 'bg-gray-900 text-white border-gray-900 font-medium'
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                }`}
+                        >
+                            {page}
+                        </button>
+                    )
+                ))}
+
+                {/* Next */}
+                <button
+                    onClick={() => onPageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    style={{ background: currentPage === totalPages ? '#f3f4f6' : '#ffffff' }}
+                >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
     );
 };
@@ -452,6 +478,175 @@ const IconButton = ({ icon, onClick, variant = 'default', title = '' }) => {
     );
 };
 
+// ==================== SEARCHABLE SELECT COMPONENT ====================
+const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 'Select...' }) => {
+    const [isOpen, setIsOpen] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const dropdownRef = React.useRef(null);
+
+    const filteredOptions = options.filter(opt =>
+        String(opt).toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const isNewValue = searchTerm && !options.some(opt =>
+        String(opt).toLowerCase() === searchTerm.toLowerCase()
+    );
+
+    React.useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleSelect = (opt) => {
+        onChange(opt);
+        setSearchTerm('');
+        setIsOpen(false);
+    };
+
+    const handleAddNew = () => {
+        if (searchTerm.trim()) {
+            onChange(searchTerm.trim());
+            setSearchTerm('');
+            setIsOpen(false);
+        }
+    };
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
+            <div
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm cursor-pointer flex items-center justify-between transition-all duration-300 bg-gray-50/50 hover:bg-white"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <span className={value ? 'text-gray-900' : 'text-gray-400'}>
+                    {value || placeholder}
+                </span>
+                <svg className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                    <path d="m6 9 6 6 6-6"></path>
+                </svg>
+            </div>
+
+            {isOpen && (
+                <div className="absolute z-50 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+                    <div className="p-2 border-b border-gray-50">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Type to search..."
+                            className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                            autoFocus
+                        />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                        {filteredOptions.map((opt, i) => (
+                            <div
+                                key={i}
+                                onClick={() => handleSelect(opt)}
+                                className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 ${value === opt ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-gray-600'}`}
+                            >
+                                {opt}
+                            </div>
+                        ))}
+                        {filteredOptions.length === 0 && !isNewValue && (
+                            <div className="px-4 py-3 text-sm text-gray-400 text-center">No options found</div>
+                        )}
+                        {isNewValue && (
+                            <div
+                                onClick={handleAddNew}
+                                className="px-4 py-2 text-sm cursor-pointer text-indigo-600 hover:bg-indigo-50 font-medium border-t border-gray-50 flex items-center gap-2"
+                            >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                    <path d="M12 5v14M5 12h14"></path>
+                                </svg>
+                                Add "{searchTerm}"
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// ==================== TOAST COMPONENT ====================
+const Toast = ({ message, type = 'info', onClose }) => {
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            onClose();
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
+    const variants = {
+        success: 'bg-white border-l-4 border-green-500 text-gray-800',
+        error: 'bg-white border-l-4 border-red-500 text-gray-800',
+        info: 'bg-white border-l-4 border-blue-500 text-gray-800',
+        warning: 'bg-white border-l-4 border-amber-500 text-gray-800'
+    };
+
+    const icons = {
+        success: <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>,
+        error: <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>,
+        info: <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+        warning: <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+    };
+
+    return (
+        <div className={`flex items-center w-full max-w-sm p-4 mb-4 rounded-lg shadow-lg shadow-gray-200 transition-all duration-300 animate-in slide-in-from-right-full ${variants[type]}`}>
+            <div className="flex-shrink-0">
+                {icons[type]}
+            </div>
+            <div className="ml-3 text-sm font-medium pr-4">
+                {message}
+            </div>
+            <button onClick={onClose} className="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 text-gray-500 items-center justify-center transition-colors">
+                <span className="sr-only">Close</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+    );
+};
+
+// ==================== TOAST CONTAINER COMPONENT ====================
+const ToastContainer = ({ toasts, removeToast }) => {
+    return (
+        <div className="fixed top-4 right-4 z-[100] flex flex-col items-end gap-2">
+            {toasts.map(toast => (
+                <Toast key={toast.id} {...toast} onClose={() => removeToast(toast.id)} />
+            ))}
+        </div>
+    );
+};
+
+// ==================== CONFIRM MODAL COMPONENT ====================
+const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText = 'Confirm', cancelText = 'Cancel', variant = 'danger' }) => {
+    if (!isOpen) return null;
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={title}
+            footer={
+                <>
+                    <Button onClick={onClose} variant="secondary">{cancelText}</Button>
+                    <Button onClick={onConfirm} variant={variant}>{confirmText}</Button>
+                </>
+            }
+        >
+            <div className="text-sm text-gray-600">
+                {message}
+            </div>
+        </Modal>
+    );
+};
+
 // Make components available globally
 window.DevcoComponents = {
     Header,
@@ -469,10 +664,14 @@ window.DevcoComponents = {
     Loading,
     EmptyState,
     Modal,
+    ConfirmModal,
     Input,
     SearchInput,
+    SearchableSelect,
     Tabs,
     StatusTabs,
     Pagination,
-    IconButton
+    IconButton,
+    Toast,
+    ToastContainer
 };

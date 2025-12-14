@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devco | Estimates</title>
+    <link rel="icon" type="image/png" href="devco-logo.png">
     <meta name="description" content="View and manage all estimates">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -19,7 +19,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        sans: ['Lato', 'system-ui', 'sans-serif'],
                     }
                 }
             }
@@ -62,18 +62,20 @@
     </style>
 </head>
 
-<body class="font-sans bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+<body class="font-sans bg-white min-h-screen">
     <div id="root"></div>
 
     <script type="text/babel" src="components.js"></script>
 
     <script type="text/babel">
-        const { Header, Button, Card, StatCard, Table, TableHead, TableBody, TableRow, TableHeader, TableCell, Badge, Loading, EmptyState, SearchInput } = window.DevcoComponents;
+        const { Header, Badge, Loading, EmptyState } = window.DevcoComponents;
 
         function EstimatesApp() {
             const [estimates, setEstimates] = React.useState([]);
             const [loading, setLoading] = React.useState(true);
             const [search, setSearch] = React.useState('');
+            const [sortField, setSortField] = React.useState('date');
+            const [sortDirection, setSortDirection] = React.useState('desc');
 
             React.useEffect(() => {
                 loadEstimates();
@@ -102,12 +104,29 @@
                 (e.estimate || '').toLowerCase().includes(search.toLowerCase())
             );
 
-            const totalEstimates = estimates.length;
-            const withServices = estimates.filter(e =>
-                e.directionalDrilling || e.excavationBackfill || e.hydroExcavation ||
-                e.potholingCoring || e.asphaltConcrete
-            ).length;
-            const uniqueCustomers = new Set(estimates.map(e => e.customerId || e.customerName)).size;
+            const handleSort = (field) => {
+                if (sortField === field) {
+                    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+                } else {
+                    setSortField(field);
+                    setSortDirection('desc'); // Default to desc for new field usually better for dates/ids
+                }
+            };
+
+            const sortedEstimates = [...filteredEstimates].sort((a, b) => {
+                let aValue = a[sortField] || '';
+                let bValue = b[sortField] || '';
+
+                // Handle date sorting
+                if (sortField === 'date') {
+                    aValue = new Date(aValue).getTime();
+                    bValue = new Date(bValue).getTime();
+                }
+
+                if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
 
             const ServiceBadges = ({ estimate }) => {
                 const services = [];
@@ -131,43 +150,33 @@
             };
 
             return (
-                <div className="min-h-screen">
-                    <Header activePage="estimates" />
-
-                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                        {/* Page Header */}
-                        <div className="flex items-center justify-between mb-8">
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900">Estimates</h1>
-                                <p className="text-gray-500 text-sm mt-1">View and manage all estimates</p>
-                            </div>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                            <StatCard icon="📋" value={totalEstimates} label="Total Estimates" color="blue" />
-                            <StatCard icon="✅" value={withServices} label="With Active Services" color="green" />
-                            <StatCard icon="👥" value={uniqueCustomers} label="Unique Customers" color="purple" />
-                        </div>
-
-                        {/* Estimates Table */}
-                        <Card className="overflow-hidden">
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                                <h2 className="text-lg font-bold text-gray-900">All Estimates</h2>
-                                <div className="flex items-center gap-3">
-                                    <SearchInput
+                <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ background: '#f0f2f5' }}>
+                    <Header
+                        activePage="estimates"
+                        rightContent={
+                            <>
+                                <div className="relative flex items-center">
+                                    <input
+                                        type="text"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         placeholder="Search estimates..."
-                                        className="w-64"
+                                        className="w-56 h-10 px-4 pl-10 text-sm text-gray-600 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all duration-200 border border-gray-200"
+                                        style={{ background: '#ffffff' }}
                                     />
-                                    <select className="px-3 py-2 text-xs border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-                                        <option>Sort by: Newest</option>
-                                        <option>Sort by: Oldest</option>
-                                        <option>Sort by: Customer</option>
-                                    </select>
+                                    <svg className="absolute left-3 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.3-4.3"></path>
+                                    </svg>
                                 </div>
-                            </div>
+                            </>
+                        }
+                    />
+
+                    <main className="flex-1 flex flex-col overflow-hidden">
+                        {/* Content Area */}
+                        <div className="flex-1 flex flex-col overflow-hidden bg-white">
+
 
                             {loading ? (
                                 <Loading text="Loading estimates..." />
@@ -178,55 +187,84 @@
                                     message="Estimates will appear here when synced from AppSheet"
                                 />
                             ) : (
-                                <Table>
-                                    <TableHead>
-                                        <tr>
-                                            <TableHeader>Proposal No</TableHeader>
-                                            <TableHeader>Customer</TableHeader>
-                                            <TableHeader>Date</TableHeader>
-                                            <TableHeader>Bid Markup</TableHeader>
-                                            <TableHeader>Services</TableHeader>
-                                            <TableHeader className="text-right">Actions</TableHeader>
-                                        </tr>
-                                    </TableHead>
-                                    <TableBody>
-                                        {filteredEstimates.map(estimate => (
-                                            <TableRow
-                                                key={estimate._id}
-                                                className="cursor-pointer"
-                                                onClick={() => window.location.href = `view.html?id=${estimate._id}`}
-                                            >
-                                                <TableCell>
-                                                    <span className="font-medium text-gray-900">
-                                                        {estimate.proposalNo || estimate.estimate || '--'}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell>{estimate.customerName || '--'}</TableCell>
-                                                <TableCell>{estimate.date || '--'}</TableCell>
-                                                <TableCell>
-                                                    <Badge variant="info">{estimate.bidMarkUp || '--'}</Badge>
-                                                </TableCell>
-                                                <TableCell>
-                                                    <ServiceBadges estimate={estimate} />
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            window.location.href = `view.html?id=${estimate._id}`;
-                                                        }}
+                                <div className="flex-1 overflow-auto" style={{ background: '#f9fafb' }}>
+                                    <table className="w-full" style={{ background: '#ffffff' }}>
+                                        <thead className="border-b border-gray-200 sticky top-0 z-10" style={{ background: '#f9fafb' }}>
+                                            <tr>
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">S.No</th>
+                                                {[
+                                                    { id: 'proposalNo', label: 'Proposal No' },
+                                                    { id: 'customerName', label: 'Customer' },
+                                                    { id: 'date', label: 'Date' },
+                                                    { id: 'bidMarkUp', label: 'Bid Markup' }
+                                                ].map(col => (
+                                                    <th
+                                                        key={col.id}
+                                                        className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-white transition-colors select-none"
+                                                        onClick={() => handleSort(col.id)}
                                                     >
-                                                        View →
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
+                                                        <div className="flex items-center gap-1">
+                                                            {col.label}
+                                                            {sortField === col.id && (
+                                                                <svg className="w-3.5 h-3.5 text-gray-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                                    {sortDirection === 'asc'
+                                                                        ? <path d="m18 15-6-6-6 6"></path>
+                                                                        : <path d="m6 9 6 6 6-6"></path>
+                                                                    }
+                                                                </svg>
+                                                            )}
+                                                        </div>
+                                                    </th>
+                                                ))}
+                                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Services</th>
+                                                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100" style={{ background: '#ffffff' }}>
+                                            {sortedEstimates.map((estimate, index) => (
+                                                <tr
+                                                    key={estimate._id}
+                                                    className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                                                    onClick={() => window.location.href = `view.html?id=${estimate._id}`}
+                                                >
+                                                    <td className="px-4 py-3 text-sm text-gray-400 font-medium">
+                                                        {index + 1}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-sm">
+                                                        <span className="font-medium text-gray-900">
+                                                            {estimate.proposalNo || estimate.estimate || '--'}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-sm text-gray-600">{estimate.customerName || '--'}</td>
+                                                    <td className="px-4 py-3 text-sm text-gray-600">{estimate.date || '--'}</td>
+                                                    <td className="px-4 py-3 text-sm">
+                                                        <Badge variant="info">{estimate.bidMarkUp || '--'}</Badge>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-sm">
+                                                        <ServiceBadges estimate={estimate} />
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                window.location.href = `view.html?id=${estimate._id}`;
+                                                            }}
+                                                            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg border border-transparent hover:border-gray-200 transition-all"
+                                                            title="View"
+                                                        >
+                                                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                                                <circle cx="12" cy="12" r="3"></circle>
+                                                            </svg>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             )}
-                        </Card>
+                        </div>
                     </main>
                 </div>
             );
