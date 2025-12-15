@@ -56,6 +56,7 @@ const EquipmentItemSchema = new mongoose.Schema({
     weeklyCost: { type: Number, default: 0 },
     monthlyCost: { type: Number, default: 0 },
     quantity: { type: Number, default: 0 },
+    times: { type: Number, default: 1 },
     quantityOfTime: { type: Number, default: 0 },
     fuelAdditiveCost: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
@@ -106,6 +107,7 @@ const OverheadItemSchema = new mongoose.Schema({
     hours: { type: Number, default: 0 },
     hourlyRate: { type: Number, default: 0 },
     dailyRate: { type: Number, default: 0 },
+    total: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
@@ -115,9 +117,11 @@ const SubcontractorItemSchema = new mongoose.Schema({
     classification: { type: String },
     subClassification: { type: String },
     subcontractor: { type: String },
-    uom: { type: String },
-    notes: { type: String },
     cost: { type: Number, default: 0 },
+    quantity: { type: Number, default: 0 },
+    uom: { type: String },
+    total: { type: Number, default: 0 },
+    notes: { type: String },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
@@ -150,11 +154,10 @@ const MaterialItemSchema = new mongoose.Schema({
 
 // 7. Miscellaneous Items Schema
 const MiscellaneousItemSchema = new mongoose.Schema({
-    classification: { type: String },
-    subClassification: { type: String },
     item: { type: String },
+    classification: { type: String },
+    quantity: { type: Number, default: 1 },
     uom: { type: String },
-    quantity: { type: Number, default: 0 },
     cost: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
@@ -379,14 +382,19 @@ async function updateAppSheet(data, providedLineItems = null) {
 
     const calculateEquipmentTotal = (item) => {
         const qty = item.quantity || 0;
+        const times = item.times !== undefined ? item.times : 1;
         const uom = item.uom || 'Daily';
-        if (uom === 'Daily') return (item.dailyCost || 0) * qty;
-        if (uom === 'Weekly') return (item.weeklyCost || 0) * qty;
-        if (uom === 'Monthly') return (item.monthlyCost || 0) * qty;
-        return (item.dailyCost || 0) * qty;
+        let val = 0;
+        if (uom === 'Daily') val = (item.dailyCost || 0);
+        else if (uom === 'Weekly') val = (item.weeklyCost || 0);
+        else if (uom === 'Monthly') val = (item.monthlyCost || 0);
+        else val = (item.dailyCost || 0);
+
+        return val * qty * times;
     };
 
     const simpleSum = (items) => items.reduce((sum, i) => sum + ((i.cost || 0) * (i.quantity || 1)), 0);
+    const costOnlySum = (items) => items.reduce((sum, i) => sum + (i.cost || 0), 0);
 
     // Calculate Category Totals
     const laborTotal = labor.reduce((sum, item) => sum + calculateLaborTotal(item), 0);
@@ -394,7 +402,7 @@ async function updateAppSheet(data, providedLineItems = null) {
     const materialTotal = simpleSum(material);
     const toolsTotal = simpleSum(tools);
     const overheadTotal = simpleSum(overhead);
-    const subcontractorTotal = simpleSum(subcontractor);
+    const subcontractorTotal = costOnlySum(subcontractor);
     const disposalTotal = simpleSum(disposal);
     const miscellaneousTotal = simpleSum(miscellaneous);
 
@@ -553,7 +561,17 @@ export default async function (body) {
 
             // Fetch and attach line items
             // Fetch and attach line items in parallel
-            const fetchItems = (model) => connection.model(model).find({ estimateId: id }).lean();
+            const fetchItems = async (model) => {
+                const items = await connection.model(model).find({ estimateId: id }).lean();
+                if (model === 'EstimateLineItemsMiscellaneous') {
+                    console.log('getEstimateById - Fetched Miscellaneous:', {
+                        count: items.length,
+                        ids: items.map(i => i._id),
+                        sample: items[0]
+                    });
+                }
+                return items;
+            };
 
             const [
                 labor,
@@ -574,6 +592,14 @@ export default async function (body) {
                 fetchItems('EstimateLineItemsDisposal'),
                 fetchItems('EstimateLineItemsMiscellaneous')
             ]);
+
+            // Debug: Check if miscellaneous matches what we expect
+            console.log('getEstimateById - Miscellaneous being attached:', {
+                fromDB: miscellaneous?.length,
+                firstId: miscellaneous?.[0]?._id,
+                estimateEmbedded: est.miscellaneous?.length,
+                estimateEmbeddedId: est.miscellaneous?.[0]?._id
+            });
 
             est.labor = labor;
             est.equipment = equipment;
@@ -715,11 +741,12 @@ export default async function (body) {
 
             // For other sections, fallback to simple cost * quantity if total is missing
             const simpleCalc = (items) => items.reduce((sum, i) => sum + (i.total || ((i.cost || 0) * (i.quantity || 1))), 0);
+            const costOnlyCalc = (items) => items.reduce((sum, i) => sum + (i.total || (i.cost || 0)), 0);
 
             const materialTotal = simpleCalc(material);
             const toolsTotal = simpleCalc(tools);
             const overheadTotal = simpleCalc(overhead);
-            const subcontractorTotal = simpleCalc(subcontractor);
+            const subcontractorTotal = costOnlyCalc(subcontractor);
             const disposalTotal = simpleCalc(disposal);
             const miscellaneousTotal = simpleCalc(miscellaneous);
 
@@ -1023,9 +1050,27 @@ export default async function (body) {
         }
 
         data.updatedAt = new Date();
+
+        // Debug logging
+        console.log('updateCatalogueItem - Attempting update:', {
+            type: type,
+            modelName: catalogueModels[type],
+            id: id,
+            data: data
+        });
+
         const result = await Model.findByIdAndUpdate(id, data, { new: true });
 
-        if (!result) throw new Error("Item not found");
+        // Debug: If not found, check what exists
+        if (!result) {
+            const count = await Model.countDocuments();
+            const sample = await Model.findOne().lean();
+            console.log('updateCatalogueItem - Item not found. Debug info:', {
+                totalDocuments: count,
+                sampleDoc: sample ? { _id: sample._id, estimateId: sample.estimateId } : null
+            });
+            throw new Error("Item not found");
+        }
 
         return {
             message: 'Item updated successfully',

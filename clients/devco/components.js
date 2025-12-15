@@ -278,7 +278,7 @@ const Modal = ({ isOpen, onClose, title, children, footer }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose}></div>
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden animate-modal">
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden animate-modal">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                     <h3 className="text-lg font-bold text-gray-900">{title}</h3>
                     <button
@@ -480,12 +480,11 @@ const IconButton = ({ icon, onClick, variant = 'default', title = '' }) => {
 
 // ==================== SEARCHABLE SELECT COMPONENT ====================
 const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 'Select...', autoFocus, onKeyDown, onNext, ...props }) => {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = React.useState(autoFocus || false);
     const [searchTerm, setSearchTerm] = React.useState('');
-    const dropdownRef = React.useRef(null);
+    const containerRef = React.useRef(null);
+    const inputRef = React.useRef(null);
     const triggerRef = React.useRef(null);
-    const justSelected = React.useRef(false);
-    const justFocused = React.useRef(false);
 
     const filteredOptions = options.filter(opt =>
         String(opt).toLowerCase().includes(searchTerm.toLowerCase())
@@ -495,59 +494,55 @@ const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 
         String(opt).toLowerCase() === searchTerm.toLowerCase()
     );
 
+    // Auto-focus and auto-open on mount if autoFocus is true
     React.useEffect(() => {
-        if (autoFocus && triggerRef.current) {
-            triggerRef.current.focus();
+        if (autoFocus) {
+            setIsOpen(true);
         }
-    }, [autoFocus]);
+    }, []);
 
     React.useEffect(() => {
         const handleClickOutside = (e) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+            if (containerRef.current && !containerRef.current.contains(e.target)) {
                 setIsOpen(false);
+                setSearchTerm('');
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelect = (opt, source = 'click') => {
+    // Focus input when dropdown opens
+    React.useEffect(() => {
+        if (isOpen && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isOpen]);
+
+    const handleSelect = (opt, source = 'click', moveNext = false) => {
         onChange(opt);
         setSearchTerm('');
         setIsOpen(false);
-        justSelected.current = true;
 
-        if (source === 'key' && onNext) {
-            onNext();
-        } else if (triggerRef.current) {
-            triggerRef.current.focus();
+        if (moveNext && onNext) {
+            // Use setTimeout to allow state to settle before focusing next field
+            setTimeout(() => {
+                onNext();
+            }, 50);
         }
     };
 
-    const handleAddNew = (source = 'click') => {
+    const handleAddNew = (source = 'click', moveNext = false) => {
         if (searchTerm.trim()) {
             onChange(searchTerm.trim());
             setSearchTerm('');
             setIsOpen(false);
-            justSelected.current = true;
 
-            if (source === 'key' && onNext) {
-                onNext();
-            } else if (triggerRef.current) {
-                triggerRef.current.focus();
+            if (moveNext && onNext) {
+                setTimeout(() => {
+                    onNext();
+                }, 50);
             }
-        }
-    };
-
-    const handleTriggerKeyDown = (e) => {
-        // Internal: Space/Down opens menu
-        if (e.key === ' ' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            setIsOpen(true);
-        }
-        // External: Propagate Enter/Tab/etc to parent
-        if (onKeyDown) {
-            onKeyDown(e);
         }
     };
 
@@ -555,90 +550,153 @@ const SearchableSelect = ({ label, value, onChange, options = [], placeholder = 
         if (e.key === 'Enter') {
             e.preventDefault();
             if (filteredOptions.length > 0) {
-                handleSelect(filteredOptions[0], 'key');
+                handleSelect(filteredOptions[0], 'key', true);
+            } else if (isNewValue) {
+                handleAddNew('key', true);
             } else {
-                handleAddNew('key');
+                // Just close and move to next if no selection needed
+                setIsOpen(false);
+                setSearchTerm('');
+                if (onNext) {
+                    setTimeout(() => onNext(), 50);
+                }
             }
+        } else if (e.key === 'Tab' && e.shiftKey) {
+            // Shift+Tab: close dropdown and let browser handle backwards navigation
+            setIsOpen(false);
+            setSearchTerm('');
+            // Don't prevent default - let browser handle Shift+Tab to previous field
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            // On Tab, select first option if available, then move to next field
+            if (filteredOptions.length > 0 && !value) {
+                handleSelect(filteredOptions[0], 'key', true);
+            } else if (isNewValue) {
+                handleAddNew('key', true);
+            } else {
+                setIsOpen(false);
+                setSearchTerm('');
+                if (onNext) {
+                    setTimeout(() => onNext(), 50);
+                }
+            }
+        } else if (e.key === 'Escape') {
+            setIsOpen(false);
+            setSearchTerm('');
         }
     };
 
-    const handleFocus = (e) => {
-        if (justSelected.current) {
-            justSelected.current = false;
-            return;
-        }
-        if (!isOpen) {
-            setIsOpen(true);
-            justFocused.current = true;
-            setTimeout(() => { justFocused.current = false; }, 200);
-        }
-        if (props.onFocus) props.onFocus(e);
-    };
-
-    const handleClick = () => {
-        if (justFocused.current) return;
-        setIsOpen(!isOpen);
+    const handleTriggerClick = () => {
+        setIsOpen(true);
     };
 
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative" ref={containerRef}>
             {label && <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>}
-            <div
-                ref={triggerRef}
-                tabIndex={0}
-                {...props}
-                onKeyDown={handleTriggerKeyDown}
-                onFocus={handleFocus}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm cursor-pointer flex items-center justify-between transition-all duration-300 bg-gray-50/50 hover:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                onClick={handleClick}
-            >
-                <span className={value ? 'text-gray-900' : 'text-gray-400'}>
-                    {value || placeholder}
-                </span>
-                <svg className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                    <path d="m6 9 6 6 6-6"></path>
-                </svg>
-            </div>
 
+            {/* Closed State - Trigger */}
+            {!isOpen && (
+                <div
+                    ref={triggerRef}
+                    id={props.id}
+                    tabIndex={0}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm cursor-pointer flex items-center justify-between transition-all duration-200 bg-gray-50/50 hover:bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    onClick={handleTriggerClick}
+                    onFocus={() => setIsOpen(true)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleTriggerClick();
+                        }
+                    }}
+                >
+                    <span className={value ? 'text-gray-900' : 'text-gray-400'}>
+                        {value || placeholder}
+                    </span>
+                    <svg className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                        <path d="m6 9 6 6 6-6"></path>
+                    </svg>
+                </div>
+            )}
+
+            {/* Open State - Dropdown Panel (replaces trigger) */}
             {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
-                    <div className="p-2 border-b border-gray-50">
+                <div
+                    className="w-full bg-white rounded-xl border border-indigo-500 ring-2 ring-indigo-500/20 overflow-hidden"
+                    style={{ boxShadow: '0 10px 40px -10px rgba(0,0,0,0.15)' }}
+                >
+                    {/* Search Input */}
+                    <div className="px-4 py-2.5 border-b border-gray-100 flex items-center gap-2">
+                        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.3-4.3"></path>
+                        </svg>
                         <input
+                            ref={inputRef}
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onKeyDown={handleInputKeyDown}
-                            placeholder="Type to search..."
-                            className="w-full px-3 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                            autoFocus
+                            placeholder={`Search or type to add...`}
+                            className="flex-1 bg-transparent outline-none text-sm text-gray-900 placeholder-gray-400"
                         />
+                        <button
+                            onClick={() => { setIsOpen(false); setSearchTerm(''); }}
+                            className="p-0.5 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <path d="M18 6L6 18M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
+
+                    {/* Options List */}
                     <div className="max-h-48 overflow-y-auto">
-                        {filteredOptions.map((opt, i) => (
+                        {/* Default/Dash Option */}
+                        <div
+                            onClick={() => handleSelect('-')}
+                            className={`px-4 py-2 text-sm cursor-pointer transition-colors ${value === '-'
+                                ? 'bg-indigo-50 text-indigo-600 font-medium'
+                                : 'text-gray-500 hover:bg-gray-50'
+                                }`}
+                        >
+                            -
+                        </div>
+
+                        {/* Filtered Options */}
+                        {filteredOptions.filter(opt => opt !== '-').map((opt, i) => (
                             <div
                                 key={i}
                                 onClick={() => handleSelect(opt)}
-                                className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-50 ${value === opt ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-gray-600'}`}
+                                className={`px-4 py-2 text-sm cursor-pointer transition-colors ${value === opt
+                                    ? 'bg-indigo-50 text-indigo-600 font-medium'
+                                    : 'text-gray-700 hover:bg-gray-50'
+                                    }`}
                             >
                                 {opt}
                             </div>
                         ))}
-                        {filteredOptions.length === 0 && !isNewValue && (
-                            <div className="px-4 py-3 text-sm text-gray-400 text-center">No options found</div>
-                        )}
-                        {isNewValue && (
-                            <div
-                                onClick={() => handleAddNew('click')}
-                                className="px-4 py-2 text-sm cursor-pointer text-indigo-600 hover:bg-indigo-50 font-medium border-t border-gray-50 flex items-center gap-2"
-                            >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                                    <path d="M12 5v14M5 12h14"></path>
-                                </svg>
-                                Add "{searchTerm}"
+
+                        {/* No Results */}
+                        {filteredOptions.filter(opt => opt !== '-').length === 0 && !isNewValue && searchTerm && (
+                            <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                                No matches found
                             </div>
                         )}
                     </div>
+
+                    {/* Add New Option */}
+                    {isNewValue && (
+                        <div
+                            onClick={() => handleAddNew('click')}
+                            className="px-4 py-2.5 text-sm cursor-pointer text-white bg-indigo-600 hover:bg-indigo-700 font-medium flex items-center gap-2 transition-colors border-t border-indigo-500"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <path d="M12 5v14M5 12h14"></path>
+                            </svg>
+                            Add "{searchTerm}"
+                        </div>
+                    )}
                 </div>
             )}
         </div>
@@ -717,6 +775,131 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, title, message, confirmText 
     );
 };
 
+// ==================== ITEM FORM COMPONENT ====================
+// Reusable form logic from Catalogue for Manual Entry
+const ItemForm = ({
+    fields,
+    headers,
+    formData,
+    onChange,
+    onSubmit,
+    onCancel,
+    submitLabel = 'Save',
+    cancelLabel = 'Cancel',
+    category,
+    dropdownFields = [],
+    fieldTypes = {},
+    fringeConstants = [],
+    isSaving = false,
+    submitButtonClass = '' // Allow overriding submit button class
+}) => {
+    // Helper to get options for a field
+    const getOptions = (field) => {
+        // This would typically come from existing items, but for manual entry 
+        // we might just rely on user input or passed-in options if we enhanced this.
+        // For now, return basic options or empty for new entries.
+        // In catalogue.html, it derives from 'items' state. 
+        // Here, we might accept an 'options' prop if needed, but for now we default to '-' and allow adding.
+        return ['-'];
+    };
+
+    const focusNextField = (currentIndex) => {
+        const visibleFields = fields.filter(f => !f.startsWith('_'));
+        const isLast = currentIndex === visibleFields.length - 1;
+
+        if (isLast) {
+            onSubmit();
+        } else {
+            let nextIndex = currentIndex + 1;
+            let nextEl = null;
+            while (nextIndex < fields.length && !nextEl) {
+                nextEl = document.getElementById(`item-form-field-${nextIndex}-new`);
+                nextIndex++;
+            }
+            if (nextEl) nextEl.focus();
+        }
+    };
+
+    const handleKeyDown = (e, index) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            focusNextField(index);
+        }
+    };
+
+    return (
+        <>
+            <div className="grid grid-cols-2 gap-5 mb-6">
+                {fields.map((field, i) => {
+                    const label = headers[i];
+                    const isDropdown = dropdownFields.includes(field);
+                    const isNumber = fieldTypes[field] === 'number' ||
+                        ['cost', 'rate', 'price', 'quantity', 'hours', 'days'].some(k => field.toLowerCase().includes(k));
+
+                    // Special Fringe Handling
+                    if (category === 'Labor' && field === 'fringe') {
+                        return (
+                            <div key={field}>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">{label}</label>
+                                <SearchableSelect
+                                    value={formData[field] || ''}
+                                    onChange={(val) => onChange(field, val)}
+                                    options={['-', ...(fringeConstants || []).map(c => c.description)]}
+                                    placeholder="Select or add fringe..."
+                                    autoFocus={i === 0}
+                                    id={`item-form-field-${i}-new`}
+                                    onKeyDown={(e) => handleKeyDown(e, i)}
+                                    onNext={() => focusNextField(i)}
+                                />
+                            </div>
+                        );
+                    }
+
+                    return (
+                        <div key={field} className={field === 'notes' ? 'col-span-2' : ''}>
+                            <label className="block text-sm font-medium text-gray-600 mb-2">{label}</label>
+                            {isDropdown ? (
+                                <SearchableSelect
+                                    value={formData[field] || ''}
+                                    onChange={(val) => onChange(field, val)}
+                                    options={getOptions(field)}
+                                    placeholder={`Select or add ${label.toLowerCase()}...`}
+                                    autoFocus={i === 0}
+                                    id={`item-form-field-${i}-new`}
+                                    onKeyDown={(e) => handleKeyDown(e, i)}
+                                    onNext={() => focusNextField(i)}
+                                />
+                            ) : (
+                                <input
+                                    type={isNumber ? 'number' : 'text'}
+                                    value={formData[field] || ''}
+                                    onChange={(e) => onChange(field, e.target.value)}
+                                    placeholder={`Enter ${label.toLowerCase()}`}
+                                    className="w-full h-11 px-4 text-sm text-gray-700 placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all border border-gray-200"
+                                    style={{ background: '#ffffff' }}
+                                    autoFocus={i === 0}
+                                    id={`item-form-field-${i}-new`}
+                                    onKeyDown={(e) => handleKeyDown(e, i)}
+                                />
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100" style={{ margin: '0 -1.5rem -1.5rem -1.5rem', padding: '1rem 1.5rem', background: '#fafafa' }}>
+                <Button variant="secondary" onClick={onCancel}>
+                    {cancelLabel}
+                </Button>
+                <Button onClick={onSubmit} disabled={isSaving} className={submitButtonClass}>
+                    {isSaving ? 'Saving...' : submitLabel}
+                </Button>
+            </div>
+        </>
+    );
+};
+
 // Make components available globally
 window.DevcoComponents = {
     Header,
@@ -743,5 +926,7 @@ window.DevcoComponents = {
     Pagination,
     IconButton,
     Toast,
-    ToastContainer
+    ToastContainer,
+    ItemForm
 };
+

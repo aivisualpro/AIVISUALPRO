@@ -160,7 +160,7 @@
             };
 
             // Fields that should use searchable dropdowns
-            const dropdownFields = ['classification', 'subClassification', 'supplier', 'fringe', 'uom'];
+            const dropdownFields = ['classification', 'subClassification', 'supplier', 'fringe', 'uom', 'subcontractor'];
 
             const categoryConfig = {
                 equipment: {
@@ -186,15 +186,15 @@
                 },
                 subcontractor: {
                     title: 'Subcontractor Items',
-                    headers: ['Subcontractor', 'Classification', 'Sub Classification', 'UOM', 'Notes', 'Cost'],
-                    fields: ['subcontractor', 'classification', 'subClassification', 'uom', 'notes', 'cost'],
+                    headers: ['Classification', 'Sub Classification', 'Subcontractor', 'Lump Sum', 'Notes'],
+                    fields: ['classification', 'subClassification', 'subcontractor', 'cost', 'notes'],
                     fieldTypes: { cost: 'number' }
                 },
                 disposal: {
                     title: 'Disposal Items',
-                    headers: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost'],
-                    fields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'quantity', 'cost'],
-                    fieldTypes: { quantity: 'number', cost: 'number' }
+                    headers: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Cost'],
+                    fields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'cost'],
+                    fieldTypes: { cost: 'number' }
                 },
                 material: {
                     title: 'Material Items',
@@ -204,15 +204,15 @@
                 },
                 miscellaneous: {
                     title: 'Miscellaneous Items',
-                    headers: ['Item', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost'],
-                    fields: ['item', 'classification', 'subClassification', 'uom', 'quantity', 'cost'],
-                    fieldTypes: { quantity: 'number', cost: 'number' }
+                    headers: ['Item', 'Classification', 'UOM', 'Cost'],
+                    fields: ['item', 'classification', 'uom', 'cost'],
+                    fieldTypes: { cost: 'number' }
                 },
                 tool: {
                     title: 'Tool Items',
-                    headers: ['Tool', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes'],
-                    fields: ['tool', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes'],
-                    fieldTypes: { cost: 'number', quantity: 'number', taxes: 'number' }
+                    headers: ['Tool', 'Classification', 'Sub Classification', 'Supplier', 'UOM', 'Cost', 'Taxes'],
+                    fields: ['tool', 'classification', 'subClassification', 'supplier', 'uom', 'cost', 'taxes'],
+                    fieldTypes: { cost: 'number', taxes: 'number' }
                 },
                 estimateLineItemsLabor: {
                     title: 'Estimate Line Items (Labor)',
@@ -558,6 +558,11 @@
                         ...defaults,
                         taxes: 7.8
                     };
+                } else if (category === 'tool') {
+                    defaults = {
+                        ...defaults,
+                        taxes: 7.8
+                    };
                 }
 
                 setFormData(defaults);
@@ -678,7 +683,7 @@
                                 />
                             ) : (
                                 <div className="flex-1 flex flex-col overflow-hidden">
-                                    <div className="flex-1 overflow-auto" style={{ background: '#f9fafb' }}>
+                                    <div className="flex-1 overflow-auto px-4" style={{ background: '#f9fafb' }}>
                                         <table className="w-full" style={{ background: '#ffffff' }}>
                                             <thead className="border-b border-gray-200 sticky top-0 z-10" style={{
                                                 background: '#f9fafb'

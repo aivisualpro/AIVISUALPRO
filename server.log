@@ -1,1890 +1,13 @@
 Server running on 3000
-GET /clients/devco/catalogue.html
-GET /clients/devco/devco-logo.png
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "labor",
-    "id": "693f125030d32178055d49ca",
-    "data": {
-      "_id": "693f125030d32178055d49ca",
-      "classification": "Travel",
-      "subClassification": "Per Diem",
-      "uom": "Hourly",
-      "cost": 75,
-      "quantity": 0,
-      "days": 0,
-      "otPd": 0,
-      "wCompPercent": 12,
-      "payrollTaxesPercent": 16,
-      "createdAt": "2025-12-14T19:38:56.388Z",
-      "updatedAt": "2025-12-14T19:38:56.388Z",
-      "__v": 0,
-      "fringe": "HDD Private"
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-GET /clients/devco/catalogue.html
+GET /clients/devco/view.html?id=0d2b8382
 GET /clients/devco/components.js
 GET /clients/devco/devco-logo.png
 POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "labor",
-    "data": {
-      "uom": "Hourly",
-      "wCompPercent": 0,
-      "payrollTaxesPercent": 0,
-      "classification": "Travel",
-      "subClassification": "Hotel",
-      "cost": 200
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "labor",
-    "data": {
-      "uom": "Hourly",
-      "wCompPercent": 0,
-      "payrollTaxesPercent": 0,
-      "classification": "Travel",
-      "subClassification": "Hotel",
-      "cost": 200
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/devco-logo.png
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/devco-logo.png
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "24x40 Vermeer Drill + Mack Truck",
-      "classification": "Directional Drilling",
-      "dailyCost": 1500,
-      "weeklyCost": 10000,
-      "monthlyCost": 3500
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "24x40 Vermeer Drill w/ Truck & Trailer",
-      "classification": "Directional Drilling",
-      "subClassification": "Drill",
-      "dailyCost": 1500,
-      "weeklyCost": 6500,
-      "monthlyCost": 22500
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "10,000 - 14,000 lbs Mini Ex",
-      "classification": "Excavation & Backfill",
-      "subClassification": "MINI-EX & BACKHOE w/ ATTACHMENTS",
-      "dailyCost": 495,
-      "weeklyCost": 1295,
-      "monthlyCost": 2850
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "7,500lbs Mini Ex",
-      "classification": "Excavation & Backfill",
-      "subClassification": "MINI-EX & BACKHOE w/ ATTACHMENTS",
-      "supplier": "Sunbelt",
-      "dailyCost": 300,
-      "weeklyCost": 1035,
-      "monthlyCost": 2330
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "9,500lbs Mini Ex",
-      "classification": "Excavation & Backfill",
-      "subClassification": "MINI-EX & BACKHOE w/ ATTACHMENTS",
-      "supplier": "Sunbelt",
-      "dailyCost": 360,
-      "weeklyCost": 1122,
-      "monthlyCost": 2561
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Backhoe Loader 68 - 74 Hp, Standard Stick",
-      "classification": "Excavation & Backfill",
-      "subClassification": "MINI-EX & BACKHOE w/ ATTACHMENTS",
-      "supplier": "Equipment Share",
-      "dailyCost": 450,
-      "weeklyCost": 1250,
-      "monthlyCost": 4500
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Compaction Wheel 24\", Excavator 25,000-39,000 Lbs",
-      "classification": "Excavation & Backfill",
-      "subClassification": "MINI-EX & BACKHOE w/ ATTACHMENTS",
-      "dailyCost": 178,
-      "weeklyCost": 490,
-      "monthlyCost": 1102
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "30\" auger with attachment",
-      "classification": "Excavation & Backfill",
-      "subClassification": "MISCELLANEOUS",
-      "dailyCost": 125,
-      "weeklyCost": 300,
-      "monthlyCost": 635
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "id": "693f192ca9195a03656cea4a",
-    "data": {
-      "_id": "693f192ca9195a03656cea4a",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Mini-Ex & Backhoe W/ Attachments",
-      "equipmentMachine": "10,000 - 14,000 lbs Mini Ex",
-      "cost": 0,
-      "dailyCost": 495,
-      "weeklyCost": 1295,
-      "monthlyCost": 2850,
-      "quantity": 0,
-      "quantityOfTime": 0,
-      "fuelAdditiveCost": 0,
-      "createdAt": "2025-12-14T20:08:12.707Z",
-      "updatedAt": "2025-12-14T20:08:12.707Z",
-      "__v": 0
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "id": "693f194ca9195a03656cea4d",
-    "data": {
-      "_id": "693f194ca9195a03656cea4d",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Mini-Ex & Backhoe W/ Attachments",
-      "equipmentMachine": "7,500lbs Mini Ex",
-      "supplier": "Sunbelt",
-      "cost": 0,
-      "dailyCost": 300,
-      "weeklyCost": 1035,
-      "monthlyCost": 2330,
-      "quantity": 0,
-      "quantityOfTime": 0,
-      "fuelAdditiveCost": 0,
-      "createdAt": "2025-12-14T20:08:44.536Z",
-      "updatedAt": "2025-12-14T20:08:44.536Z",
-      "__v": 0
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "id": "693f199ca9195a03656cea50",
-    "data": {
-      "_id": "693f199ca9195a03656cea50",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Mini-Ex & Backhoe W/ Attachments",
-      "equipmentMachine": "9,500lbs Mini Ex",
-      "supplier": "Sunbelt",
-      "cost": 0,
-      "dailyCost": 360,
-      "weeklyCost": 1122,
-      "monthlyCost": 2561,
-      "quantity": 0,
-      "quantityOfTime": 0,
-      "fuelAdditiveCost": 0,
-      "createdAt": "2025-12-14T20:10:04.850Z",
-      "updatedAt": "2025-12-14T20:10:04.850Z",
-      "__v": 0
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "id": "693f19bba9195a03656cea53",
-    "data": {
-      "_id": "693f19bba9195a03656cea53",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Mini-Ex & Backhoe W/ Attachments",
-      "equipmentMachine": "Backhoe Loader 68 - 74 Hp, Standard Stick",
-      "supplier": "Equipment Share",
-      "cost": 0,
-      "dailyCost": 450,
-      "weeklyCost": 1250,
-      "monthlyCost": 4500,
-      "quantity": 0,
-      "quantityOfTime": 0,
-      "fuelAdditiveCost": 0,
-      "createdAt": "2025-12-14T20:10:35.860Z",
-      "updatedAt": "2025-12-14T20:10:35.860Z",
-      "__v": 0
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "id": "693f19d9a9195a03656cea56",
-    "data": {
-      "_id": "693f19d9a9195a03656cea56",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Mini-Ex & Backhoe W/ Attachments",
-      "equipmentMachine": "Compaction Wheel 24\", Excavator 25,000-39,000 Lbs",
-      "cost": 0,
-      "dailyCost": 178,
-      "weeklyCost": 490,
-      "monthlyCost": 1102,
-      "quantity": 0,
-      "quantityOfTime": 0,
-      "fuelAdditiveCost": 0,
-      "createdAt": "2025-12-14T20:11:05.377Z",
-      "updatedAt": "2025-12-14T20:11:05.377Z",
-      "__v": 0
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "updateCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "id": "693f1a05a9195a03656cea59",
-    "data": {
-      "_id": "693f1a05a9195a03656cea59",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Miscellaneous",
-      "equipmentMachine": "30\" auger with attachment",
-      "cost": 0,
-      "dailyCost": 125,
-      "weeklyCost": 300,
-      "monthlyCost": 635,
-      "quantity": 0,
-      "quantityOfTime": 0,
-      "fuelAdditiveCost": 0,
-      "createdAt": "2025-12-14T20:11:49.064Z",
-      "updatedAt": "2025-12-14T20:11:49.064Z",
-      "__v": 0
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Saw Concrete 20\" Walk Behind",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Miscellaneous",
-      "dailyCost": 172,
-      "weeklyCost": 516,
-      "monthlyCost": 1162
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Water Trailer 500 Gallon W/ Pump",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Miscellaneous",
-      "supplier": "Sunbelt",
-      "dailyCost": 110,
-      "weeklyCost": 325,
-      "monthlyCost": 715
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Skid Steer 1500-2000Lbs",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Skid Steer W/ Attachments",
-      "supplier": "H&E",
-      "dailyCost": 415,
-      "weeklyCost": 1205,
-      "monthlyCost": 2875
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Skid Steer Track Cab 2800-3200Lbs",
-      "classification": "Excavation & Backfill",
-      "subClassification": "Skid Steer W/ Attachments",
-      "supplier": "Sunbelt",
-      "dailyCost": 496,
-      "monthlyCost": 3750,
-      "weeklyCost": 1528
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "800G Tow Behind",
-      "classification": "Hydro-excavation",
-      "subClassification": "Hydrovac Truck & Vacuums W/ Accessories",
-      "dailyCost": 500,
-      "weeklyCost": 2000,
-      "monthlyCost": 6800
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "800G Vermeer Vacuum",
-      "classification": "Hydro-excavation",
-      "subClassification": "Hydrovac Truck & Vacuums W/ Accessories",
-      "supplier": "Sunbelt",
-      "dailyCost": 635,
-      "weeklyCost": 2095,
-      "monthlyCost": 4440
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "8Yd Vermeer Vac Truck Vxt300",
-      "classification": "Hydro-excavation",
-      "subClassification": "Hydrovac Truck & Vacuums W/ Accessories",
-      "dailyCost": 1500,
-      "weeklyCost": 6500,
-      "monthlyCost": 22500
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "equipmentMachine": "Dw 800G Vac Trailer",
-      "classification": "Potholing",
-      "dailyCost": 60,
-      "weeklyCost": 400,
-      "monthlyCost": 1500
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/devco-logo.png
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "equipment",
-    "data": {
-      "classification": "Trucks",
-      "subClassification": "-",
-      "supplier": "-",
-      "equipmentMachine": "Gang Truck/Work Truck W/Fuel",
-      "dailyCost": 400,
-      "weeklyCost": 1650,
-      "monthlyCost": 4500
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-GET /clients/devco/estimates.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getEstimates"
-}
-GET /clients/devco/view.html?id=db93c443
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
 Devco Backend - Received body: {
   "action": "getEstimateById",
   "payload": {
-    "id": "db93c443"
+    "id": "0d2b8382"
   }
 }
 POST /webhook/devcoBackend
@@ -1912,113 +35,333 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "constant"
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
   }
 }
 getEstimateById - Service fields: {
-  id: 'db93c443',
-  directionalDrilling: true,
-  excavationBackfill: true,
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
   hydroExcavation: false,
   potholingCoring: false,
   asphaltConcrete: false
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f71ec24b5eeb72fbc0332') ],
+  sample: {
+    _id: new ObjectId('693f71ec24b5eeb72fbc0332'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f71ec24b5eeb72fbc0332'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
   "action": "getEstimatesByProposal",
   "payload": {
-    "proposalNo": "0000"
+    "proposalNo": "25-0291"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "updateEstimate",
   "payload": {
-    "id": "db93c443",
-    "_id": "db93c443",
+    "id": "0d2b8382",
+    "_id": "0d2b8382",
     "__v": 0,
-    "bidMarkUp": "23.00%",
-    "createdAt": "2025-12-14T06:25:10.319Z",
-    "customerId": "591fb41e",
-    "customerName": "DEVCO",
-    "date": "12/14/2025",
-    "estimate": "0000-V.2",
-    "fringe": "HDD Public",
-    "proposalNo": "0000",
-    "status": "draft",
-    "updatedAt": "2025-12-14T19:29:03.006Z",
-    "grandTotal": 45933.12,
-    "margin": 8589.12,
-    "subTotal": 37344,
+    "asphaltConcrete": false,
+    "bidMarkUp": "30.00%",
+    "createdAt": "2025-12-13T20:35:20.241Z",
+    "customerId": "e0c83c1a",
+    "customerName": "Sierra West Electric",
+    "date": "6/16/2025",
+    "directionalDrilling": false,
+    "estimate": "25-0291-V.1",
+    "excavationBackfill": false,
+    "fringe": "Light Commercial",
+    "hydroExcavation": false,
+    "potholingCoring": false,
+    "proposalNo": "25-0291",
+    "updatedAt": "2025-12-15T02:26:56.506Z",
+    "grandTotal": 81059.68,
+    "margin": 18706.079999999998,
+    "subTotal": 62353.6,
     "labor": [
       {
-        "_id": "693f0ff611233cff7595cb74",
-        "estimateId": "db93c443",
-        "labor": "Laborer-HDD Public",
+        "_id": "693f71ec24b5eeb72fbc032b",
+        "estimateId": "0d2b8382",
+        "labor": "Laborer-Light Commercial",
         "classification": "Laborer",
-        "subClassification": "Prevailing Wage",
-        "fringe": "HDD Public",
+        "subClassification": "",
+        "fringe": "Light Commercial",
         "basePay": 50,
-        "quantity": 5,
+        "quantity": 4,
         "days": 8,
         "otPd": 2,
         "wCompPercent": 12,
         "payrollTaxesPercent": 16,
-        "createdAt": "2025-12-13T22:31:57.948Z",
-        "updatedAt": "2025-12-14T18:49:33.885Z",
+        "createdAt": "2025-12-13T22:31:57.789Z",
+        "updatedAt": "2025-12-13T22:31:57.789Z",
         "__v": 0
       }
     ],
-    "equipment": [],
-    "material": [],
+    "equipment": [
+      {
+        "_id": "693f71ec24b5eeb72fbc032d",
+        "classification": "Excavation & Backfill",
+        "subClassification": "Mini-Ex & Backhoe W/ Attachments",
+        "equipmentMachine": "10,000 - 14,000 lbs Mini Ex",
+        "uom": "Weekly",
+        "supplier": "-",
+        "cost": 0,
+        "dailyCost": 495,
+        "weeklyCost": 1295,
+        "monthlyCost": 2850,
+        "quantity": 1,
+        "quantityOfTime": 0,
+        "fuelAdditiveCost": 0,
+        "createdAt": "2025-12-14T20:08:12.707Z",
+        "updatedAt": "2025-12-14T20:12:38.092Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f71ec24b5eeb72fbc032e",
+        "classification": "Excavation & Backfill",
+        "subClassification": "Skid Steer W/ Attachments",
+        "equipmentMachine": "Skid Steer 1500-2000Lbs",
+        "uom": "Weekly",
+        "supplier": "H&E",
+        "cost": 0,
+        "dailyCost": 415,
+        "weeklyCost": 1205,
+        "monthlyCost": 2875,
+        "quantity": 1,
+        "quantityOfTime": 0,
+        "fuelAdditiveCost": 0,
+        "createdAt": "2025-12-14T20:17:02.449Z",
+        "updatedAt": "2025-12-14T20:17:02.449Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "material": [
+      {
+        "_id": "693f71ec24b5eeb72fbc0322",
+        "classification": "Electrical Materials",
+        "subClassification": "Pullbox & Handhole",
+        "material": "Christy Concrete 17 x 30 Lid Marked \"Communications\" W/HD holes",
+        "uom": "Each",
+        "supplier": "-",
+        "cost": 112,
+        "quantity": 15,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:58:24.144Z",
+        "updatedAt": "2025-12-14T20:58:24.144Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f71ec24b5eeb72fbc0323",
+        "classification": "Pipe & Sweeps",
+        "subClassification": "Fiberglass Riser Bends",
+        "material": "5\" - 48 Degree Riser Bends",
+        "uom": "Foot",
+        "supplier": "Cal Duct",
+        "cost": 305,
+        "quantity": 8,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:56:47.524Z",
+        "updatedAt": "2025-12-14T20:56:47.524Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f71ec24b5eeb72fbc0324",
+        "classification": "Pipe & Sweeps",
+        "subClassification": "PVC Conduit",
+        "material": "PVC Pipe 3' x 20' sch40 Bell end",
+        "uom": "Foot",
+        "supplier": "-",
+        "cost": 4.04,
+        "quantity": 40,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:57:05.162Z",
+        "updatedAt": "2025-12-14T20:57:05.162Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f71ec24b5eeb72fbc0325",
+        "classification": "Restoration Material",
+        "subClassification": "Asphalt",
+        "material": "Asphalt",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 7500,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:57:20.164Z",
+        "updatedAt": "2025-12-14T20:57:20.164Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f71ec24b5eeb72fbc0326",
+        "classification": "Restoration Material",
+        "subClassification": "Concrete",
+        "material": "Concrete",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 10000,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:58:03.730Z",
+        "updatedAt": "2025-12-14T20:58:03.731Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f71ec24b5eeb72fbc0327",
+        "classification": "Restoration Material",
+        "subClassification": "Sand & Slurry",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 6000,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-15T01:55:17.928Z",
+        "updatedAt": "2025-12-15T01:55:17.928Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
     "tools": [],
     "overhead": [
       {
-        "_id": "693f0ff611233cff7595cb76",
-        "overhead": "new test overhead",
-        "uom": "Hourly",
-        "days": 12,
-        "hours": 123,
-        "hourlyRate": 123,
-        "dailyRate": 231,
-        "createdAt": "2025-12-14T06:43:46.905Z",
-        "updatedAt": "2025-12-14T06:43:46.905Z",
-        "estimateId": "db93c443",
+        "_id": "693f71eb24b5eeb72fbc0320",
+        "classification": "Overhead",
+        "subClassification": "-",
+        "overhead": "Devco Overhead",
+        "days": 8,
+        "hours": 64,
+        "hourlyRate": 150,
+        "dailyRate": 1200,
+        "createdAt": "2025-12-14T20:47:54.108Z",
+        "updatedAt": "2025-12-14T20:47:54.108Z",
+        "estimateId": "0d2b8382",
         "__v": 0
       }
     ],
     "subcontractor": [
       {
-        "_id": "693f0ff611233cff7595cb78",
-        "subcontractor": "new test",
-        "cost": 12000,
-        "createdAt": "2025-12-14T06:44:11.003Z",
-        "updatedAt": "2025-12-14T06:44:11.003Z",
-        "estimateId": "db93c443",
+        "_id": "693f71ec24b5eeb72fbc0329",
+        "classification": "Private Locator",
+        "subClassification": "",
+        "subcontractor": "",
+        "cost": 1500,
+        "createdAt": "2025-12-15T02:22:29.953Z",
+        "updatedAt": "2025-12-15T02:22:29.953Z",
+        "estimateId": "0d2b8382",
+        "__v": 0,
+        "uom": "Each",
+        "quantity": 1,
+        "total": 1500
+      }
+    ],
+    "disposal": [
+      {
+        "_id": "693f71ec24b5eeb72fbc0330",
+        "classification": "Excavation Spoils Haul Off",
+        "subClassification": "-",
+        "disposalAndHaulOff": "Dirt Haul Off",
+        "uom": "Per Truck",
+        "quantity": 4,
+        "cost": 700,
+        "createdAt": "2025-12-14T22:57:01.544Z",
+        "updatedAt": "2025-12-14T22:57:01.544Z",
+        "estimateId": "0d2b8382",
         "__v": 0
       }
     ],
-    "disposal": [],
-    "miscellaneous": []
+    "miscellaneous": [
+      {
+        "_id": "693f71ec24b5eeb72fbc0332",
+        "item": "Conduit Special",
+        "classification": "-",
+        "quantity": 250,
+        "uom": "Foot",
+        "cost": 6,
+        "createdAt": "2025-12-14T23:00:48.603Z",
+        "updatedAt": "2025-12-14T23:00:48.603Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ]
   }
 }
 updateEstimate - Update data being saved: {
-  updatedAt: 2025-12-14T20:25:06.971Z,
-  estimate: '0000-V.2',
-  date: '12/14/2025',
-  customerId: '591fb41e',
-  customerName: 'DEVCO',
-  proposalNo: '0000',
-  bidMarkUp: '23.00%',
-  status: 'draft',
-  fringe: 'HDD Public',
-  subTotal: 37344,
-  margin: 8589.12,
-  grandTotal: 45933.12
+  updatedAt: 2025-12-15T02:29:14.338Z,
+  estimate: '25-0291-V.1',
+  date: '6/16/2025',
+  customerId: 'e0c83c1a',
+  customerName: 'Sierra West Electric',
+  proposalNo: '25-0291',
+  bidMarkUp: '30.00%',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false,
+  fringe: 'Light Commercial',
+  subTotal: 62353.6,
+  margin: 18706.079999999998,
+  grandTotal: 81059.68
 }
 updateEstimate - Result from MongoDB: {
-  directionalDrilling: true,
-  excavationBackfill: true,
+  directionalDrilling: false,
+  excavationBackfill: false,
   hydroExcavation: false,
   potholingCoring: false,
   asphaltConcrete: false
@@ -2032,1079 +375,138 @@ Devco Backend - Sending to AppSheet: {
   },
   "Rows": [
     {
-      "Record_Id": "db93c443",
-      "Estimate #": "0000-V.2",
-      "Date": "12/14/2025",
-      "Customer": "591fb41e",
-      "Proposal No": "0000",
-      "Bid Mark UP Percentage": "23.00%",
-      "Directional Drilling": "Y",
-      "Excavation & Backfill": "Y",
+      "Record_Id": "0d2b8382",
+      "Estimate #": "25-0291-V.1",
+      "Date": "6/16/2025",
+      "Customer": "e0c83c1a",
+      "Proposal No": "25-0291",
+      "Bid Mark UP Percentage": "30.00%",
+      "Directional Drilling": "N",
+      "Excavation & Backfill": "N",
       "Hydro-excavation": "N",
       "Potholing & Coring": "N",
       "Asphalt & Concrete": "N",
-      "Fringe": "HDD Public",
-      "Labor": "37344.00",
-      "Equipment": "0.00",
-      "Material": "0.00",
+      "Fringe": "Light Commercial",
+      "Labor": "26272.00",
+      "Equipment": "2500.00",
+      "Material": "27781.60",
       "Tools": "0.00",
       "Overhead": "0.00",
-      "Subcontractor": "12000.00",
-      "Disposal": "0.00",
-      "Miscellaneous": "0.00",
-      "subTotal": "37344.00",
-      "margin": "8589.12",
-      "grandTotal": "45933.12"
+      "Subcontractor": "1500.00",
+      "Disposal": "2800.00",
+      "Miscellaneous": "1500.00",
+      "subTotal": "62353.60",
+      "margin": "18706.08",
+      "grandTotal": "81059.68"
     }
   ]
 }
 Devco Backend - AppSheet response: {
   Rows: [
     {
-      _RowNumber: '58',
-      Record_Id: 'db93c443',
-      'Estimate #': '0000-V.2',
-      Date: '12/14/2025',
-      Customer: '591fb41e',
-      'Proposal No': '0000',
-      'Bid Mark UP Percentage': '0.23',
-      'Directional Drilling': 'Y',
-      'Excavation & Backfill': 'Y',
+      _RowNumber: '28',
+      Record_Id: '0d2b8382',
+      'Estimate #': '25-0291-V.1',
+      Date: '06/16/2025',
+      Customer: 'e0c83c1a',
+      'Proposal No': '25-0291',
+      'Bid Mark UP Percentage': '0.3',
+      'Directional Drilling': 'N',
+      'Excavation & Backfill': 'N',
       'Hydro-excavation': 'N',
       'Potholing & Coring': 'N',
       'Asphalt & Concrete': 'N',
-      Fringe: 'HDD Public',
-      Labor: '37344',
-      Equipment: '0',
-      Material: '0',
+      Fringe: 'Light Commercial',
+      Labor: '26272',
+      Equipment: '2500',
+      Material: '27781.6',
       Tools: '0',
       Overhead: '0',
-      Subcontractor: '12000',
-      Disposal: '0',
-      Miscellaneous: '0',
-      subTotal: '37344',
-      margin: '8589.12',
-      grandTotal: '45933.12',
-      Update: '',
+      Subcontractor: '1500',
+      Disposal: '2800',
+      Miscellaneous: '1500',
+      subTotal: '62353.6',
+      margin: '18706.08',
+      grandTotal: '81059.68',
+      Update: '2',
       'Estimate PDF': '',
-      'Labor Estimate LineItems': '',
+      'Labor Estimate LineItems': '4666ede9',
       Actions: '',
       'Total Labor': '',
       'Total Equipment': '',
-      'Equipment Estimate LineItems': '',
-      'Total Estimate Amount': '0',
-      'Material Estimate LineItems': '',
+      'Equipment Estimate LineItems': '867dc542 , 2232bade',
+      'Total Estimate Amount': '97923.23',
+      'Material Estimate LineItems': '745ef335 , a8c0cb07 , e4f06cb4 , 64843426 , 5ecbdc32 , cbc388af',
       'Total Material': '',
       'Tools Estimate LineItems': '',
       'Total Tools': '',
-      'Total LineItems Amount': '0',
+      'Total LineItems Amount': '75325.56',
       'Focus View': 'Focus View',
-      'Subcontractor Estimate LineItems': '',
-      'Disposal Estimate Lineitems': '',
-      'Overhead Estimate Lineitems': '',
+      'Subcontractor Estimate LineItems': 'f5fc7e3f',
+      'Disposal Estimate Lineitems': '44c40a28',
+      'Overhead Estimate Lineitems': 'c9586439',
       'Total Subcontractors': '',
       'Total Disposal': '',
       'Total Overheads': '',
-      'Bid Mark UP Amount VC': '0',
+      'Bid Mark UP Amount VC': '22597.67',
       'Total Miscellaneous': '',
-      'Miscellaneous Estimate Lineitems': ''
+      'Miscellaneous Estimate Lineitems': '9e89d8d7'
     }
   ]
 }
-Devco Backend - Updated estimate: db93c443
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
+Devco Backend - Updated estimate: 0d2b8382
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "getCatalogueItems",
+  "action": "getEstimateById",
   "payload": {
-    "type": "equipment"
+    "id": "0d2b8382"
   }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "getCatalogueItems",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "equipment"
+    "proposalNo": "25-0291"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
+GET /clients/devco/view.html?id=0d2b8382
 GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/devco-logo.png
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/estimates.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getEstimates"
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/devco-logo.png
-GET /clients/devco/constants.html
-GET /clients/devco/constants.html
-GET /clients/devco/devco-logo.png
-GET /.well-known/appspecific/com.chrome.devtools.json
-GET /clients/devco/constants.html
-GET /.well-known/appspecific/com.chrome.devtools.json
-GET /clients/devco/constants.html
-GET /.well-known/appspecific/com.chrome.devtools.json
-GET /clients/devco/devco-logo.png
-GET /clients/devco/constants.html
-GET /.well-known/appspecific/com.chrome.devtools.json
-GET /clients/devco/devco-logo.png
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-GET /clients/devco/constants.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "constant"
-  }
-}
-GET /clients/devco/estimates.html
-GET /clients/devco/components.js
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getEstimates"
-}
-GET /clients/devco/view.html?id=db93c443
 GET /clients/devco/components.js
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getEstimateById",
   "payload": {
-    "id": "db93c443"
+    "id": "0d2b8382"
   }
 }
 POST /webhook/devcoBackend
@@ -3126,6 +528,858 @@ Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
     "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
   }
 }
 POST /webhook/devcoBackend
@@ -3136,109 +1390,715 @@ Devco Backend - Received body: {
   }
 }
 getEstimateById - Service fields: {
-  id: 'db93c443',
-  directionalDrilling: true,
-  excavationBackfill: true,
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
   hydroExcavation: false,
   potholingCoring: false,
   asphaltConcrete: false
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
   "action": "getEstimatesByProposal",
   "payload": {
-    "proposalNo": "0000"
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "equipment"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f727ad87fc2f75a800779') ],
+  sample: {
+    _id: new ObjectId('693f727ad87fc2f75a800779'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f727ad87fc2f75a800779'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "updateEstimate",
   "payload": {
-    "id": "db93c443",
-    "_id": "db93c443",
+    "id": "0d2b8382",
+    "_id": "0d2b8382",
     "__v": 0,
-    "bidMarkUp": "23.00%",
-    "createdAt": "2025-12-14T06:25:10.319Z",
-    "customerId": "591fb41e",
-    "customerName": "DEVCO",
-    "date": "12/14/2025",
-    "estimate": "0000-V.2",
-    "fringe": "HDD Public",
-    "proposalNo": "0000",
-    "status": "draft",
-    "updatedAt": "2025-12-14T20:25:14.543Z",
-    "grandTotal": 34341.6,
-    "margin": 6421.6,
-    "subTotal": 27920,
+    "asphaltConcrete": false,
+    "bidMarkUp": "30.00%",
+    "createdAt": "2025-12-13T20:35:20.241Z",
+    "customerId": "e0c83c1a",
+    "customerName": "Sierra West Electric",
+    "date": "6/16/2025",
+    "directionalDrilling": false,
+    "estimate": "25-0291-V.1",
+    "excavationBackfill": false,
+    "fringe": "Light Commercial",
+    "hydroExcavation": false,
+    "potholingCoring": false,
+    "proposalNo": "25-0291",
+    "updatedAt": "2025-12-15T02:29:21.715Z",
+    "grandTotal": 182466.18,
+    "margin": 42107.58,
+    "subTotal": 140358.6,
     "labor": [
       {
-        "_id": "693f1d23a9195a03656ceaf4",
-        "estimateId": "db93c443",
-        "labor": "Laborer-HDD Public",
+        "_id": "693f727ad87fc2f75a80076e",
+        "estimateId": "0d2b8382",
+        "labor": "Laborer-Light Commercial",
         "classification": "Laborer",
-        "subClassification": "Prevailing Wage",
-        "fringe": "HDD Public",
+        "subClassification": "",
+        "fringe": "Light Commercial",
         "basePay": 50,
-        "quantity": 5,
+        "quantity": 4,
         "days": 8,
         "otPd": 2,
         "wCompPercent": 12,
         "payrollTaxesPercent": 16,
-        "createdAt": "2025-12-13T22:31:57.948Z",
-        "updatedAt": "2025-12-14T18:49:33.885Z",
+        "createdAt": "2025-12-13T22:31:57.789Z",
+        "updatedAt": "2025-12-13T22:31:57.789Z",
         "__v": 0
       }
     ],
-    "equipment": [],
-    "material": [],
+    "equipment": [
+      {
+        "_id": "693f727ad87fc2f75a800769",
+        "classification": "Excavation & Backfill",
+        "subClassification": "Mini-Ex & Backhoe W/ Attachments",
+        "equipmentMachine": "10,000 - 14,000 lbs Mini Ex",
+        "uom": "Weekly",
+        "supplier": "-",
+        "cost": 0,
+        "dailyCost": 495,
+        "weeklyCost": 1295,
+        "monthlyCost": 2850,
+        "quantity": 1,
+        "quantityOfTime": 0,
+        "fuelAdditiveCost": 0,
+        "createdAt": "2025-12-14T20:08:12.707Z",
+        "updatedAt": "2025-12-14T20:12:38.092Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f727ad87fc2f75a80076a",
+        "classification": "Excavation & Backfill",
+        "subClassification": "Skid Steer W/ Attachments",
+        "equipmentMachine": "Skid Steer 1500-2000Lbs",
+        "uom": "Weekly",
+        "supplier": "H&E",
+        "cost": 0,
+        "dailyCost": 415,
+        "weeklyCost": 1205,
+        "monthlyCost": 2875,
+        "quantity": 1,
+        "quantityOfTime": 0,
+        "fuelAdditiveCost": 0,
+        "createdAt": "2025-12-14T20:17:02.449Z",
+        "updatedAt": "2025-12-14T20:17:02.449Z",
+        "estimateId": "0d2b8382",
+        "__v": 0,
+        "total": 2410,
+        "times": 2
+      }
+    ],
+    "material": [
+      {
+        "_id": "693f727ad87fc2f75a800770",
+        "classification": "Electrical Materials",
+        "subClassification": "Pullbox & Handhole",
+        "material": "Christy Concrete 17 x 30 Lid Marked \"Communications\" W/HD holes",
+        "uom": "Each",
+        "supplier": "-",
+        "cost": 112,
+        "quantity": 15,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:58:24.144Z",
+        "updatedAt": "2025-12-14T20:58:24.144Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f727ad87fc2f75a800771",
+        "classification": "Pipe & Sweeps",
+        "subClassification": "Fiberglass Riser Bends",
+        "material": "5\" - 48 Degree Riser Bends",
+        "uom": "Foot",
+        "supplier": "Cal Duct",
+        "cost": 305,
+        "quantity": 8,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:56:47.524Z",
+        "updatedAt": "2025-12-14T20:56:47.524Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f727ad87fc2f75a800772",
+        "classification": "Pipe & Sweeps",
+        "subClassification": "PVC Conduit",
+        "material": "PVC Pipe 3' x 20' sch40 Bell end",
+        "uom": "Foot",
+        "supplier": "-",
+        "cost": 4.04,
+        "quantity": 40,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:57:05.162Z",
+        "updatedAt": "2025-12-14T20:57:05.162Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f727ad87fc2f75a800773",
+        "classification": "Restoration Material",
+        "subClassification": "Asphalt",
+        "material": "Asphalt",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 7500,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:57:20.164Z",
+        "updatedAt": "2025-12-14T20:57:20.164Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f727ad87fc2f75a800774",
+        "classification": "Restoration Material",
+        "subClassification": "Concrete",
+        "material": "Concrete",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 10000,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:58:03.730Z",
+        "updatedAt": "2025-12-14T20:58:03.731Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f727ad87fc2f75a800775",
+        "classification": "Restoration Material",
+        "subClassification": "Sand & Slurry",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 6000,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-15T01:55:17.928Z",
+        "updatedAt": "2025-12-15T01:55:17.928Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
     "tools": [],
     "overhead": [
       {
-        "_id": "693f1d23a9195a03656ceaf6",
-        "overhead": "new test overhead",
-        "uom": "Hourly",
-        "days": 12,
-        "hours": 123,
-        "hourlyRate": 123,
-        "dailyRate": 231,
-        "createdAt": "2025-12-14T06:43:46.905Z",
-        "updatedAt": "2025-12-14T06:43:46.905Z",
-        "estimateId": "db93c443",
+        "_id": "693f727ad87fc2f75a80076c",
+        "classification": "Overhead",
+        "subClassification": "-",
+        "overhead": "Devco Overhead",
+        "days": 8,
+        "hours": 64,
+        "hourlyRate": 150,
+        "dailyRate": 1200,
+        "createdAt": "2025-12-14T20:47:54.108Z",
+        "updatedAt": "2025-12-14T20:47:54.108Z",
+        "estimateId": "0d2b8382",
         "__v": 0
       }
     ],
     "subcontractor": [
       {
-        "_id": "693f1d23a9195a03656ceaf8",
-        "subcontractor": "new test",
-        "cost": 12000,
-        "createdAt": "2025-12-14T06:44:11.003Z",
-        "updatedAt": "2025-12-14T06:44:11.003Z",
-        "estimateId": "db93c443",
+        "_id": "693f727ad87fc2f75a80077b",
+        "classification": "Private Locator",
+        "subClassification": "",
+        "subcontractor": "",
+        "cost": 1500,
+        "quantity": 1,
+        "uom": "Each",
+        "total": 1500,
+        "createdAt": "2025-12-15T02:22:29.953Z",
+        "updatedAt": "2025-12-15T02:22:29.953Z",
+        "estimateId": "0d2b8382",
         "__v": 0
       }
     ],
-    "disposal": [],
-    "miscellaneous": []
+    "disposal": [
+      {
+        "_id": "693f727ad87fc2f75a800777",
+        "classification": "Excavation Spoils Haul Off",
+        "subClassification": "-",
+        "disposalAndHaulOff": "Dirt Haul Off",
+        "uom": "Per Truck",
+        "quantity": 4,
+        "cost": 700,
+        "createdAt": "2025-12-14T22:57:01.544Z",
+        "updatedAt": "2025-12-14T22:57:01.544Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "miscellaneous": [
+      {
+        "_id": "693f727ad87fc2f75a800779",
+        "item": "Conduit Special",
+        "classification": "-",
+        "quantity": 250,
+        "uom": "Foot",
+        "cost": 6,
+        "createdAt": "2025-12-14T23:00:48.603Z",
+        "updatedAt": "2025-12-14T23:00:48.603Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ]
   }
 }
 updateEstimate - Update data being saved: {
-  updatedAt: 2025-12-14T20:46:03.034Z,
-  estimate: '0000-V.2',
-  date: '12/14/2025',
-  customerId: '591fb41e',
-  customerName: 'DEVCO',
-  proposalNo: '0000',
-  bidMarkUp: '23.00%',
-  status: 'draft',
-  fringe: 'HDD Public',
-  subTotal: 27920,
-  margin: 6421.6,
-  grandTotal: 34341.6
+  updatedAt: 2025-12-15T02:43:40.714Z,
+  estimate: '25-0291-V.1',
+  date: '6/16/2025',
+  customerId: 'e0c83c1a',
+  customerName: 'Sierra West Electric',
+  proposalNo: '25-0291',
+  bidMarkUp: '30.00%',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false,
+  fringe: 'Light Commercial',
+  subTotal: 140358.6,
+  margin: 42107.58,
+  grandTotal: 182466.18
 }
 updateEstimate - Result from MongoDB: {
-  directionalDrilling: true,
-  excavationBackfill: true,
+  directionalDrilling: false,
+  excavationBackfill: false,
   hydroExcavation: false,
   potholingCoring: false,
   asphaltConcrete: false
@@ -3252,93 +2112,145 @@ Devco Backend - Sending to AppSheet: {
   },
   "Rows": [
     {
-      "Record_Id": "db93c443",
-      "Estimate #": "0000-V.2",
-      "Date": "12/14/2025",
-      "Customer": "591fb41e",
-      "Proposal No": "0000",
-      "Bid Mark UP Percentage": "23.00%",
-      "Directional Drilling": "Y",
-      "Excavation & Backfill": "Y",
+      "Record_Id": "0d2b8382",
+      "Estimate #": "25-0291-V.1",
+      "Date": "6/16/2025",
+      "Customer": "e0c83c1a",
+      "Proposal No": "25-0291",
+      "Bid Mark UP Percentage": "30.00%",
+      "Directional Drilling": "N",
+      "Excavation & Backfill": "N",
       "Hydro-excavation": "N",
       "Potholing & Coring": "N",
       "Asphalt & Concrete": "N",
-      "Fringe": "HDD Public",
-      "Labor": "37344.00",
-      "Equipment": "0.00",
-      "Material": "0.00",
+      "Fringe": "Light Commercial",
+      "Labor": "26272.00",
+      "Equipment": "2500.00",
+      "Material": "27781.60",
       "Tools": "0.00",
       "Overhead": "0.00",
-      "Subcontractor": "12000.00",
-      "Disposal": "0.00",
-      "Miscellaneous": "0.00",
-      "subTotal": "27920.00",
-      "margin": "6421.60",
-      "grandTotal": "34341.60"
+      "Subcontractor": "1500.00",
+      "Disposal": "2800.00",
+      "Miscellaneous": "1500.00",
+      "subTotal": "140358.60",
+      "margin": "42107.58",
+      "grandTotal": "182466.18"
     }
   ]
 }
 Devco Backend - AppSheet response: {
   Rows: [
     {
-      _RowNumber: '58',
-      Record_Id: 'db93c443',
-      'Estimate #': '0000-V.2',
-      Date: '12/14/2025',
-      Customer: '591fb41e',
-      'Proposal No': '0000',
-      'Bid Mark UP Percentage': '0.23',
-      'Directional Drilling': 'Y',
-      'Excavation & Backfill': 'Y',
+      _RowNumber: '28',
+      Record_Id: '0d2b8382',
+      'Estimate #': '25-0291-V.1',
+      Date: '06/16/2025',
+      Customer: 'e0c83c1a',
+      'Proposal No': '25-0291',
+      'Bid Mark UP Percentage': '0.3',
+      'Directional Drilling': 'N',
+      'Excavation & Backfill': 'N',
       'Hydro-excavation': 'N',
       'Potholing & Coring': 'N',
       'Asphalt & Concrete': 'N',
-      Fringe: 'HDD Public',
-      Labor: '37344',
-      Equipment: '0',
-      Material: '0',
+      Fringe: 'Light Commercial',
+      Labor: '26272',
+      Equipment: '2500',
+      Material: '27781.6',
       Tools: '0',
       Overhead: '0',
-      Subcontractor: '12000',
-      Disposal: '0',
-      Miscellaneous: '0',
-      subTotal: '27920',
-      margin: '6421.6',
-      grandTotal: '34341.6',
-      Update: '',
+      Subcontractor: '1500',
+      Disposal: '2800',
+      Miscellaneous: '1500',
+      subTotal: '140358.6',
+      margin: '42107.58',
+      grandTotal: '182466.18',
+      Update: '2',
       'Estimate PDF': '',
-      'Labor Estimate LineItems': '',
+      'Labor Estimate LineItems': '4666ede9',
       Actions: '',
       'Total Labor': '',
       'Total Equipment': '',
-      'Equipment Estimate LineItems': '',
-      'Total Estimate Amount': '0',
-      'Material Estimate LineItems': '',
+      'Equipment Estimate LineItems': '867dc542 , 2232bade',
+      'Total Estimate Amount': '97923.23',
+      'Material Estimate LineItems': '745ef335 , a8c0cb07 , e4f06cb4 , 64843426 , 5ecbdc32 , cbc388af',
       'Total Material': '',
       'Tools Estimate LineItems': '',
       'Total Tools': '',
-      'Total LineItems Amount': '0',
+      'Total LineItems Amount': '75325.56',
       'Focus View': 'Focus View',
-      'Subcontractor Estimate LineItems': '',
-      'Disposal Estimate Lineitems': '',
-      'Overhead Estimate Lineitems': '',
+      'Subcontractor Estimate LineItems': 'f5fc7e3f',
+      'Disposal Estimate Lineitems': '44c40a28',
+      'Overhead Estimate Lineitems': 'c9586439',
       'Total Subcontractors': '',
       'Total Disposal': '',
       'Total Overheads': '',
-      'Bid Mark UP Amount VC': '0',
+      'Bid Mark UP Amount VC': '22597.67',
       'Total Miscellaneous': '',
-      'Miscellaneous Estimate Lineitems': ''
+      'Miscellaneous Estimate Lineitems': '9e89d8d7'
     }
   ]
 }
-Devco Backend - Updated estimate: db93c443
-GET /clients/devco/catalogue.html
+Devco Backend - Updated estimate: 0d2b8382
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f75dcd87fc2f75a80090c') ],
+  sample: {
+    _id: new ObjectId('693f75dcd87fc2f75a80090c'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f75dcd87fc2f75a80090c'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
 GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "equipment"
+    "type": "estimateLineItemsLabor"
   }
 }
 POST /webhook/devcoBackend
@@ -3346,34 +2258,6 @@ Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
     "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
@@ -3394,21 +2278,29 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "tool"
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
+    "type": "subcontractor"
   }
 }
 POST /webhook/devcoBackend
@@ -3418,100 +2310,63 @@ Devco Backend - Received body: {
     "type": "constant"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f75dcd87fc2f75a80090c') ],
+  sample: {
+    _id: new ObjectId('693f75dcd87fc2f75a80090c'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
   }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f75dcd87fc2f75a80090c'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "addCatalogueItem",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "overhead",
-    "data": {
-      "classification": "Overhead",
-      "subClassification": "-",
-      "overhead": "Devco Overhead",
-      "hourlyRate": 187.5,
-      "dailyRate": 1500
-    }
+    "proposalNo": "25-0291"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "overhead",
-    "data": {
-      "classification": "-",
-      "subClassification": "-",
-      "overhead": "Airbnb",
-      "hourlyRate": 15,
-      "dailyRate": 120
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "overhead",
-    "data": {
-      "classification": "-",
-      "subClassification": "-",
-      "overhead": "Per Diem",
-      "hourlyRate": 65,
-      "dailyRate": 520
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "overhead",
-    "data": {
-      "classification": "-",
-      "subClassification": "-",
-      "overhead": "Risk Factor",
-      "hourlyRate": 50,
-      "dailyRate": 400
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/devco-logo.png
+GET /clients/devco/templates.html
 GET /clients/devco/components.js
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getTemplates"
+}
+GET /clients/devco/estimates.html
+GET /clients/devco/components.js
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimates"
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
@@ -3523,7 +2378,43 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "labor"
+    "type": "material"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "miscellaneous"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
   }
 }
 POST /webhook/devcoBackend
@@ -3533,32 +2424,57 @@ Devco Backend - Received body: {
     "type": "constant"
   }
 }
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f75dcd87fc2f75a80090c') ],
+  sample: {
+    _id: new ObjectId('693f75dcd87fc2f75a80090c'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f75dcd87fc2f75a80090c'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "getCatalogueItems",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "labor"
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "overhead"
+    "type": "estimateLineItemsLabor"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
+    "type": "equipment"
   }
 }
 POST /webhook/devcoBackend
@@ -3579,38 +2495,29 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "tool"
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
+    "type": "subcontractor"
   }
 }
 POST /webhook/devcoBackend
@@ -3620,32 +2527,56 @@ Devco Backend - Received body: {
     "type": "constant"
   }
 }
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f75dcd87fc2f75a80090c') ],
+  sample: {
+    _id: new ObjectId('693f75dcd87fc2f75a80090c'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f75dcd87fc2f75a80090c'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "getCatalogueItems",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "labor"
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "overhead"
+    "type": "estimateLineItemsLabor"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
+    "type": "equipment"
   }
 }
 POST /webhook/devcoBackend
@@ -3666,31 +2597,29 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "tool"
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-GET /clients/devco/catalogue.html
-GET /clients/devco/components.js
-GET /clients/devco/devco-logo.png
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
+    "type": "subcontractor"
   }
 }
 POST /webhook/devcoBackend
@@ -3700,119 +2629,57 @@ Devco Backend - Received body: {
     "type": "constant"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f75dcd87fc2f75a80090c') ],
+  sample: {
+    _id: new ObjectId('693f75dcd87fc2f75a80090c'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
   }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f75dcd87fc2f75a80090c'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "getCatalogueItems",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "overhead"
+    "proposalNo": "25-0291"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "miscellaneous"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "tool"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-GET /clients/devco/catalogue.html
+GET /clients/devco/view.html?id=0d2b8382
 GET /clients/devco/components.js
 GET /clients/devco/devco-logo.png
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
     "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
@@ -3833,59 +2700,485 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "tool"
+    "type": "overhead"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "estimateLineItemsLabor"
+    "type": "subcontractor"
   }
 }
-GET /clients/devco/catalogue.html
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f75dcd87fc2f75a80090c') ],
+  sample: {
+    _id: new ObjectId('693f75dcd87fc2f75a80090c'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f75dcd87fc2f75a80090c'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "updateEstimate",
+  "payload": {
+    "id": "0d2b8382",
+    "_id": "0d2b8382",
+    "__v": 0,
+    "asphaltConcrete": false,
+    "bidMarkUp": "30%",
+    "createdAt": "2025-12-13T20:35:20.241Z",
+    "customerId": "e0c83c1a",
+    "customerName": "Sierra West Electric",
+    "date": "6/16/2025",
+    "directionalDrilling": false,
+    "estimate": "25-0291-V.1",
+    "excavationBackfill": false,
+    "fringe": "Light Commercial",
+    "hydroExcavation": false,
+    "potholingCoring": false,
+    "proposalNo": "25-0291",
+    "updatedAt": "2025-12-15T02:43:47.735Z",
+    "grandTotal": 83876.73423999999,
+    "margin": 19356.16943999999,
+    "subTotal": 64520.5648,
+    "labor": [
+      {
+        "_id": "693f75dcd87fc2f75a8008fa",
+        "estimateId": "0d2b8382",
+        "labor": "Laborer-Light Commercial",
+        "classification": "Laborer",
+        "subClassification": "",
+        "fringe": "Light Commercial",
+        "basePay": 50,
+        "quantity": 4,
+        "days": 8,
+        "otPd": 2,
+        "wCompPercent": 12,
+        "payrollTaxesPercent": 16,
+        "createdAt": "2025-12-13T22:31:57.789Z",
+        "updatedAt": "2025-12-13T22:31:57.789Z",
+        "__v": 0
+      }
+    ],
+    "equipment": [
+      {
+        "_id": "693f75dcd87fc2f75a8008fc",
+        "classification": "Excavation & Backfill",
+        "subClassification": "Mini-Ex & Backhoe W/ Attachments",
+        "equipmentMachine": "10,000 - 14,000 lbs Mini Ex",
+        "uom": "Weekly",
+        "supplier": "-",
+        "cost": 0,
+        "dailyCost": 495,
+        "weeklyCost": 1295,
+        "monthlyCost": 2850,
+        "quantity": 1,
+        "quantityOfTime": 0,
+        "fuelAdditiveCost": 0,
+        "createdAt": "2025-12-14T20:08:12.707Z",
+        "updatedAt": "2025-12-14T20:12:38.092Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f75dcd87fc2f75a8008fd",
+        "classification": "Excavation & Backfill",
+        "subClassification": "Skid Steer W/ Attachments",
+        "equipmentMachine": "Skid Steer 1500-2000Lbs",
+        "uom": "Weekly",
+        "supplier": "H&E",
+        "cost": 0,
+        "dailyCost": 415,
+        "weeklyCost": 1205,
+        "monthlyCost": 2875,
+        "quantity": 1,
+        "quantityOfTime": 0,
+        "fuelAdditiveCost": 0,
+        "createdAt": "2025-12-14T20:17:02.449Z",
+        "updatedAt": "2025-12-14T20:17:02.449Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "material": [
+      {
+        "_id": "693f75dcd87fc2f75a8008ff",
+        "classification": "Electrical Materials",
+        "subClassification": "Pullbox & Handhole",
+        "material": "Christy Concrete 17 x 30 Lid Marked \"Communications\" W/HD holes",
+        "uom": "Each",
+        "supplier": "-",
+        "cost": 112,
+        "quantity": 15,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:58:24.144Z",
+        "updatedAt": "2025-12-14T20:58:24.144Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f75dcd87fc2f75a800900",
+        "classification": "Pipe & Sweeps",
+        "subClassification": "Fiberglass Riser Bends",
+        "material": "5\" - 48 Degree Riser Bends",
+        "uom": "Foot",
+        "supplier": "Cal Duct",
+        "cost": 305,
+        "quantity": 8,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:56:47.524Z",
+        "updatedAt": "2025-12-14T20:56:47.524Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f75dcd87fc2f75a800901",
+        "classification": "Pipe & Sweeps",
+        "subClassification": "PVC Conduit",
+        "material": "PVC Pipe 3' x 20' sch40 Bell end",
+        "uom": "Foot",
+        "supplier": "-",
+        "cost": 4.04,
+        "quantity": 40,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:57:05.162Z",
+        "updatedAt": "2025-12-14T20:57:05.162Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f75dcd87fc2f75a800902",
+        "classification": "Restoration Material",
+        "subClassification": "Asphalt",
+        "material": "Asphalt",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 7500,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:57:20.164Z",
+        "updatedAt": "2025-12-14T20:57:20.164Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f75dcd87fc2f75a800903",
+        "classification": "Restoration Material",
+        "subClassification": "Concrete",
+        "material": "Concrete",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 10000,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-14T20:58:03.730Z",
+        "updatedAt": "2025-12-14T20:58:03.731Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      },
+      {
+        "_id": "693f75dcd87fc2f75a800904",
+        "classification": "Restoration Material",
+        "subClassification": "Sand & Slurry",
+        "uom": "-",
+        "supplier": "-",
+        "cost": 6000,
+        "quantity": 1,
+        "taxes": 7.8,
+        "createdAt": "2025-12-15T01:55:17.928Z",
+        "updatedAt": "2025-12-15T01:55:17.928Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "tools": [],
+    "overhead": [
+      {
+        "_id": "693f75dcd87fc2f75a800908",
+        "classification": "Overhead",
+        "subClassification": "-",
+        "overhead": "Devco Overhead",
+        "days": 8,
+        "hours": 64,
+        "hourlyRate": 150,
+        "dailyRate": 1200,
+        "createdAt": "2025-12-14T20:47:54.108Z",
+        "updatedAt": "2025-12-14T20:47:54.108Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "subcontractor": [
+      {
+        "_id": "693f75dcd87fc2f75a800906",
+        "classification": "Private Locator",
+        "subClassification": "",
+        "subcontractor": "",
+        "cost": 1500,
+        "quantity": 1,
+        "uom": "Each",
+        "total": 1500,
+        "createdAt": "2025-12-15T02:22:29.953Z",
+        "updatedAt": "2025-12-15T02:22:29.953Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "disposal": [
+      {
+        "_id": "693f75dcd87fc2f75a80090a",
+        "classification": "Excavation Spoils Haul Off",
+        "subClassification": "-",
+        "disposalAndHaulOff": "Dirt Haul Off",
+        "uom": "Per Truck",
+        "quantity": 4,
+        "cost": 700,
+        "createdAt": "2025-12-14T22:57:01.544Z",
+        "updatedAt": "2025-12-14T22:57:01.544Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ],
+    "miscellaneous": [
+      {
+        "_id": "693f75dcd87fc2f75a80090c",
+        "item": "Conduit Special",
+        "classification": "-",
+        "quantity": 250,
+        "uom": "Foot",
+        "cost": 6,
+        "createdAt": "2025-12-14T23:00:48.603Z",
+        "updatedAt": "2025-12-14T23:00:48.603Z",
+        "estimateId": "0d2b8382",
+        "__v": 0
+      }
+    ]
+  }
+}
+updateEstimate - Update data being saved: {
+  updatedAt: 2025-12-15T02:48:29.374Z,
+  estimate: '25-0291-V.1',
+  date: '6/16/2025',
+  customerId: 'e0c83c1a',
+  customerName: 'Sierra West Electric',
+  proposalNo: '25-0291',
+  bidMarkUp: '30%',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false,
+  fringe: 'Light Commercial',
+  subTotal: 64520.5648,
+  margin: 19356.16943999999,
+  grandTotal: 83876.73423999999
+}
+updateEstimate - Result from MongoDB: {
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+updateAppSheet: Using provided line items for calculation
+Devco Backend - Sending to AppSheet: {
+  "Action": "Edit",
+  "Properties": {
+    "Locale": "en-US",
+    "Timezone": "Pacific Standard Time"
+  },
+  "Rows": [
+    {
+      "Record_Id": "0d2b8382",
+      "Estimate #": "25-0291-V.1",
+      "Date": "6/16/2025",
+      "Customer": "e0c83c1a",
+      "Proposal No": "25-0291",
+      "Bid Mark UP Percentage": "30%",
+      "Directional Drilling": "N",
+      "Excavation & Backfill": "N",
+      "Hydro-excavation": "N",
+      "Potholing & Coring": "N",
+      "Asphalt & Concrete": "N",
+      "Fringe": "Light Commercial",
+      "Labor": "26272.00",
+      "Equipment": "2500.00",
+      "Material": "27781.60",
+      "Tools": "0.00",
+      "Overhead": "0.00",
+      "Subcontractor": "1500.00",
+      "Disposal": "2800.00",
+      "Miscellaneous": "1500.00",
+      "subTotal": "64520.56",
+      "margin": "19356.17",
+      "grandTotal": "83876.73"
+    }
+  ]
+}
+Devco Backend - AppSheet response: {
+  Rows: [
+    {
+      _RowNumber: '28',
+      Record_Id: '0d2b8382',
+      'Estimate #': '25-0291-V.1',
+      Date: '06/16/2025',
+      Customer: 'e0c83c1a',
+      'Proposal No': '25-0291',
+      'Bid Mark UP Percentage': '0.3',
+      'Directional Drilling': 'N',
+      'Excavation & Backfill': 'N',
+      'Hydro-excavation': 'N',
+      'Potholing & Coring': 'N',
+      'Asphalt & Concrete': 'N',
+      Fringe: 'Light Commercial',
+      Labor: '26272',
+      Equipment: '2500',
+      Material: '27781.6',
+      Tools: '0',
+      Overhead: '0',
+      Subcontractor: '1500',
+      Disposal: '2800',
+      Miscellaneous: '1500',
+      subTotal: '64520.56',
+      margin: '19356.17',
+      grandTotal: '83876.73',
+      Update: '2',
+      'Estimate PDF': '',
+      'Labor Estimate LineItems': '4666ede9',
+      Actions: '',
+      'Total Labor': '',
+      'Total Equipment': '',
+      'Equipment Estimate LineItems': '867dc542 , 2232bade',
+      'Total Estimate Amount': '97923.23',
+      'Material Estimate LineItems': '745ef335 , a8c0cb07 , e4f06cb4 , 64843426 , 5ecbdc32 , cbc388af',
+      'Total Material': '',
+      'Tools Estimate LineItems': '',
+      'Total Tools': '',
+      'Total LineItems Amount': '75325.56',
+      'Focus View': 'Focus View',
+      'Subcontractor Estimate LineItems': 'f5fc7e3f',
+      'Disposal Estimate Lineitems': '44c40a28',
+      'Overhead Estimate Lineitems': 'c9586439',
+      'Total Subcontractors': '',
+      'Total Disposal': '',
+      'Total Overheads': '',
+      'Bid Mark UP Amount VC': '22597.67',
+      'Total Miscellaneous': '',
+      'Miscellaneous Estimate Lineitems': '9e89d8d7'
+    }
+  ]
+}
+Devco Backend - Updated estimate: 0d2b8382
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f76fdd87fc2f75a8009c7') ],
+  sample: {
+    _id: new ObjectId('693f76fdd87fc2f75a8009c7'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f76fdd87fc2f75a8009c7'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
 GET /clients/devco/components.js
 GET /clients/devco/devco-logo.png
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
     "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
@@ -3906,197 +3199,89 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "tool"
+    "type": "overhead"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "estimateLineItemsLabor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "Fiberglass Riser Bends",
-      "supplier": "Cal Duct",
-      "uom": "-",
-      "material": "5\" - 48 Degree Riser Bends",
-      "cost": 305,
-      "taxes": 7.8
-    }
+    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "material"
+    "type": "subcontractor"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "-",
-      "uom": "Foot",
-      "material": "PVC Pipe 3' x 20' sch40 Bell end",
-      "cost": 4.04,
-      "taxes": 7.8
-    }
-  }
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "material"
+    "type": "constant"
   }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f76fdd87fc2f75a8009c7') ],
+  sample: {
+    _id: new ObjectId('693f76fdd87fc2f75a8009c7'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f76fdd87fc2f75a8009c7'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "addCatalogueItem",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Asphalt",
-      "supplier": "-",
-      "uom": "-",
-      "material": "Asphalt",
-      "cost": 7500,
-      "taxes": 7.8
-    }
+    "proposalNo": "25-0291"
   }
 }
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Concrete",
-      "supplier": "-",
-      "uom": "-",
-      "material": "Concrete",
-      "cost": 10000,
-      "taxes": 7.8
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Electrical Materials",
-      "subClassification": "Pullbox & Handhole",
-      "supplier": "-",
-      "uom": "Each",
-      "material": "Christy Concrete 17 x 30 Lid Marked \"Communications\" W/HD holes",
-      "cost": 112,
-      "taxes": 7.8
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "HDD Materials",
-      "subClassification": "-",
-      "supplier": "RDO Equipment",
-      "uom": "Bag",
-      "material": "Bore-Gel",
-      "cost": 11.1,
-      "taxes": 7.8
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-GET /clients/devco/catalogue.html
+GET /clients/devco/view.html?id=0d2b8382
 GET /clients/devco/components.js
 GET /clients/devco/devco-logo.png
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "estimateLineItemsLabor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
     "type": "equipment"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "labor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "overhead"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "subcontractor"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
@@ -4117,7 +3302,75 @@ POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "tool"
+    "type": "overhead"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "disposal"
+  }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "subcontractor"
+  }
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getCatalogueItems",
+  "payload": {
+    "type": "constant"
+  }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f76fdd87fc2f75a8009c7') ],
+  sample: {
+    _id: new ObjectId('693f76fdd87fc2f75a8009c7'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f76fdd87fc2f75a8009c7'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
+}
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimatesByProposal",
+  "payload": {
+    "proposalNo": "25-0291"
+  }
+}
+GET /clients/devco/view.html?id=0d2b8382
+GET /clients/devco/components.js
+GET /clients/devco/devco-logo.png
+POST /webhook/devcoBackend
+Devco Backend - Received body: {
+  "action": "getEstimateById",
+  "payload": {
+    "id": "0d2b8382"
   }
 }
 POST /webhook/devcoBackend
@@ -4129,18 +3382,9 @@ Devco Backend - Received body: {
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "addCatalogueItem",
+  "action": "getCatalogueItems",
   "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "BoreGard",
-      "supplier": "-",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "5\" Schedule 40 Boregard 20' Sticks",
-      "cost": 13.1
-    }
+    "type": "equipment"
   }
 }
 POST /webhook/devcoBackend
@@ -4152,528 +3396,73 @@ Devco Backend - Received body: {
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "addCatalogueItem",
+  "action": "getCatalogueItems",
   "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "BoreGard",
-      "supplier": "Apex Underground Supply",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "3\" S40 x 20' BoreGard Conduit PG&E M",
-      "cost": 8.06
-    }
+    "type": "miscellaneous"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "material"
+    "type": "overhead"
   }
+}
+getEstimateById - Service fields: {
+  id: '0d2b8382',
+  directionalDrilling: false,
+  excavationBackfill: false,
+  hydroExcavation: false,
+  potholingCoring: false,
+  asphaltConcrete: false
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "addCatalogueItem",
+  "action": "getCatalogueItems",
   "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "BoreGard",
-      "supplier": "-",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "4\" Schedule 40 Boregard 20' Sticks",
-      "cost": 9.5
-    }
+    "type": "disposal"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "So-Cal Utility Products",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "2\" Sch40 Conduit 20' Lengths",
-      "cost": 1.05
-    }
+    "type": "subcontractor"
   }
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
   "action": "getCatalogueItems",
   "payload": {
-    "type": "material"
+    "type": "constant"
   }
+}
+getEstimateById - Fetched Miscellaneous: {
+  count: 1,
+  ids: [ new ObjectId('693f76fdd87fc2f75a8009c7') ],
+  sample: {
+    _id: new ObjectId('693f76fdd87fc2f75a8009c7'),
+    item: 'Conduit Special',
+    classification: '-',
+    quantity: 250,
+    uom: 'Foot',
+    cost: 6,
+    createdAt: 2025-12-14T23:00:48.603Z,
+    updatedAt: 2025-12-14T23:00:48.603Z,
+    estimateId: '0d2b8382',
+    __v: 0
+  }
+}
+getEstimateById - Miscellaneous being attached: {
+  fromDB: 1,
+  firstId: new ObjectId('693f76fdd87fc2f75a8009c7'),
+  estimateEmbedded: undefined,
+  estimateEmbeddedId: undefined
 }
 POST /webhook/devcoBackend
 Devco Backend - Received body: {
-  "action": "addCatalogueItem",
+  "action": "getEstimatesByProposal",
   "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Sand & Slurry",
-      "supplier": "UNK",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "Utility Sand",
-      "cost": 600
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Concrete",
-      "supplier": "-",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "80 LB Bag 5000 PSI Concrete",
-      "cost": 15
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Sand & Slurry",
-      "supplier": "Robertsons",
-      "uom": "Cubic Yard",
-      "taxes": 7.8,
-      "material": "1 Sack Slurry",
-      "cost": 136
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Concrete",
-      "supplier": "Lowes",
-      "uom": "Bag",
-      "taxes": 7.8,
-      "material": "60lb concrete 4500psi",
-      "cost": 3.63
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Electrical Materials",
-      "subClassification": "Pad",
-      "supplier": "Oldcastle",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "Edison - Slab box 1012SB",
-      "cost": 8000
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "-",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "5\" Sch 40 PVC",
-      "cost": 10
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "BoreGard",
-      "supplier": "-",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "3\" PVC40 Boregard",
-      "cost": 7.95
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "-",
-      "subClassification": "Paving",
-      "supplier": "Vulcan",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "Asphalt",
-      "cost": 5000
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Asphalt",
-      "supplier": "Home Depot",
-      "uom": "50Lb Bag",
-      "taxes": 7.8,
-      "material": "Cold Patch - Temp Ashpalt",
-      "cost": 20
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "Saf-T-Co",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "3\" SCH80 X 20'",
-      "cost": 4.2
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "Saf-T-Co",
-      "uom": "Piece",
-      "taxes": 7.8,
-      "material": "3\" X 90 X 36 SCH80",
-      "cost": 30
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "So-Cal Utility Products",
-      "uom": "Each",
-      "taxes": 7.8,
-      "material": "3\" Sch40 90x36 W/Bell",
-      "cost": 25
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "So-Cal Utility Products",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "2\" Sch40 Conduit 10' Lengths",
-      "cost": 1.05
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "PVC Conduit",
-      "supplier": "So-Cal Utility Products",
-      "uom": "Each",
-      "taxes": 7.8,
-      "material": "2\" Sch40 Slip Couplings",
-      "cost": 8
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "HDPE",
-      "supplier": "Saf-T-Co",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "2\" Sdr11 Smooth/Smooth Orange/Empty 1000' Per Reel",
-      "cost": 0.92
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "HDPE",
-      "supplier": "Saf-T-Co",
-      "uom": "Foot",
-      "taxes": 7.8,
-      "material": "2\" /Sdr-9 /Regular /Smooth-Wall /Orange /Orange /No Lube /Empty/Ink Jet /Standard Print",
-      "cost": 1.03
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Pipe & Sweeps",
-      "subClassification": "Poly Gas pipe",
-      "supplier": "-",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "1.5\" Gas Pipe"
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Hand Hole",
-      "subClassification": "-",
-      "supplier": "-",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "Hand Hole"
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "-",
-      "supplier": "West Coast",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "Crushed Rock",
-      "cost": 55.5
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "addCatalogueItem",
-  "payload": {
-    "type": "material",
-    "data": {
-      "classification": "Restoration Material",
-      "subClassification": "Asphalt",
-      "supplier": "Telekinesis",
-      "uom": "-",
-      "taxes": 7.8,
-      "material": "Hot Asphalt",
-      "cost": 160
-    }
-  }
-}
-POST /webhook/devcoBackend
-Devco Backend - Received body: {
-  "action": "getCatalogueItems",
-  "payload": {
-    "type": "material"
+    "proposalNo": "25-0291"
   }
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Devco | Estimate Details</title>
+    <title>Devco | Estimate Details v1.1.0</title>
     <link rel="icon" type="image/png" href="devco-logo.png">
     <meta name="description" content="View and edit estimate details">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,7 +58,7 @@
         // Initialize Lucide Icons
         React.useEffect && lucide.createIcons();
 
-        const Icon = ({ name, size = 16, className = '' }) => {
+        const DevcoIcon = ({ name, size = 16, className = '' }) => {
             const iconRef = React.useRef(null);
 
             React.useEffect(() => {
@@ -87,8 +87,8 @@
 
 
 
-        const AddItemModal = ({ section, isOpen, onClose, onSave, items = [], catalog = [], fringe }) => {
-            const { Modal, Input, SearchableSelect, Button, EmptyState, Badge } = window.DevcoComponents;
+        const AddItemModal = ({ section, isOpen, onClose, onSave, items = [], catalog = [], fringe, fringeConstants }) => {
+            const { Modal, Input, SearchableSelect, Button, EmptyState, Badge, ItemForm } = window.DevcoComponents;
             const [mode, setMode] = React.useState('manual');
             const [formData, setFormData] = React.useState({});
             const [selectedItems, setSelectedItems] = React.useState(new Set());
@@ -98,48 +98,50 @@
             React.useEffect(() => {
                 if (isOpen) {
                     setFormData({});
-
-                    const existingIdentifiers = new Set(items.map(i => {
-                        if (section?.id === 'Labor') {
-                            const basePay = typeof i.basePay === 'number' ? i.basePay : parseFloat(String(i.basePay || 0).replace(/[^0-9.-]+/g, ""));
-                            return `${i.classification || ''}|${i.subClassification || ''}|${i.fringe || ''}|${basePay}`.toLowerCase().trim();
-                        }
-                        return (i.classification || i.item || i.name || '').toLowerCase().trim();
-                    }));
-
-                    const preSelected = new Set();
-                    if (catalog) {
-                        catalog.forEach(catItem => {
-                            let catId = '';
-                            if (section?.id === 'Labor') {
-                                const basePay = typeof catItem.basePay === 'number' ? catItem.basePay : parseFloat(String(catItem.basePay || 0).replace(/[^0-9.-]+/g, ""));
-                                catId = `${catItem.classification || ''}|${catItem.subClassification || ''}|${catItem.fringe || ''}|${basePay}`.toLowerCase().trim();
-                            } else {
-                                catId = (catItem.classification || catItem.item || catItem.name || '').toLowerCase().trim();
-                            }
-
-                            if (existingIdentifiers.has(catId)) {
-                                preSelected.add(catItem);
-                            }
-                        });
-                    }
-
-                    setSelectedItems(preSelected);
+                    setSelectedItems(new Set()); // Start clean, do not pre-select existing
                     setSearchTerm('');
-                    setMode(catalog && catalog.length > 0 ? 'catalog' : 'manual');
+                    setMode('catalog'); // Always default to catalog view for consistency
                 }
-            }, [isOpen, catalog, items]);
+            }, [isOpen, catalog]);
 
             // Helper to get unique identifier for an item
             const getIdentifier = (i) => {
-                if (section?.id === 'Labor') {
-                    // Include subClassification and basePay for strict matching
-                    // Handle numeric basePay comparison safely
+                const sId = section?.id;
+                const normalize = (val) => String(val || '').toLowerCase().trim();
+
+                if (sId === 'Labor') {
+                    // Match by classification + subClassification + fringe
                     const basePay = typeof i.basePay === 'number' ? i.basePay : parseFloat(String(i.basePay || 0).replace(/[^0-9.-]+/g, ""));
-                    return `${i.classification || ''}|${i.subClassification || ''}|${i.fringe || ''}|${basePay}`.toLowerCase().trim();
+                    return `labor|${normalize(i.classification)}|${normalize(i.subClassification)}|${normalize(i.fringe)}|${basePay}`;
                 }
-                return (i.classification || i.item || i.name || '').toLowerCase().trim();
+                if (sId === 'Equipment') {
+                    return `equip|${normalize(i.equipmentMachine)}|${normalize(i.classification)}`;
+                }
+                if (sId === 'Material') {
+                    return `mat|${normalize(i.material)}|${normalize(i.classification)}`;
+                }
+                if (sId === 'Tools') {
+                    return `tool|${normalize(i.tool)}|${normalize(i.classification)}`;
+                }
+                if (sId === 'Overhead') {
+                    return `over|${normalize(i.overhead)}|${normalize(i.classification)}`;
+                }
+                if (sId === 'Disposal') {
+                    return `disp|${normalize(i.disposalAndHaulOff)}|${normalize(i.classification)}`;
+                }
+                if (sId === 'Miscellaneous') {
+                    return `misc|${normalize(i.item)}|${normalize(i.classification)}`;
+                }
+                if (sId === 'Subcontractor') {
+                    return `sub|${normalize(i.subcontractor)}|${normalize(i.classification)}`;
+                }
+
+                return normalize(i.classification || i.item || i.name || i.description);
             };
+
+            const existingIdentifiers = React.useMemo(() => {
+                return new Set(items.map(getIdentifier));
+            }, [items, section]);
 
             // Catalog Logic (Moved up before conditional return)
             const filteredCatalog = React.useMemo(() => {
@@ -174,8 +176,12 @@
             if (!isOpen || !section) return null;
 
             // Manual Logic
-            const dropdownFields = ['classification', 'subClassification', 'supplier', 'fringe', 'uom'];
-            const getOptions = (field) => items.map(item => item[field]).filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i).sort();
+            const dropdownFields = ['classification', 'subClassification', 'supplier', 'fringe', 'uom', 'item'];
+            const getOptions = (field) => {
+                // Combine options from existing items AND catalog
+                const allItems = [...items, ...(catalog || [])];
+                return allItems.map(item => item[field]).filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i).sort();
+            };
 
             const handleManualSubmit = async (e) => {
                 e.preventDefault();
@@ -200,11 +206,8 @@
                 if (selectedItems.size === 0) return;
                 setSaving(true);
 
-                // Identify items that are NOT already in the estimate
-                const existingIdentifiers = new Set(items.map(getIdentifier));
-
                 const promises = Array.from(selectedItems).map(item => {
-                    // Skip if already exists
+                    // Double check if already exists (should be disabled in UI, but safe check)
                     if (existingIdentifiers.has(getIdentifier(item))) return Promise.resolve();
 
                     // Remove _id to avoid duplicate key error. Backend must generate new ID.
@@ -241,12 +244,10 @@
                 </>
             ) : (
                 <>
-                    {catalog && catalog.length > 0 && (
-                        <Button onClick={() => setMode('catalog')} variant="ghost" className="mr-auto">Back to Catalog</Button>
-                    )}
+                    <Button onClick={() => setMode('catalog')} variant="ghost" className="mr-auto">Back to Catalog</Button>
                     <Button onClick={onClose} variant="secondary">Cancel</Button>
-                    <Button onClick={handleManualSubmit} disabled={saving}>
-                        {saving ? 'Saving...' : 'Save Item'}
+                    <Button onClick={handleManualSubmit} disabled={saving} className={section.id === 'Overhead' ? "!bg-[#10B981] !hover:bg-[#059669] text-white px-6 py-2.5 h-10 shadow-md font-bold" : ""}>
+                        {saving ? 'Saving...' : (section.id === 'Overhead' ? 'Save the cost' : 'Save Item')}
                     </Button>
                 </>
             );
@@ -256,10 +257,28 @@
                 if (section?.id === 'Labor') {
                     return ['classification', 'basePay', 'subClassification'];
                 }
+                if (section?.id === 'Miscellaneous') {
+                    return ['item', 'classification', 'uom', 'cost'];
+                }
+                if (section?.id === 'Overhead') {
+                    return ['overhead', 'classification', 'subClassification', 'hourlyRate', 'dailyRate'];
+                }
+                if (section?.id === 'Disposal') {
+                    return ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'cost'];
+                }
+                if (section?.id === 'Equipment') {
+                    return ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'dailyCost', 'weeklyCost', 'monthlyCost'];
+                }
+                if (section?.id === 'Material') {
+                    return ['material', 'classification', 'subClassification', 'supplier', 'uom', 'cost'];
+                }
+                if (section?.id === 'Subcontractor') {
+                    return ['subcontractor', 'classification', 'subClassification', 'uom', 'cost'];
+                }
                 if (filteredCatalog.length === 0) return [];
                 const first = filteredCatalog[0];
                 // Prioritize common fields
-                const priority = ['classification', 'item', 'name', 'type', 'description', 'rate', 'cost', 'price', 'basePay'];
+                const priority = ['item', 'classification', 'name', 'type', 'description', 'uom', 'cost', 'rate', 'price', 'basePay'];
                 const keys = Object.keys(first).filter(k => !['_id', 'createdAt', 'updatedAt', '__v'].includes(k));
                 return keys.sort((a, b) => {
                     const idxA = priority.indexOf(a);
@@ -273,7 +292,12 @@
             const displayCols = getCatalogColumns();
 
             return (
-                <Modal isOpen={isOpen} onClose={onClose} title={`Add ${section.title}`} footer={footerContent}>
+                <Modal
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    title={mode === 'manual' && section.id === 'Overhead' ? 'Add a overhead manually' : `Add ${section.title}`}
+                    footer={mode === 'catalog' ? footerContent : undefined} // ItemForm has its own footer
+                >
                     {mode === 'catalog' ? (
                         <div className="space-y-4">
                             <div className="relative">
@@ -294,15 +318,23 @@
                                             <th className="p-3 w-10">
                                                 <input type="checkbox" className="rounded border-gray-300"
                                                     onChange={(e) => {
-                                                        if (e.target.checked) setSelectedItems(new Set(filteredCatalog));
+                                                        if (e.target.checked) {
+                                                            // Select ONLY items that are not already added
+                                                            const selectable = filteredCatalog.filter(i => !existingIdentifiers.has(getIdentifier(i)));
+                                                            setSelectedItems(new Set(selectable));
+                                                        }
                                                         else setSelectedItems(new Set());
                                                     }}
-                                                    checked={filteredCatalog.length > 0 && selectedItems.size === filteredCatalog.length}
+                                                    checked={filteredCatalog.length > 0 && selectedItems.size > 0 && selectedItems.size === filteredCatalog.filter(i => !existingIdentifiers.has(getIdentifier(i))).length}
                                                 />
                                             </th>
                                             {displayCols.map(col => {
                                                 let label = col.replace(/([A-Z])/g, ' $1').trim();
                                                 if (section.id === 'Labor' && col === 'classification') label = 'Item';
+                                                if (section.id === 'Equipment' && col === 'equipmentMachine') label = 'Equipment';
+                                                if (section.id === 'Equipment' && col === 'equipmentMachine') label = 'Equipment';
+                                                if (section.id === 'Disposal' && col === 'disposalAndHaulOff') label = 'Disposal';
+                                                if (section.id === 'Subcontractor' && col === 'subcontractor') label = 'Subcontractor';
                                                 return <th key={col} className="p-3 capitalize">{label}</th>;
                                             })}
                                         </tr>
@@ -310,10 +342,19 @@
                                     <tbody className="divide-y divide-gray-100">
                                         {filteredCatalog.map((item, idx) => {
                                             const isSuggested = section?.id === 'Labor' && fringe && String(item.fringe || '').trim().toLowerCase() === String(fringe).trim().toLowerCase();
+                                            const isAdded = existingIdentifiers.has(getIdentifier(item));
+
                                             return (
-                                                <tr key={item._id || idx} className={`cursor-pointer transition-colors ${selectedItems.has(item) ? 'bg-indigo-100' : (isSuggested ? 'bg-blue-50' : 'hover:bg-gray-50')}`} onClick={() => toggleSelection(item)}>
+                                                <tr
+                                                    key={item._id || idx}
+                                                    className={`cursor-pointer transition-colors ${isAdded ? 'bg-gray-100 opacity-60 cursor-not-allowed' :
+                                                        selectedItems.has(item) ? 'bg-indigo-100' :
+                                                            (isSuggested ? 'bg-blue-50' : 'hover:bg-gray-50')
+                                                        }`}
+                                                    onClick={() => !isAdded && toggleSelection(item)}
+                                                >
                                                     <td className="p-3">
-                                                        <input type="checkbox" checked={selectedItems.has(item)} onChange={() => { }} className="rounded border-gray-300 pointer-events-none" />
+                                                        <input type="checkbox" checked={selectedItems.has(item) || isAdded} disabled={isAdded} onChange={() => { }} className="rounded border-gray-300 pointer-events-none" />
                                                     </td>
                                                     {displayCols.map((col, cIdx) => (
                                                         <td key={col} className="p-3 text-gray-700">
@@ -325,7 +366,7 @@
                                                                         </span>
                                                                     );
                                                                 }
-                                                                if (typeof item[col] === 'number' && ['cost', 'rate', 'price', 'basePay'].some(k => col.toLowerCase().includes(k))) {
+                                                                if (typeof item[col] === 'number' && ['cost', 'rate', 'price', 'basePay', 'dailyCost', 'weeklyCost', 'monthlyCost'].some(k => col.toLowerCase().includes(k))) {
                                                                     return `$${item[col].toLocaleString()}`;
                                                                 }
                                                                 return item[col];
@@ -348,40 +389,24 @@
                             </div>
                         </div>
                     ) : (
-                        <form className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {fieldsToRender.map((field, idx) => {
-                                    const label = headersToRender[idx];
-                                    const isNumber = ['cost', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent', 'basePay', 'taxes', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'hourlyRate', 'dailyRate'].includes(field);
-                                    const isDropdown = dropdownFields.includes(field);
-
-                                    if (section.id === 'Labor' && field === 'labor') return null;
-                                    if (field === 'total') return null;
-
-                                    return (
-                                        <div key={field} className="col-span-1">
-                                            {isDropdown ? (
-                                                <SearchableSelect
-                                                    label={label}
-                                                    value={formData[field] || ''}
-                                                    onChange={val => handleChange(field, val)}
-                                                    options={getOptions(field)}
-                                                    placeholder={`Select or type ${label}`}
-                                                />
-                                            ) : (
-                                                <Input
-                                                    label={label}
-                                                    type={isNumber ? "number" : "text"}
-                                                    value={formData[field] || ''}
-                                                    onChange={e => handleChange(field, e.target.value)}
-                                                    placeholder={`Enter ${label}`}
-                                                />
-                                            )}
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </form>
+                        <div className="px-0 py-2">
+                            <ItemForm
+                                fields={fieldsToRender.filter(f => f !== 'labor' && f !== 'total')}
+                                headers={headersToRender.filter((h, i) => fieldsToRender[i] !== 'labor' && fieldsToRender[i] !== 'total')}
+                                formData={formData}
+                                onChange={handleChange}
+                                onSubmit={() => handleManualSubmit({ preventDefault: () => { } })}
+                                onCancel={onClose}
+                                submitLabel={section.id === 'Overhead' ? 'Save the cost' : 'Save Item'}
+                                cancelLabel="Cancel"
+                                category={section.id}
+                                dropdownFields={dropdownFields}
+                                fieldTypes={{}} // We can infer or pass specific types if needed, ItemForm handles basics
+                                fringeConstants={fringeConstants} // Pass fringeConstants if available in scope
+                                isSaving={saving}
+                                submitButtonClass={section.id === 'Overhead' ? "!bg-[#10B981] !hover:bg-[#059669] text-white px-6 py-2.5 h-10 shadow-md font-bold" : ""}
+                            />
+                        </div>
                     )}
                 </Modal>
             );
@@ -417,9 +442,16 @@
                         <div className="flex items-center justify-between pb-2">
                             <div className="flex items-center gap-3">
                                 <div className={`transition-transform duration-300 text-gray-400 group-hover:text-gray-600 ${isOpen ? 'rotate-180' : ''}`}>
-                                    <Icon name="chevron-down" size={24} />
+                                    <DevcoIcon name="chevron-down" size={24} />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 tracking-tight">{title}</h3>
+                                <h3 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                                    {title}
+                                    {count > 0 && (
+                                        <span className="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full font-bold">
+                                            {count}
+                                        </span>
+                                    )}
+                                </h3>
                             </div>
 
                             <div className="flex items-center gap-4">
@@ -427,7 +459,7 @@
                                     className="flex items-center justify-start gap-2 w-48 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl shadow-sm transition-all"
                                     onClick={(e) => { e.stopPropagation(); onAdd(); }}
                                 >
-                                    <Icon name="plus" size={16} />
+                                    <DevcoIcon name="plus" size={16} />
                                     Add {title}
                                 </button>
                                 <span className="text-xl font-bold text-gray-900 w-32 text-right">{formatMoney(total)}</span>
@@ -584,9 +616,9 @@
             );
         };
 
-        const LineItemsTable = ({ headers, items, fields, editableFields = [], onUpdateItem, onExplain, onDelete, sectionId, suppliers = [], uoms = [] }) => {
+        const LineItemsTable = ({ headers, items, fields, editableFields = [], onUpdateItem, onExplain, onDelete, sectionId, suppliers = [], uoms = [], miscClassifications = [], miscUoms = [], overheadClassifications = [], overheadSubClassifications = [], disposalClassifications = [], disposalUoms = [], subClassifications = [], subSubClassifications = [], subContractors = [], subUoms = [] }) => {
             // Safe Icon resolution
-            const Icon = window.DevcoComponents?.Icon || window.Icon || (({ name }) => <span className="text-xs">{name}</span>);
+
 
             if (!items || items.length === 0) {
                 return (
@@ -613,122 +645,279 @@
                             </datalist>
                         </>
                     )}
+                    {sectionId === 'Miscellaneous' && (
+                        <>
+                            <datalist id="misc-classifications">
+                                {miscClassifications.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                            <datalist id="misc-uoms">
+                                {miscUoms.map(u => <option key={u} value={u} />)}
+                            </datalist>
+                        </>
+                    )}
+                    {sectionId === 'Overhead' && (
+                        <>
+                            <datalist id="overhead-classifications">
+                                {overheadClassifications.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                            <datalist id="overhead-subclassifications">
+                                {overheadSubClassifications.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                        </>
+                    )}
+                    {sectionId === 'Disposal' && (
+                        <>
+                            <datalist id="disposal-classifications">
+                                {disposalClassifications.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                            <datalist id="disposal-uoms">
+                                {disposalUoms.map(u => <option key={u} value={u} />)}
+                            </datalist>
+                        </>
+                    )}
+                    {sectionId === 'Subcontractor' && (
+                        <>
+                            <datalist id="sub-classifications">
+                                {subClassifications.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                            <datalist id="sub-subclassifications">
+                                {subSubClassifications.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                            <datalist id="sub-contractors">
+                                {subContractors.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                            <datalist id="sub-uoms">
+                                {subUoms.map(c => <option key={c} value={c} />)}
+                            </datalist>
+                        </>
+                    )}
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">
-                                <th className="px-3 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-8 text-center">#</th>
+                                <th className="px-2 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-8 text-center">#</th>
                                 {headers.map((header, i) => (
-                                    <th key={i} className="px-3 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                                    <th key={i} className="px-2 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                                         {header}
                                     </th>
                                 ))}
-                                <th className="px-3 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-10 text-center"></th>
+                                <th className="px-2 py-2 text-[10px] font-semibold text-gray-500 uppercase tracking-wider w-10 text-center"></th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {items.map((item, i) => (
-                                <tr key={item._id || i} className="hover:bg-gray-50/50 transition-colors group">
-                                    <td className="px-3 py-2 text-[11px] text-gray-400 text-center font-medium">
-                                        {i + 1}
-                                    </td>
-                                    {fields.map((field, j) => {
-                                        const isEditable = editableFields.includes(field);
-                                        const val = item[field];
-                                        let displayVal = val || (val === 0 ? 0 : '--');
+                            {items.map((item, i) => {
+                                // Create a key that changes when item values change (forces input re-render)
+                                const itemKey = `${item._id || i}-${item.updatedAt || ''}-${item.quantity || 0}-${item.cost || 0}`;
+                                return (
+                                    <tr key={itemKey} className="hover:bg-gray-50/50 transition-colors group">
+                                        <td className="px-2 py-2 text-[11px] text-gray-400 text-center font-medium">
+                                            {i + 1}
+                                        </td>
+                                        {fields.map((field, j) => {
+                                            const isEditable = editableFields.includes(field);
+                                            const val = item[field];
+                                            let displayVal = val || (val === 0 ? 0 : '--');
 
-                                        if (typeof val === 'number') {
-                                            const lowerField = field.toLowerCase();
-                                            if (lowerField.includes('percent')) {
-                                                displayVal = `${val}%`;
-                                            } else if (lowerField.includes('cost') || lowerField.includes('pay') || lowerField.includes('rate') || lowerField === 'total') {
-                                                displayVal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+                                            if (typeof val === 'number') {
+                                                const lowerField = field.toLowerCase();
+                                                if (lowerField.includes('percent')) {
+                                                    displayVal = `${val}%`;
+                                                } else if (lowerField.includes('cost') || lowerField.includes('pay') || lowerField.includes('rate') || lowerField === 'total') {
+                                                    displayVal = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+                                                }
                                             }
-                                        }
 
-                                        // Clickable Total Logic
-                                        if (field === 'total' && onExplain) {
+                                            // Clickable Total Logic
+                                            if (field === 'total' && onExplain) {
+                                                return (
+                                                    <td key={j} className="px-2 py-2 text-[11px] whitespace-nowrap">
+                                                        <div
+                                                            onClick={(e) => { e.stopPropagation(); onExplain(item); }}
+                                                            className="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-center gap-1"
+                                                            title="View Calculation Breakdown"
+                                                        >
+                                                            {displayVal}
+                                                            <DevcoIcon name="info" size={10} className="opacity-50" />
+                                                        </div>
+                                                    </td>
+                                                );
+                                            }
+
                                             return (
-                                                <td key={j} className="px-3 py-2 text-[11px] whitespace-nowrap">
-                                                    <div
-                                                        onClick={(e) => { e.stopPropagation(); onExplain(item); }}
-                                                        className="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer flex items-center gap-1"
-                                                        title="View Calculation Breakdown"
-                                                    >
-                                                        {displayVal}
-                                                        <Icon name="info" size={10} className="opacity-50" />
-                                                    </div>
+                                                <td key={j} className="px-2 py-2 text-[11px] text-gray-700 whitespace-nowrap">
+                                                    {isEditable ? (
+                                                        field === 'uom' && sectionId === 'Equipment' ? (
+                                                            <select
+                                                                value={val || 'Daily'}
+                                                                onChange={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                            >
+                                                                <option value="Daily">Daily</option>
+                                                                <option value="Weekly">Weekly</option>
+                                                                <option value="Monthly">Monthly</option>
+                                                            </select>
+                                                        ) : field === 'uom' && sectionId === 'Material' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="material-uoms"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="UOM"
+                                                            />
+                                                        ) : field === 'supplier' && sectionId === 'Equipment' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="equipment-suppliers"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-24 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="Select..."
+                                                            />
+                                                        ) : field === 'supplier' && sectionId === 'Material' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="material-suppliers"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-24 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="Select..."
+                                                            />
+                                                        ) : (field === 'classification' || field === 'subClassification') && sectionId === 'Material' ? (
+                                                            <input
+                                                                type="text"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-28 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder={field === 'classification' ? 'Class' : 'Sub Class'}
+                                                            />
+                                                        ) : field === 'classification' && sectionId === 'Miscellaneous' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="misc-classifications"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-28 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="Classification"
+                                                            />
+                                                        ) : field === 'uom' && sectionId === 'Miscellaneous' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="misc-uoms"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="UOM"
+                                                            />
+                                                        ) : field === 'classification' && sectionId === 'Overhead' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="overhead-classifications"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-full min-w-[120px] bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder="Classification"
+                                                            />
+                                                        ) : field === 'subClassification' && sectionId === 'Overhead' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="overhead-subclassifications"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-full min-w-[120px] bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder="Sub Classification"
+                                                            />
+                                                        ) : field === 'classification' && sectionId === 'Disposal' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="disposal-classifications"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-full min-w-[120px] bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder="Classification"
+                                                            />
+                                                        ) : field === 'uom' && sectionId === 'Disposal' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="disposal-uoms"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="UOM"
+                                                            />
+                                                        ) : field === 'uom' && sectionId === 'Disposal' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="disposal-uoms"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="UOM"
+                                                            />
+                                                        ) : field === 'classification' && sectionId === 'Subcontractor' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="sub-classifications"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-full min-w-[120px] bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder="Classification"
+                                                            />
+                                                        ) : field === 'subClassification' && sectionId === 'Subcontractor' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="sub-subclassifications"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-full min-w-[120px] bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder="Sub Class"
+                                                            />
+                                                        ) : field === 'subcontractor' && sectionId === 'Subcontractor' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="sub-contractors"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-full min-w-[120px] bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                                                                placeholder="Contractor"
+                                                            />
+                                                        ) : field === 'uom' && sectionId === 'Subcontractor' ? (
+                                                            <input
+                                                                type="text"
+                                                                list="sub-uoms"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
+                                                                placeholder="UOM"
+                                                            />
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                defaultValue={val}
+                                                                onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
+                                                                className={`${(field === 'quantity' || field === 'times' || field === 'fuelAdditiveCost') ? 'w-12' : 'w-16'} bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center`}
+                                                            />
+                                                        )
+                                                    ) : (
+                                                        <span>{displayVal}</span>
+                                                    )}
                                                 </td>
                                             );
-                                        }
-
-                                        return (
-                                            <td key={j} className="px-3 py-2 text-[11px] text-gray-700 whitespace-nowrap">
-                                                {isEditable ? (
-                                                    field === 'uom' && sectionId === 'Equipment' ? (
-                                                        <select
-                                                            value={val || 'Daily'}
-                                                            onChange={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
-                                                            className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
-                                                        >
-                                                            <option value="Daily">Daily</option>
-                                                            <option value="Weekly">Weekly</option>
-                                                            <option value="Monthly">Monthly</option>
-                                                        </select>
-                                                    ) : field === 'uom' && sectionId === 'Material' ? (
-                                                        <input
-                                                            type="text"
-                                                            list="material-uoms"
-                                                            defaultValue={val}
-                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
-                                                            className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
-                                                            placeholder="UOM"
-                                                        />
-                                                    ) : field === 'supplier' && sectionId === 'Equipment' ? (
-                                                        <input
-                                                            type="text"
-                                                            list="equipment-suppliers"
-                                                            defaultValue={val}
-                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
-                                                            className="w-24 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
-                                                            placeholder="Select..."
-                                                        />
-                                                    ) : field === 'supplier' && sectionId === 'Material' ? (
-                                                        <input
-                                                            type="text"
-                                                            list="material-suppliers"
-                                                            defaultValue={val}
-                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
-                                                            className="w-24 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
-                                                            placeholder="Select..."
-                                                        />
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            defaultValue={val}
-                                                            onBlur={(e) => onUpdateItem && onUpdateItem(item, field, e.target.value)}
-                                                            className="w-16 bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-center"
-                                                        />
-                                                    )
-                                                ) : (
-                                                    <span>{displayVal}</span>
-                                                )}
-                                            </td>
-                                        );
-                                    })}
-                                    <td className="px-3 py-2 text-center">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDelete && onDelete(item); }}
-                                            className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
-                                            title="Delete Item"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
+                                        })}
+                                        <td className="px-2 py-2 text-center">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onDelete && onDelete(item); }}
+                                                className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
+                                                title="Delete Item"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
-                </div>
+                </div >
             );
         };
 
@@ -847,6 +1036,10 @@
             const [laborCatalog, setLaborCatalog] = React.useState([]);
             const [equipmentCatalog, setEquipmentCatalog] = React.useState([]);
             const [materialCatalog, setMaterialCatalog] = React.useState([]);
+            const [miscellaneousCatalog, setMiscellaneousCatalog] = React.useState([]);
+            const [overheadCatalog, setOverheadCatalog] = React.useState([]);
+            const [disposalCatalog, setDisposalCatalog] = React.useState([]);
+            const [subcontractorCatalog, setSubcontractorCatalog] = React.useState([]);
             const [fringeConstants, setFringeConstants] = React.useState([]); // Added Fringe Constants State
             const [loading, setLoading] = React.useState(true);
             const [editing, setEditing] = React.useState(true);
@@ -858,6 +1051,119 @@
             const [breakdownData, setBreakdownData] = React.useState(null);
             const [chartAnimate, setChartAnimate] = React.useState(false);
             const [versionHistory, setVersionHistory] = React.useState([]); // Version timeline
+            const [unsavedChanges, setUnsavedChanges] = React.useState(false); // Track unsaved changes
+
+            // Local Storage Helper
+            const updateLocalStore = (id, newEstimate, newFormData) => {
+                const key = `estimate_unsaved_${id}`;
+                const data = {
+                    timestamp: Date.now(),
+                    estimate: newEstimate,
+                    formData: newFormData
+                };
+                localStorage.setItem(key, JSON.stringify(data));
+                setUnsavedChanges(true);
+            };
+
+            const clearLocalStore = (id) => {
+                localStorage.removeItem(`estimate_unsaved_${id}`);
+                setUnsavedChanges(false);
+            };
+
+            const checkLocalStore = (id) => {
+                const key = `estimate_unsaved_${id}`;
+                const stored = localStorage.getItem(key);
+                if (stored) {
+                    try {
+                        const data = JSON.parse(stored);
+                        // Optional: Check if local data is newer than DB data?
+                        // For now, we assume local data takes precedence if it exists
+                        return data;
+                    } catch (e) {
+                        console.error("Error parsing local store:", e);
+                        return null;
+                    }
+                }
+                return null;
+            };
+
+            const handleGlobalSave = async () => {
+                const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
+                if (!id) return;
+
+                setSaving(true);
+                try {
+                    // Prepare payload matching updateEstimate signature
+                    // We need to map estimate state (keyed by internal keys like 'labor') 
+                    // to backend expected keys (usually match internal keys but let's be safe)
+
+                    // Use Chart Data directly for consistency
+                    const currentSubTotal = chartData.subTotal;
+                    const grandTotalAmount = chartData.grandTotal;
+                    const marginAmount = grandTotalAmount - currentSubTotal;
+
+                    const payload = {
+                        id: id,
+                        ...formData, // Header fields
+                        // Ensure markup is saved as string with %
+                        bidMarkUp: (String(formData.bidMarkUp).includes('%') ? formData.bidMarkUp : `${formData.bidMarkUp}%`),
+
+                        // Calculated Fields
+                        subTotal: currentSubTotal,
+                        margin: marginAmount,
+                        grandTotal: grandTotalAmount,
+
+                        labor: estimate.labor,
+                        equipment: estimate.equipment,
+                        material: estimate.material,
+                        tools: estimate.tools || estimate.tool,
+                        overhead: estimate.overhead,
+                        subcontractor: estimate.subcontractor,
+                        disposal: estimate.disposal,
+                        miscellaneous: estimate.miscellaneous
+                    };
+
+                    console.log('Global Save Payload:', payload);
+
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'updateEstimate',
+                            payload: payload
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.success) {
+                        throw new Error(result.error || 'Save failed');
+                    }
+
+                    // Update sort order after successful save
+                    if (sections && sections.length > 0) {
+                        const newOrder = [...sections].sort((a, b) => {
+                            const getTot = (s) => s.items.reduce((sum, i) => sum + (i.total || 0), 0);
+                            return getTot(b) - getTot(a);
+                        }).map(s => s.id);
+                        setSectionOrder(newOrder);
+                    }
+
+                    setSaving(false);
+                    addToast('Estimate saved successfully', 'success');
+                    clearLocalStore(id);
+
+                    // Reload to confirm sync and get fresh state
+                    await loadEstimate(true);
+
+                } catch (e) {
+                    console.error("Global Save Error:", e);
+                    addToast('Failed to save estimate', 'error');
+                } finally {
+                    setSaving(false);
+                }
+            };
+
 
             // Trigger chart animation when estimate loads
             React.useEffect(() => {
@@ -891,6 +1197,10 @@
                 loadLaborCatalog();
                 loadEquipmentCatalog();
                 loadMaterialCatalog();
+                loadMiscellaneousCatalog();
+                loadOverheadCatalog();
+                loadDisposalCatalog();
+                loadSubcontractorCatalog();
                 loadFringeConstants(); // Load fringe constants
             }, [estimateId]);
 
@@ -1066,6 +1376,82 @@
                 }
             };
 
+            const loadMiscellaneousCatalog = async () => {
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'getCatalogueItems',
+                            payload: { type: 'miscellaneous' }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success && result.result) {
+                        setMiscellaneousCatalog(result.result);
+                    }
+                } catch (error) {
+                    console.error('Error loading miscellaneous catalog:', error);
+                }
+            };
+
+            const loadOverheadCatalog = async () => {
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'getCatalogueItems',
+                            payload: { type: 'overhead' }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success && result.result) {
+                        setOverheadCatalog(result.result);
+                    }
+                } catch (error) {
+                    console.error('Error loading overhead catalog:', error);
+                }
+            };
+
+            const loadDisposalCatalog = async () => {
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'getCatalogueItems',
+                            payload: { type: 'disposal' }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success && result.result) {
+                        setDisposalCatalog(result.result);
+                    }
+                } catch (error) {
+                    console.error('Error loading disposal catalog:', error);
+                }
+            };
+
+            const loadSubcontractorCatalog = async () => {
+                try {
+                    const response = await fetch('/webhook/devcoBackend', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'getCatalogueItems',
+                            payload: { type: 'subcontractor' }
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success && result.result) {
+                        setSubcontractorCatalog(result.result);
+                    }
+                } catch (error) {
+                    console.error('Error loading subcontractor catalog:', error);
+                }
+            };
+
             const loadFringeConstants = async () => {
                 try {
                     const response = await fetch('/webhook/devcoBackend', {
@@ -1105,6 +1491,28 @@
                         setEstimate(loadedData);
                         setFormData(loadedData);
 
+                        // Check for local unsaved changes
+                        const localData = checkLocalStore(estimateId);
+                        if (localData) {
+                            console.log("Loading unsaved changes from local storage");
+                            const mergedEstimate = localData.estimate || loadedData;
+
+                            // Fix for legacy 'tool' key in local storage
+                            if (mergedEstimate.tool && Array.isArray(mergedEstimate.tool)) {
+                                console.log('Migrating local storage: tool -> tools');
+                                mergedEstimate.tools = mergedEstimate.tool;
+                                delete mergedEstimate.tool;
+                            }
+
+                            const mergedFormData = localData.formData || loadedData;
+                            setEstimate(mergedEstimate);
+                            setFormData(mergedFormData);
+                            setUnsavedChanges(true);
+                            addToast('Restored unsaved changes', 'info');
+                        } else {
+                            setUnsavedChanges(false);
+                        }
+
                         // Load version history if proposalNo exists
                         if (loadedData.proposalNo) {
                             loadVersionHistory(loadedData.proposalNo);
@@ -1135,138 +1543,11 @@
                 }
             };
 
-            const saveEstimate = async () => {
-                // Allow saving if recordId OR _id OR estimateId exists
-                if (!formData.recordId && !formData._id && !estimateId) return;
 
-                // Service fields are saved separately by toggleService - exclude them from auto-save
-                // to prevent race conditions where auto-save overwrites toggle changes
-                const {
-                    directionalDrilling,
-                    excavationBackfill,
-                    hydroExcavation,
-                    potholingCoring,
-                    asphaltConcrete,
-                    ...formDataWithoutServices
-                } = formData;
-
-                // Calculate Financials for DB
-                let currentSubTotal = 0;
-
-                // 1. Labor
-                (estimate?.labor || []).forEach(item => {
-                    const lTotal = calculateLaborTotal(item);
-                    currentSubTotal += (lTotal || 0);
-                });
-
-                // 2. Equipment
-                (estimate?.equipment || []).forEach(item => {
-                    const qty = item.quantity || 0;
-                    const uom = item.uom || 'Daily';
-                    let val = 0;
-                    if (uom === 'Daily') val = (item.dailyCost || 0) * qty;
-                    if (uom === 'Weekly') val = (item.weeklyCost || 0) * qty;
-                    if (uom === 'Monthly') val = (item.monthlyCost || 0) * qty;
-                    currentSubTotal += (item.total !== undefined ? item.total : val);
-                });
-
-                // 3. Material
-                (estimate?.material || []).forEach(item => {
-                    currentSubTotal += (item.cost || 0) * (item.quantity || 0);
-                });
-
-                // 4. Tools
-                (estimate?.tools || []).forEach(item => {
-                    currentSubTotal += (item.cost || 0) * (item.quantity || 0);
-                });
-
-                // Markup
-                const markUpStr = formData.bidMarkUp || '0%';
-                const markUpPct = parseFloat(String(markUpStr).replace(/[^0-9.-]+/g, "")) || 0;
-                const marginAmount = currentSubTotal * (markUpPct / 100);
-                const grandTotalAmount = currentSubTotal + marginAmount;
-
-                // Format Payload
-                const payload = {
-                    id: estimateId || formData._id || formData.recordId,
-                    ...formDataWithoutServices,
-                    // Ensure markup is saved as "24%" string
-                    bidMarkUp: formData.bidMarkUp ? `${String(formData.bidMarkUp).replace(/[%]/g, '')}%` : '0%',
-
-                    // Add Calculated Fields
-                    subTotal: currentSubTotal,
-                    margin: marginAmount,
-                    grandTotal: grandTotalAmount,
-
-                    // Include Line Items for Backend Persistence
-                    labor: estimate?.labor || [],
-                    equipment: estimate?.equipment || [],
-                    material: estimate?.material || [],
-                    tools: estimate?.tools || [],
-                    overhead: estimate?.overhead || [],
-                    subcontractor: estimate?.subcontractor || [],
-                    disposal: estimate?.disposal || [],
-                    miscellaneous: estimate?.miscellaneous || []
-                };
-
-                console.log('Saving Estimate Payload:', {
-                    id: payload.id,
-                    subTotal: payload.subTotal,
-                    margin: payload.margin,
-                    grandTotal: payload.grandTotal
-                });
-
-                try {
-                    const response = await fetch('/webhook/devcoBackend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'updateEstimate',
-                            payload: payload
-                        })
-                    });
-
-                } catch (error) {
-                    console.error('Error saving:', error);
-                }
-            };
-
-            // Auto-save effect
-            React.useEffect(() => {
-                // Ensure we have an ID to save to
-                if (loading || (!formData.recordId && !formData._id && !estimateId)) return;
-                // Skip if a service toggle is in progress
-                if (skipAutoSaveRef.current) return;
-
-                const timer = setTimeout(() => {
-                    // Double-check the flag before saving (might have changed during timeout)
-                    if (!skipAutoSaveRef.current) {
-                        saveEstimate();
-                    }
-                }, 1000);
-
-                return () => clearTimeout(timer);
-            }, [formData]);
 
             const handleSaveItem = async (section, data, isManual = false) => {
                 if (!estimate || !section) return;
-
-                const typeMap = {
-                    'Labor': 'estimateLineItemsLabor',
-                    'Equipment': 'estimateLineItemsEquipment',
-                    'Material': 'estimateLineItemsMaterial',
-                    'Tools': 'estimateLineItemsTool',
-                    'Overhead': 'estimateLineItemsOverhead',
-                    'Subcontractor': 'estimateLineItemsSubcontractor',
-                    'Disposal': 'estimateLineItemsDisposal',
-                    'Miscellaneous': 'estimateLineItemsMiscellaneous'
-                };
-
-                const type = typeMap[section.id];
-                if (!type) {
-                    console.error("Unknown section type:", section.id);
-                    return;
-                }
+                const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
 
                 try {
                     // Ensure numeric fields are numbers
@@ -1280,112 +1561,54 @@
                         }
                     });
 
-                    // Special logic for Labor: Calculate labor field = Classification - Fringe
+                    // Special handling for Labor unique string if needed
                     if (section.id === 'Labor') {
                         processedData.labor = `${processedData.classification || ''}${processedData.fringe ? '-' + processedData.fringe : ''}`;
                     }
 
-                    // Link to current estimate
+                    // Generate temp ID
+                    processedData._id = 'temp_' + Date.now() + Math.random().toString(36).substr(2, 9);
                     processedData.estimateId = estimate._id;
 
-                    const response = await fetch('/webhook/devcoBackend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'addCatalogueItem',
-                            payload: {
-                                type: type,
-                                data: processedData
-                            }
-                        })
+                    // Update State & Local Storage
+                    setEstimate(prev => {
+                        const currentItems = prev[section.key] || [];
+                        const newEstimate = {
+                            ...prev,
+                            [section.key]: [...currentItems, processedData]
+                        };
+                        updateLocalStore(id, newEstimate, formData);
+                        return newEstimate;
                     });
 
-                    const result = await response.json();
-                    if (result.success) {
-                        // If successfully added to Estimate Line Items, ALSO add to main Labor Catalogue if it's Labor AND Manual Entry
-                        if (section.id === 'Labor' && isManual) {
-                            const laborPayload = {
-                                classification: processedData.classification,
-                                subClassification: processedData.subClassification,
-                                fringe: processedData.fringe,
-                                cost: processedData.basePay, // Mapping basePay -> cost
-                                wCompPercent: processedData.wCompPercent,
-                                payrollTaxesPercent: processedData.payrollTaxesPercent,
-                                uom: 'Hour' // Defaulting UOM if missing
-                            };
+                    addToast('Item added (unsaved)', 'success');
 
-                            await fetch('/webhook/devcoBackend', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    action: 'addCatalogueItem',
-                                    payload: { type: 'labor', data: laborPayload }
-                                })
-                            });
-                        }
-
-                        // Refresh appropriate catalog
-                        // Refresh estimate to show new item
-                        loadEstimate(true);
-
-                        // Also refresh catalogs if needed (unlikely for specific line items but safe to keep)
-                        if (section.id === 'Labor') loadLaborCatalog();
-                        else if (section.id === 'Equipment') loadEquipmentCatalog();
-                    } else {
-                        console.error('Failed to add item:', result.error);
-                        alert('Failed to save item. Please try again.');
-                    }
-                } catch (e) {
-                    console.error('Error adding item:', e);
-                    alert('Error saving item.');
+                } catch (error) {
+                    console.error('Error saving item locally:', error);
+                    addToast('Failed to add item', 'error');
                 }
             };
 
+
             const handleDeleteItem = (section, item) => {
-                setConfirmConfig({
-                    isOpen: true,
-                    title: 'Delete Item',
-                    message: `Are you sure you want to delete this ${section.id === 'Labor' ? item.labor : (item.item || item.classification || 'item')}?`,
-                    onConfirm: async () => {
-                        const typeMap = {
-                            'Labor': 'estimateLineItemsLabor',
-                            'Equipment': 'estimateLineItemsEquipment',
-                            'Material': 'estimateLineItemsMaterial',
-                            'Tools': 'estimateLineItemsTool',
-                            'Overhead': 'estimateLineItemsOverhead',
-                            'Subcontractor': 'estimateLineItemsSubcontractor',
-                            'Disposal': 'estimateLineItemsDisposal',
-                            'Miscellaneous': 'estimateLineItemsMiscellaneous'
-                        };
-                        const type = typeMap[section.id];
+                if (!confirm('Area you sure you want to delete this item?')) return;
+                const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
 
-                        // Optimistic Update
-                        setEstimate(prev => ({
-                            ...prev,
-                            [section.key]: (prev[section.key] || []).filter(i => i._id !== item._id)
-                        }));
+                setEstimate(prev => {
+                    const currentItems = prev[section.key] || [];
+                    const updatedItems = currentItems.filter(i => i._id !== item._id);
 
-                        try {
-                            await fetch('/webhook/devcoBackend', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    action: 'deleteCatalogueItem',
-                                    payload: { type: type, id: item._id }
-                                })
-                            });
-                            addToast('Item deleted successfully', 'success');
-                            loadEstimate(true);
-                        } catch (e) {
-                            console.error('Error deleting item', e);
-                            addToast('Failed to delete item', 'error');
-                            loadEstimate(true); // Revert
-                        }
-                    }
+                    const newEstimate = { ...prev, [section.key]: updatedItems };
+                    updateLocalStore(id, newEstimate, formData);
+                    return newEstimate;
                 });
+
+                addToast('Item removed (unsaved)', 'info');
             };
 
+
             const handleItemUpdate = async (section, item, field, value) => {
+                const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
                 const typeMap = {
                     'Labor': 'estimateLineItemsLabor',
                     'Equipment': 'estimateLineItemsEquipment',
@@ -1401,42 +1624,267 @@
 
                 // Parse value if numeric field
                 let finalValue = value;
-                const isNumber = ['quantity', 'days', 'otPd', 'basePay', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'cost'].includes(field);
+                const isNumber = ['quantity', 'days', 'otPd', 'basePay', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'cost', 'wCompPercent', 'payrollTaxesPercent', 'taxes', 'hourlyRate', 'dailyRate', 'times'].includes(field);
                 if (isNumber) {
-                    finalValue = parseFloat(value);
-                    if (isNaN(finalValue)) finalValue = 0;
+                    // Handle empty strings as 0 or keep as is?
+                    if (value === '') finalValue = 0;
+                    else {
+                        finalValue = parseFloat(value);
+                        if (isNaN(finalValue)) finalValue = 0;
+                    }
                 }
 
-                // Optimistic Update
+                if (section.id === 'Overhead') {
+                    if (field === 'days') {
+                        finalValue = parseFloat(value) || 0;
+                        const hours = finalValue * 8;
+                        const hourlyRate = item.hourlyRate || 0;
+                        const total = hours * hourlyRate;
+
+                        // Update multiple fields
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i => {
+                                if (i._id === item._id) {
+                                    // Total is calculated as hours * hourlyRate.
+                                    // Daily Rate should vary if days vary, but ideally it represents cost per day.
+                                    // If we fix Hourly Rate, then Daily Rate = (Days * 8 * Hourly Rate) / Days = 8 * Hourly Rate.
+                                    // It seems Daily Rate is just 8 * Hourly Rate regardless of Days if Hours = Days * 8.
+                                    // However, let's strictly follow the user formula: (Hours * Hourly Rate) / Days.
+                                    // note: Hours = Days * 8, so (Days * 8 * Rate) / Days = 8 * Rate.
+                                    // So Daily Rate is constant per hourly rate change, but we should set it explicitly.
+                                    const newDailyRate = finalValue > 0 ? total / finalValue : 0;
+                                    return { ...i, days: finalValue, hours: hours, total: total, dailyRate: newDailyRate };
+                                }
+                                return i;
+                            });
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                    if (field === 'hourlyRate') {
+                        finalValue = parseFloat(value) || 0;
+                        const hours = item.hours || 0;
+                        const total = hours * finalValue;
+
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i => {
+                                if (i._id === item._id) {
+                                    const dailyRate = i.days > 0 ? total / i.days : 0;
+                                    return { ...i, hourlyRate: finalValue, total: total, dailyRate: dailyRate };
+                                }
+                                return i;
+                            });
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                    if (field === 'dailyRate') {
+                        finalValue = parseFloat(value) || 0;
+                        const days = item.days || 0;
+                        // Assuming 8 hour day logic holds for rate conversion too
+                        const calculatedHourlyRate = finalValue / 8;
+                        const hours = days * 8;
+                        const total = days * finalValue; // Or hours * calculatedHourlyRate
+
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i =>
+                                i._id === item._id ? { ...i, dailyRate: finalValue, hourlyRate: calculatedHourlyRate, total: total } : i
+                            );
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                }
+
+                if (section.id === 'Equipment') {
+                    // Equipment Total Recalculation
+                    const relevantFields = ['quantity', 'times', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost'];
+                    if (relevantFields.includes(field)) {
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i => {
+                                if (i._id === item._id) {
+                                    // Get all values, defaulting to current item value if not the field being updated
+                                    // For 'times', default to 1 if undefined to preserve legacy math
+                                    const getVal = (k, def) => (field === k ? finalValue : (i[k] !== undefined ? i[k] : def));
+
+                                    const qty = parseFloat(getVal('quantity', 0)) || 0;
+                                    const times = parseFloat(getVal('times', 1)); // Default to 1
+                                    const uom = getVal('uom', 'Daily');
+
+                                    const daily = parseFloat(getVal('dailyCost', 0)) || 0;
+                                    const weekly = parseFloat(getVal('weeklyCost', 0)) || 0;
+                                    const monthly = parseFloat(getVal('monthlyCost', 0)) || 0;
+
+                                    let newTotal = 0;
+                                    const safeTimes = isNaN(times) ? 1 : times;
+
+                                    if (uom === 'Daily') newTotal = daily * qty * safeTimes;
+                                    else if (uom === 'Weekly') newTotal = weekly * qty * safeTimes;
+                                    else if (uom === 'Monthly') newTotal = monthly * qty * safeTimes;
+
+                                    return {
+                                        ...i,
+                                        [field]: finalValue,
+                                        total: newTotal,
+                                        times: safeTimes
+                                    };
+                                }
+                                return i;
+                            });
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                }
+
+                if (section.id === 'Equipment') {
+                    // Equipment Total Recalculation
+                    const relevantFields = ['quantity', 'times', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost'];
+                    if (relevantFields.includes(field)) {
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i => {
+                                if (i._id === item._id) {
+                                    const getVal = (k, def) => (field === k ? finalValue : (i[k] !== undefined ? i[k] : def));
+
+                                    const qty = parseFloat(getVal('quantity', 0)) || 0;
+                                    const times = parseFloat(getVal('times', 1)); // Default to 1 if not set
+                                    const uom = getVal('uom', 'Daily');
+
+                                    let cost = 0;
+                                    if (uom === 'Daily') cost = parseFloat(getVal('dailyCost', 0)) || 0;
+                                    else if (uom === 'Weekly') cost = parseFloat(getVal('weeklyCost', 0)) || 0;
+                                    else if (uom === 'Monthly') cost = parseFloat(getVal('monthlyCost', 0)) || 0;
+                                    else cost = parseFloat(getVal('dailyCost', 0)) || 0;
+
+                                    const newTotal = (cost * qty * (isNaN(times) ? 1 : times));
+                                    // Note: fuelAdditiveCost often added to total? User formula didn't explicitly include it in 'cost * qty * times', 
+                                    // but if it's a cost, it might need to be. 
+                                    // Standard logic was just 'cost' based on UOM. 
+                                    // If fuel is separate, add it here if needed. 
+                                    // For now, sticking to: Cost * Qty * Times.
+
+                                    return {
+                                        ...i,
+                                        [field]: finalValue,
+                                        times: isNaN(times) ? 1 : times, // Ensure times is saved
+                                        total: newTotal
+                                    };
+                                }
+                                return i;
+                            });
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                }
+
+                if (section.id === 'Subcontractor') {
+                    // Subcontractor Total Recalculation (Qty * Cost)
+                    const relevantFields = ['quantity', 'cost'];
+                    if (relevantFields.includes(field)) {
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i => {
+                                if (i._id === item._id) {
+                                    const getVal = (k, def) => (field === k ? finalValue : (i[k] !== undefined ? i[k] : def));
+                                    const qty = parseFloat(getVal('quantity', 0)) || 0;
+                                    const cost = parseFloat(getVal('cost', 0)) || 0;
+                                    const newTotal = qty * cost;
+                                    return {
+                                        ...i,
+                                        [field]: finalValue,
+                                        total: newTotal
+                                    };
+                                }
+                                return i;
+                            });
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                }
+
+                if (section.id === 'Material') {
+                    // Material Total Recalculation
+                    const relevantFields = ['quantity', 'cost', 'taxes'];
+                    if (relevantFields.includes(field)) {
+                        setEstimate(prev => {
+                            const currentItems = prev[section.key] || [];
+                            const updatedItems = currentItems.map(i => {
+                                if (i._id === item._id) {
+                                    const getVal = (k, def) => (field === k ? finalValue : (i[k] !== undefined ? i[k] : def));
+
+                                    const qty = parseFloat(getVal('quantity', 0)) || 0;
+                                    const cost = parseFloat(getVal('cost', 0)) || 0;
+                                    const taxes = parseFloat(getVal('taxes', 0)) || 0;
+
+                                    // Formula: (Qty * Cost) + (Qty * Cost * Tax)
+                                    // Check if Tax is percentage (e.g. 8.5) or decimal (0.085).
+                                    // Usually users enter 8.5 for 8.5%.
+                                    // If value is > 1, assume percent. If < 1, ambiguous.
+                                    // Let's assume input is percentage for consistency with other parts if any.
+                                    // User said: (Qty x Cost)*Tax. If Tax is 10 (for $10), it adds $10?
+                                    // "Tax" usually implies a rate.
+                                    // Let's try treating it as a percentage value.
+                                    // Total = (Qty * Cost) * (1 + taxes / 100)
+
+                                    const subTotal = qty * cost;
+                                    const taxAmount = subTotal * (taxes / 100);
+                                    const newTotal = subTotal + taxAmount;
+
+                                    return {
+                                        ...i,
+                                        [field]: finalValue,
+                                        total: newTotal
+                                    };
+                                }
+                                return i;
+                            });
+                            const newEstimate = { ...prev, [section.key]: updatedItems };
+                            updateLocalStore(id, newEstimate, formData);
+                            return newEstimate;
+                        });
+                        return;
+                    }
+                }
+
+                if (section.id === 'Labor') {
+                    // Recalculate labor total if quantity/days/otPd changes
+                    // Using existing calculation logic if needed, or relying on `calculateLaborTotal` helper if it's purely display.
+                    // But here we are storing values. 
+                    // Labor total is calculated on the fly in `sections` usually, but let's stick to standard single field update unless complex.
+                }
+
+                // Standard single field update
                 setEstimate(prev => {
                     const currentItems = prev[section.key] || [];
                     const updatedItems = currentItems.map(i =>
                         i._id === item._id ? { ...i, [field]: finalValue } : i
                     );
-                    return { ...prev, [section.key]: updatedItems };
+
+                    const newEstimate = { ...prev, [section.key]: updatedItems };
+                    updateLocalStore(id, newEstimate, formData);
+                    return newEstimate;
                 });
-
-                try {
-                    await fetch('/webhook/devcoBackend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            action: 'updateCatalogueItem', // We use this since estimateLineItemsLabor is a catalogue type
-                            payload: {
-                                type: type,
-                                id: item._id,
-                                data: { [field]: finalValue }
-                            }
-                        })
-                    });
-
-                    // Reload to reflect changes silently
-                    loadEstimate(true);
-                } catch (e) {
-                    console.error("Error updating item:", e);
-                    loadEstimate(true); // Revert/Refresh on error
-                }
             };
+
 
             const toggleSection = (section) => {
                 setOpenSections(prev => ({
@@ -1484,7 +1932,10 @@
                 }
             };
 
-            const sections = React.useMemo(() => {
+            const [sectionOrder, setSectionOrder] = React.useState([]);
+            const initialSortDone = React.useRef(false);
+
+            const baseSections = React.useMemo(() => {
                 const defaultColors = {
                     Labor: '#4F7E17',
                     Equipment: '#0000FF',
@@ -1501,7 +1952,7 @@
                     return (constant && constant.color) ? constant.color : (defaultColors[name] || '#cbd5e1');
                 };
 
-                return [
+                const unsortedSections = [
                     {
                         id: 'Labor',
                         title: 'Labor',
@@ -1511,8 +1962,7 @@
                                 ...item,
                                 labor: item.labor || `${item.classification || ''}-${item.fringe || ''}`,
                                 total: calculateLaborTotal(item)
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                            })),
                         headers: ['Labor', 'Classification', 'Sub Classification', 'Base Pay', 'Quantity', 'Days', 'OT PD', 'W. Comp', 'Payroll Tax', 'Total'],
                         fields: ['labor', 'classification', 'subClassification', 'basePay', 'quantity', 'days', 'otPd', 'wCompPercent', 'payrollTaxesPercent', 'total'],
                         formHeaders: ['Classification', 'Sub Classification', 'Fringe', 'Base Pay', 'Quantity', 'Days', 'OT PD', 'W. Comp %', 'Payroll Tax %'],
@@ -1526,20 +1976,24 @@
                         items: (estimate?.equipment || [])
                             .map(item => {
                                 const qty = item.quantity || 0;
+                                const times = item.times !== undefined ? item.times : 1;
                                 const uom = item.uom || 'Daily';
                                 let calculatedTotal = 0;
-                                if (uom === 'Daily') calculatedTotal = (item.dailyCost || 0) * qty;
-                                else if (uom === 'Weekly') calculatedTotal = (item.weeklyCost || 0) * qty;
-                                else if (uom === 'Monthly') calculatedTotal = (item.monthlyCost || 0) * qty;
+
+                                const cost = uom === 'Daily' ? (item.dailyCost || 0) :
+                                    uom === 'Weekly' ? (item.weeklyCost || 0) :
+                                        (item.monthlyCost || 0);
+
+                                calculatedTotal = cost * qty * times;
 
                                 return {
                                     ...item,
+                                    times: times, // Ensure times is present
                                     total: item.total ?? calculatedTotal
                                 };
-                            })
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                        headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Quantity', 'UOM', 'Daily Cost', 'Weekly Cost', 'Monthly Cost', 'Fuel Additive', 'Total'],
-                        fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'quantity', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'total'],
+                            }),
+                        headers: ['Equipment / Machine', 'Classification', 'Sub Classification', 'Supplier', 'Qty', 'Times', 'UOM', 'Daily Cost', 'Weekly Cost', 'Monthly Cost', 'Fuel', 'Total'],
+                        fields: ['equipmentMachine', 'classification', 'subClassification', 'supplier', 'quantity', 'times', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost', 'total'],
                         color: getColor('Equipment')
                     },
                     {
@@ -1549,23 +2003,21 @@
                         items: (estimate?.material || [])
                             .map(item => ({
                                 ...item,
-                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                        headers: ['Material', 'Classification', 'Sub Classification', 'Supplier', 'Quantity', 'UOM', 'Cost', 'Taxes', 'Total'],
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0) * (1 + (item.taxes || 0) / 100))
+                            })),
+                        headers: ['Material', 'Classification', 'Sub Classification', 'Supplier', 'Qty', 'UOM', 'Cost', 'Taxes', 'Total'],
                         fields: ['material', 'classification', 'subClassification', 'supplier', 'quantity', 'uom', 'cost', 'taxes', 'total'],
                         color: getColor('Material')
                     },
                     {
                         id: 'Tools',
                         title: 'Tools',
-                        key: 'tool',
+                        key: 'tools',
                         items: (estimate?.tools || [])
                             .map(item => ({
                                 ...item,
                                 total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                            })),
                         headers: ['Tool', 'Classification', 'Sub Classification', 'UOM', 'Supplier', 'Cost', 'Quantity', 'Taxes', 'Total'],
                         fields: ['tool', 'classification', 'subClassification', 'uom', 'supplier', 'cost', 'quantity', 'taxes', 'total'],
                         color: getColor('Tools')
@@ -1578,10 +2030,11 @@
                             .map(item => ({
                                 ...item,
                                 total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                        headers: ['Overhead', 'Classification', 'Sub Classification', 'UOM', 'Days', 'Hours', 'Hourly Rate', 'Daily Rate', 'Total'],
-                        fields: ['overhead', 'classification', 'subClassification', 'uom', 'days', 'hours', 'hourlyRate', 'dailyRate', 'total'],
+                            })),
+                        headers: ['Overhead', 'Classification', 'Sub Classification', 'Days', 'Hours', 'Hourly Rate', 'Daily Rate', 'Total'],
+                        fields: ['overhead', 'classification', 'subClassification', 'days', 'hours', 'hourlyRate', 'dailyRate', 'total'],
+                        formHeaders: ['Overhead', 'Classification', 'Sub Classification', 'Hourly Cost', 'Daily Cost'],
+                        formFields: ['overhead', 'classification', 'subClassification', 'hourlyRate', 'dailyRate'],
                         color: getColor('Overhead')
                     },
                     {
@@ -1592,10 +2045,11 @@
                             .map(item => ({
                                 ...item,
                                 total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                        headers: ['Subcontractor', 'Classification', 'Sub Classification', 'UOM', 'Notes', 'Cost', 'Total'],
-                        fields: ['subcontractor', 'classification', 'subClassification', 'uom', 'notes', 'cost', 'total'],
+                            })),
+                        headers: ['Classification', 'Sub Classification', 'Contractor', 'Qty', 'UOM', 'Cost', 'Total'],
+                        fields: ['classification', 'subClassification', 'subcontractor', 'quantity', 'uom', 'cost', 'total'],
+                        formHeaders: ['Classification', 'Sub Classification', 'Contractor', 'Qty', 'UOM', 'Cost'],
+                        formFields: ['classification', 'subClassification', 'subcontractor', 'quantity', 'uom', 'cost'],
                         color: getColor('Subcontractor')
                     },
                     {
@@ -1606,10 +2060,11 @@
                             .map(item => ({
                                 ...item,
                                 total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
+                            })),
                         headers: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost', 'Total'],
                         fields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'quantity', 'cost', 'total'],
+                        formHeaders: ['Disposal And Haul OFF', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost'],
+                        formFields: ['disposalAndHaulOff', 'classification', 'subClassification', 'uom', 'quantity', 'cost'],
                         color: getColor('Disposal')
                     },
                     {
@@ -1619,18 +2074,46 @@
                         items: (estimate?.miscellaneous || [])
                             .map(item => ({
                                 ...item,
-                                total: item.total ?? ((item.cost || 0) * (item.quantity || 0))
-                            }))
-                            .sort((a, b) => (b.total || 0) - (a.total || 0)),
-                        headers: ['Item', 'Classification', 'Sub Classification', 'UOM', 'Quantity', 'Cost', 'Total'],
-                        fields: ['item', 'classification', 'subClassification', 'uom', 'quantity', 'cost', 'total'],
+                                total: item.total ?? ((item.cost || 0) * (item.quantity || 1))
+                            })),
+                        headers: ['Item', 'Classification', 'Quantity', 'UOM', 'Cost', 'Total'],
+                        fields: ['item', 'classification', 'quantity', 'uom', 'cost', 'total'],
+                        formHeaders: ['Item', 'Classification', 'UOM', 'Cost'],
+                        formFields: ['item', 'classification', 'uom', 'cost'],
                         color: getColor('Miscellaneous')
                     }
                 ];
+
+                return unsortedSections; // Return raw sections without sorting
             }, [estimate, fringeConstants]);
 
+            // sort logic
+            const sections = React.useMemo(() => {
+                if (sectionOrder.length === 0) return baseSections;
+                return [...baseSections].sort((a, b) => {
+                    const idxA = sectionOrder.indexOf(a.id);
+                    const idxB = sectionOrder.indexOf(b.id);
+                    if (idxA === -1) idxA = 999;
+                    if (idxB === -1) idxB = 999;
+                    return idxA - idxB;
+                });
+            }, [baseSections, sectionOrder]);
+
+            // Initial Sort on Load
+            React.useEffect(() => {
+                if (estimate && !initialSortDone.current && baseSections.length > 0) {
+                    const newOrder = [...baseSections].sort((a, b) => {
+                        const getTot = (s) => s.items.reduce((sum, i) => sum + (i.total || 0), 0);
+                        return getTot(b) - getTot(a);
+                    }).map(s => s.id);
+                    setSectionOrder(newOrder);
+                    initialSortDone.current = true;
+                }
+            }, [estimate, baseSections]);
+
+
             // --- Chart & Header Data Preparation ---
-            const Icon = window.DevcoComponents?.Icon || window.Icon || (({ name }) => <span className="text-xs">{name}</span>);
+
 
             const uniqueEquipmentSuppliers = React.useMemo(() => {
                 return [...new Set(equipmentCatalog.map(i => i.supplier).filter(Boolean))].sort();
@@ -1644,9 +2127,49 @@
                 return [...new Set(materialCatalog.map(i => i.uom).filter(Boolean))].sort();
             }, [materialCatalog]);
 
+            const uniqueMiscClassifications = React.useMemo(() => {
+                return [...new Set(miscellaneousCatalog.map(i => i.classification).filter(Boolean))].sort();
+            }, [miscellaneousCatalog]);
+
+            const uniqueMiscUOMs = React.useMemo(() => {
+                return [...new Set(miscellaneousCatalog.map(i => i.uom).filter(Boolean))].sort();
+            }, [miscellaneousCatalog]);
+
+            const uniqueOverheadClassifications = React.useMemo(() => {
+                return [...new Set(overheadCatalog.map(i => i.classification).filter(Boolean))].sort();
+            }, [overheadCatalog]);
+
+            const uniqueOverheadSubClassifications = React.useMemo(() => {
+                return [...new Set(overheadCatalog.map(i => i.subClassification).filter(Boolean))].sort();
+            }, [overheadCatalog]);
+
+            const uniqueDisposalClassifications = React.useMemo(() => {
+                return [...new Set(disposalCatalog.map(i => i.classification).filter(Boolean))].sort();
+            }, [disposalCatalog]);
+
+            const uniqueDisposalUOMs = React.useMemo(() => {
+                return [...new Set(disposalCatalog.map(i => i.uom).filter(Boolean))].sort();
+            }, [disposalCatalog]);
+
+            const uniqueSubClassifications = React.useMemo(() => {
+                return [...new Set(subcontractorCatalog.map(i => i.classification).filter(Boolean))].sort();
+            }, [subcontractorCatalog]);
+
+            const uniqueSubSubClassifications = React.useMemo(() => {
+                return [...new Set(subcontractorCatalog.map(i => i.subClassification).filter(Boolean))].sort();
+            }, [subcontractorCatalog]);
+
+            const uniqueSubContractors = React.useMemo(() => {
+                return [...new Set(subcontractorCatalog.map(i => i.subcontractor).filter(Boolean))].sort();
+            }, [subcontractorCatalog]);
+
+            const uniqueSubUOMs = React.useMemo(() => {
+                return [...new Set(subcontractorCatalog.map(i => i.uom).filter(Boolean))].sort();
+            }, [subcontractorCatalog]);
+
             const chartData = React.useMemo(() => {
                 try {
-                    if (!sections) return { slices: [], total: 0 };
+                    if (!sections) return { slices: [], total: 0, subTotal: 0, grandTotal: 0, markupPct: 0 };
 
                     const data = sections.map(s => {
                         const items = s.items || estimate[s.key] || [];
@@ -1655,60 +2178,53 @@
                     });
 
                     // Calculate Subtotal and Markup
-                    // Calculate Subtotal and Markup
-                    const subtotal = data.reduce((sum, d) => sum + d.value, 0);
-                    const markupPct = parseFloat(estimate?.markup || 0);
-                    const markupAmount = subtotal * (markupPct / 100);
+                    const subTotal = data.reduce((sum, d) => sum + d.value, 0);
+                    const markupStr = formData?.bidMarkUp || estimate?.bidMarkUp || '0';
+                    const markupPct = parseFloat(String(markupStr).replace(/[^0-9.-]+/g, "")) || 0;
+                    const markupAmount = subTotal * (markupPct / 100);
+                    const grandTotal = subTotal + markupAmount;
 
-                    // Add Markup Slice
-                    // if (markupAmount > 0) {
-                    //    data.push({
-                    //        id: 'Markup',
-                    //        label: 'Markup',
-                    //        value: markupAmount,
-                    //        color: '#a855f7' // Purple 500
-                    //    });
-                    // }
-
-                    const total = subtotal; // + markupAmount;
-                    return { slices: data, total };
+                    return { slices: data, total: grandTotal, subTotal, grandTotal, markupPct };
                 } catch (err) {
                     console.error("Chart Data Error:", err);
-                    return { slices: [], total: 0 };
+                    return { slices: [], total: 0, subTotal: 0, grandTotal: 0, markupPct: 0 };
                 }
-            }, [sections, estimate]);
+            }, [sections, estimate, formData.bidMarkUp]);
 
             // Track if we have performed the initial expansion (using ref to avoid closure issues)
             const initialExpandDone = React.useRef(false);
             const prevSliceValues = React.useRef({});
 
             // Auto-collapse/expand accordion sections
+            // Auto-collapse/expand accordion sections based on ITEMS COUNT
             React.useEffect(() => {
-                if (!chartData?.slices || chartData.slices.length === 0) return;
+                if (!sections) return;
 
-                const oldVals = prevSliceValues.current;
+                const oldVals = prevSliceValues.current; // reusing this ref but strictly for counts now
                 const isFirstRun = !initialExpandDone.current;
 
                 // Calculate new state
                 const newState = {};
+                const newCounts = {};
 
-                chartData.slices.forEach(s => {
-                    const val = s.value;
-                    const oldVal = oldVals[s.id] || 0;
+                sections.forEach(s => {
+                    const count = s.items.length;
+                    newCounts[s.id] = count;
+                    const oldCount = oldVals[s.id] || 0;
 
                     if (isFirstRun) {
-                        // Initial Load: Expand if value > 0, collapse if 0
-                        newState[s.id] = val > 0;
+                        // Initial Load: Expand if items > 0
+                        newState[s.id] = count > 0;
                     } else {
                         // Continuous Updates:
-                        if (val === 0) {
-                            // Force collapse if 0
+                        if (count === 0) {
+                            // Force collapse if 0 items
                             newState[s.id] = false;
-                        } else if (val > 0 && oldVal === 0) {
-                            // Auto-expand if transitioning from 0 -> >0
+                        } else if (count > 0 && oldCount === 0) {
+                            // Auto-expand if transitioning from 0 -> >0 items
                             newState[s.id] = true;
                         }
-                        // For other cases (val > 0 and oldVal > 0), don't set - preserve manual state
+                        // For other cases (items > 0 and oldItems > 0), don't set - preserve manual state
                     }
                 });
 
@@ -1722,132 +2238,52 @@
                 });
 
                 // Update tracking refs
-                const newValues = {};
-                chartData.slices.forEach(s => newValues[s.id] = s.value);
-                prevSliceValues.current = newValues;
+                prevSliceValues.current = newCounts;
 
                 if (isFirstRun) {
                     initialExpandDone.current = true;
                 }
-            }, [chartData]);
+            }, [sections]);
 
-            const toggleService = async (serviceId) => {
+            const toggleService = (serviceId) => {
                 const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
-                console.log('toggleService called:', { serviceId, id, currentValue: formData[serviceId] });
-
-                if (!id) {
-                    console.error("Cannot save service: Missing Estimate ID");
-                    addToast('Failed to save: Missing ID', 'error');
-                    return;
-                }
+                if (!id) return;
 
                 const newVal = !formData[serviceId];
-                console.log('New value will be:', newVal);
 
-                // Prevent auto-save from interfering with this operation
-                skipAutoSaveRef.current = true;
-
-                // 1. Optimistic Update
-                setFormData(prev => ({ ...prev, [serviceId]: newVal }));
-
-                // 2. Backend Update
-                try {
-                    const payload = {
-                        action: 'updateEstimate',
-                        payload: {
-                            id: id,
-                            [serviceId]: newVal
-                        }
-                    };
-                    console.log('Sending payload:', JSON.stringify(payload));
-
-                    const response = await fetch('/webhook/devcoBackend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    console.log('Response:', result);
-
-                    if (!result.success) {
-                        throw new Error(result.error || 'Update failed');
-                    }
-
-                    // Reload to confirm sync
-                    await loadEstimate(true);
-
-                    // Re-enable auto-save after a delay to let formData settle
-                    setTimeout(() => {
-                        skipAutoSaveRef.current = false;
-                    }, 1500);
-                } catch (e) {
-                    console.error("Error saving service:", e);
-                    addToast('Failed to save service', 'error');
-                    // Revert
-                    setFormData(prev => ({ ...prev, [serviceId]: !newVal }));
-                    // Re-enable auto-save
-                    skipAutoSaveRef.current = false;
-                }
+                // Optimistic Update & Local Store
+                setFormData(prev => {
+                    const newFormData = { ...prev, [serviceId]: newVal };
+                    updateLocalStore(id, estimate, newFormData);
+                    return newFormData;
+                });
             };
 
-            const toggleStatus = async () => {
+
+            const toggleStatus = () => {
                 const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
                 const currentStatus = formData.status || 'draft';
                 const newStatus = currentStatus === 'confirmed' ? 'draft' : 'confirmed';
 
-                console.log('toggleStatus called:', { id, currentStatus, newStatus });
+                // Optimistic Update & Local Store
+                setFormData(prev => {
+                    const newFormData = { ...prev, status: newStatus };
+                    updateLocalStore(id, estimate, newFormData);
+                    return newFormData;
+                });
 
-                if (!id) {
-                    console.error("Cannot save status: Missing Estimate ID");
-                    addToast('Failed to save: Missing ID', 'error');
-                    return;
-                }
-
-                // Prevent auto-save from interfering
-                skipAutoSaveRef.current = true;
-
-                // Optimistic Update
-                setFormData(prev => ({ ...prev, status: newStatus }));
-
-                try {
-                    const payload = {
-                        action: 'updateEstimate',
-                        payload: {
-                            id: id,
-                            status: newStatus
-                        }
-                    };
-                    console.log('Sending status payload:', JSON.stringify(payload));
-
-                    const response = await fetch('/webhook/devcoBackend', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    console.log('Status response:', result);
-
-                    if (!result.success) {
-                        throw new Error(result.error || 'Update failed');
-                    }
-
-                    addToast(`Estimate ${newStatus === 'confirmed' ? 'confirmed' : 'set to draft'}`, 'success');
-
-                    // Reload to confirm sync
-                    await loadEstimate(true);
-
-                    // Re-enable auto-save after delay
-                    setTimeout(() => {
-                        skipAutoSaveRef.current = false;
-                    }, 1500);
-                } catch (e) {
-                    console.error("Error saving status:", e);
-                    addToast('Failed to update status', 'error');
-                    // Revert
-                    setFormData(prev => ({ ...prev, status: currentStatus }));
-                    skipAutoSaveRef.current = false;
-                }
+                addToast(`Estimate ${newStatus === 'confirmed' ? 'confirmed' : 'set to draft'} (unsaved)`, 'info');
             };
+
+            const handleHeaderUpdate = (field, value) => {
+                const id = estimateId || formData._id || new URLSearchParams(window.location.search).get('id');
+                setFormData(prev => {
+                    const newFormData = { ...prev, [field]: value };
+                    updateLocalStore(id, estimate, newFormData);
+                    return newFormData;
+                });
+            };
+
 
             const servicesList = [
                 { id: 'directionalDrilling', label: 'Drilling', color: 'emerald', icon: <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" /> },
@@ -1871,27 +2307,42 @@
                 const allExpanded = sections && sections.length > 0 && sections.every(s => openSections[s.id]);
 
                 const handleToggleAll = () => {
-                    if (allExpanded) {
-                        setOpenSections({});
-                    } else {
-                        const allOpen = {};
-                        if (sections) sections.forEach(s => allOpen[s.id] = true);
-                        setOpenSections(allOpen);
-                    }
+                    setOpenSections(prev => {
+                        const next = {};
+                        if (allExpanded) {
+                            // Collapse all
+                            sections.forEach(s => next[s.id] = false);
+                        } else {
+                            // Expand all
+                            sections.forEach(s => next[s.id] = true);
+                        }
+                        return next;
+                    });
                 };
 
                 return (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
+                        {unsavedChanges && (
+                            <button
+                                onClick={handleGlobalSave}
+                                disabled={saving}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all font-bold text-xs shadow-md"
+                            >
+                                {saving ? <DevcoIcon name="loader" size={14} className="animate-spin" /> : <DevcoIcon name="save" size={14} />}
+                                SAVE
+                            </button>
+                        )}
                         <button
                             onClick={handleToggleAll}
                             className="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title={allExpanded ? "Collapse All" : "Expand All"}
                         >
-                            <Icon name={allExpanded ? "chevrons-up" : "chevrons-down"} size={20} />
+                            <DevcoIcon name={allExpanded ? "chevrons-up" : "chevrons-down"} size={20} />
                         </button>
                     </div>
                 );
             };
+
 
             return (
                 <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
@@ -1906,7 +2357,7 @@
                                     className="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-transparent hover:border-blue-100"
                                     title="Refresh Data"
                                 >
-                                    <Icon name="refresh-cw" size={20} />
+                                    <DevcoIcon name="refresh-cw" size={20} />
                                 </button>
                                 <button
                                     onClick={handleCreateNew}
@@ -1926,7 +2377,7 @@
                         }
                     />
 
-                    <main className="flex-1 overflow-y-auto">
+                    < main className="flex-1 overflow-y-auto" >
                         <div className="w-full px-4 py-8">
                             {/* Detailed Header Card */}
 
@@ -2010,7 +2461,7 @@
                                                 <input
                                                     type="number"
                                                     value={formData.bidMarkUp || ''}
-                                                    onChange={e => setFormData({ ...formData, bidMarkUp: e.target.value })}
+                                                    onChange={e => handleHeaderUpdate('bidMarkUp', e.target.value)}
                                                     className="w-full bg-transparent text-xl font-bold text-slate-700 h-full px-4 outline-none text-left"
                                                     placeholder="0"
                                                 />
@@ -2024,7 +2475,7 @@
                                             <div className="relative shadow-[inset_4px_4px_8px_#d1d9e6,inset_-4px_-4px_8px_#ffffff] rounded-2xl p-1 bg-[#eef2f6] h-12 flex items-center">
                                                 <select
                                                     value={formData.fringe || ''}
-                                                    onChange={e => setFormData({ ...formData, fringe: e.target.value })}
+                                                    onChange={e => handleHeaderUpdate('fringe', e.target.value)}
                                                     className="w-full appearance-none bg-transparent text-lg font-bold text-slate-700 h-full px-4 outline-none cursor-pointer text-left"
                                                 >
                                                     <option value="">None</option>
@@ -2033,7 +2484,7 @@
                                                     <option value="Light Commercial">Light Commercial</option>
                                                 </select>
                                                 <div className="absolute right-4 pointer-events-none text-slate-400">
-                                                    <Icon name="chevron-down" size={18} />
+                                                    <DevcoIcon name="chevron-down" size={18} />
                                                 </div>
                                             </div>
                                         </div>
@@ -2065,7 +2516,7 @@
                                                     let currentAngle = 180; // Start from left
 
                                                     return sortedSlices.map((slice, idx) => {
-                                                        const percent = chartData.total > 0 ? slice.value / chartData.total : 0;
+                                                        const percent = chartData.subTotal > 0 ? slice.value / chartData.subTotal : 0;
                                                         const sliceAngle = percent * availableAngle;
 
                                                         // Skip if segment is too small
@@ -2112,25 +2563,39 @@
                                             </svg>
 
                                             {/* Center Total - positioned at bottom center of the arc */}
-                                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-center">
-                                                <div className="text-[10px] text-blue-400 font-medium">Total</div>
-                                                <div className="text-xl font-black text-slate-800">${chartData.total.toLocaleString()}</div>
+                                            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center">
+                                                <div className="text-xs text-blue-500 font-bold mb-0">Total</div>
+                                                <div className="text-2xl font-black text-slate-800 tracking-tight leading-none">${chartData.grandTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                                                <div className="text-xs font-bold text-slate-400 mt-[-2px]">${chartData.subTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
                                             </div>
                                         </div>
 
                                         {/* Legend */}
-                                        <div className="w-full mt-2 space-y-1 flex-1 overflow-y-auto max-h-[100px]">
+                                        <div className="w-full mt-2 space-y-1 flex-1 overflow-y-auto max-h-[120px]">
+                                            {/* Legend Headers (Optional but helpful given tight layout) */}
+                                            {/* <div className="flex justify-between px-1 text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1">
+                                                <span>Category</span>
+                                                <div className="flex gap-4">
+                                                    <span className="w-16 text-right">Sub</span>
+                                                    <span className="w-16 text-right">Total</span>
+                                                </div>
+                                            </div> */}
+
                                             {chartData.slices.filter(s => s.value > 0).sort((a, b) => b.value - a.value).slice(0, 6).map(slice => {
-                                                const percent = chartData.total > 0 ? ((slice.value / chartData.total) * 100).toFixed(1) : 0;
+                                                // Percent of Subtotal
+                                                const percent = chartData.subTotal > 0 ? ((slice.value / chartData.subTotal) * 100).toFixed(1) : 0;
+                                                const marginedValue = slice.value * (1 + (chartData.markupPct / 100));
+
                                                 return (
-                                                    <div key={slice.id} className="flex items-center justify-between py-0.5 px-1 hover:bg-white/50 rounded transition-colors">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: slice.color }}></div>
-                                                            <span className="text-[11px] font-medium text-slate-600">{slice.label}</span>
+                                                    <div key={slice.id} className="flex items-center justify-between py-1 px-1 hover:bg-white/50 rounded transition-colors group">
+                                                        <div className="flex items-center gap-2 min-w-0">
+                                                            <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: slice.color }}></div>
+                                                            <span className="text-[11px] font-medium text-slate-600 truncate">{slice.label}</span>
                                                         </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[10px] font-medium text-slate-400">{percent}%</span>
-                                                            <span className="text-[11px] font-bold text-slate-800">${slice.value.toLocaleString()}</span>
+                                                        <div className="flex items-center gap-1 shrink-0">
+                                                            <span className="text-[10px] font-medium text-slate-400 w-10 text-right">{percent}%</span>
+                                                            <span className="text-[11px] font-medium text-slate-500 w-16 text-right">${slice.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                                                            <span className="text-[11px] font-bold text-slate-800 w-16 text-right">${marginedValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                                                         </div>
                                                     </div>
                                                 );
@@ -2167,7 +2632,7 @@
                                                                 <div className="flex items-center gap-2 text-xs text-slate-400">
                                                                     <span>{new Date(ver.date).toLocaleDateString()}</span>
                                                                     <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                                                    <span className={`font-bold ${isCurrent ? 'text-blue-600' : 'text-slate-500'}`}>${(ver.totalAmount || 0).toLocaleString()}</span>
+                                                                    <span className={`font-bold ${isCurrent ? 'text-blue-600' : 'text-slate-500'}`}>${(ver.totalAmount || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                                                                 </div>
                                                             </div>
                                                             {!isCurrent && (
@@ -2209,15 +2674,29 @@
                                             fields={section.fields}
                                             editableFields={
                                                 section.id === 'Labor' ? ['quantity', 'days', 'otPd', 'basePay'] :
-                                                    section.id === 'Equipment' ? ['supplier', 'quantity', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost'] :
-                                                        section.id === 'Material' ? ['supplier', 'uom', 'cost', 'quantity'] :
-                                                            []
+                                                    section.id === 'Equipment' ? ['supplier', 'quantity', 'times', 'uom', 'dailyCost', 'weeklyCost', 'monthlyCost', 'fuelAdditiveCost'] :
+                                                        section.id === 'Material' ? ['classification', 'subClassification', 'supplier', 'uom', 'cost', 'taxes', 'quantity'] :
+                                                            section.id === 'Miscellaneous' ? ['classification', 'quantity', 'uom', 'cost'] :
+                                                                section.id === 'Overhead' ? ['classification', 'subClassification', 'days', 'hourlyRate'] :
+                                                                    section.id === 'Disposal' ? ['classification', 'subClassification', 'uom', 'quantity', 'cost'] :
+                                                                        section.id === 'Subcontractor' ? ['classification', 'subClassification', 'subcontractor', 'quantity', 'uom', 'cost'] :
+                                                                            []
                                             }
                                             onUpdateItem={(item, field, value) => handleItemUpdate(section, item, field, value)}
                                             onExplain={section.id === 'Labor' ? handleExplain : undefined}
                                             onDelete={(item) => handleDeleteItem(section, item)}
                                             suppliers={section.id === 'Equipment' ? uniqueEquipmentSuppliers : section.id === 'Material' ? uniqueMaterialSuppliers : []}
                                             uoms={section.id === 'Material' ? uniqueMaterialUOMs : []}
+                                            miscClassifications={section.id === 'Miscellaneous' ? uniqueMiscClassifications : []}
+                                            miscUoms={section.id === 'Miscellaneous' ? uniqueMiscUOMs : []}
+                                            overheadClassifications={section.id === 'Overhead' ? uniqueOverheadClassifications : []}
+                                            overheadSubClassifications={section.id === 'Overhead' ? uniqueOverheadSubClassifications : []}
+                                            disposalClassifications={section.id === 'Disposal' ? uniqueDisposalClassifications : []}
+                                            disposalUoms={section.id === 'Disposal' ? uniqueDisposalUOMs : []}
+                                            subClassifications={section.id === 'Subcontractor' ? uniqueSubClassifications : []}
+                                            subSubClassifications={section.id === 'Subcontractor' ? uniqueSubSubClassifications : []}
+                                            subContractors={section.id === 'Subcontractor' ? uniqueSubContractors : []}
+                                            subUoms={section.id === 'Subcontractor' ? uniqueSubUOMs : []}
                                         />
                                     </AccordionItem>
                                 ))
@@ -2232,11 +2711,17 @@
                         catalog={activeSection ? (
                             activeSection.id === 'Labor' ? laborCatalog :
                                 activeSection.id === 'Equipment' ? equipmentCatalog :
-                                    []
+                                    activeSection.id === 'Material' ? materialCatalog : // Added Material Catalog
+                                        activeSection.id === 'Miscellaneous' ? miscellaneousCatalog :
+                                            activeSection.id === 'Overhead' ? overheadCatalog : // Added Overhead Catalog
+                                                activeSection.id === 'Disposal' ? disposalCatalog :
+                                                    activeSection.id === 'Subcontractor' ? subcontractorCatalog :
+                                                        []
                         ) : []}
                         fringe={formData.fringe}
                         onClose={() => setActiveSection(null)}
                         onSave={handleSaveItem}
+                        fringeConstants={fringeConstants} // Pass fringeConstants prop
                     />
 
                     <CalculationExplanationModal
