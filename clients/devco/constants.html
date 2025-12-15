@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devco | Constants</title>
+    <script>
+        (function () {
+            if (!localStorage.getItem('devco_session_valid')) {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+            }
+        })();
+    </script>
     <link rel="icon" type="image/png" href="devco-logo.png">
     <meta name="description" content="Manage global constants">
     <link rel="preconnect" href="https://fonts.googleapis.com">

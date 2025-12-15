@@ -5,6 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devco | Estimate Details v1.1.0</title>
+    <script>
+        (function () {
+            // Check if current page is login.html to avoid loop (though this is view.html)
+            if (!localStorage.getItem('devco_session_valid')) {
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+            }
+        })();
+    </script>
     <link rel="icon" type="image/png" href="devco-logo.png">
     <meta name="description" content="View and edit estimate details">
     <link rel="preconnect" href="https://fonts.googleapis.com">
