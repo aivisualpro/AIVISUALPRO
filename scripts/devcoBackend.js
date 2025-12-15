@@ -904,12 +904,11 @@ export default async function (body) {
             return { message: `No estimate found with id: ${idToUse}`, deleted: false };
         }
 
-        // Delete from AppSheet as well
-        await deleteFromAppSheet(idToUse);
-
-        console.log(`Deleted estimate from AppSheet webhook: ${idToUse}`);
+        // NOTE: Intentionally NOT deleting from AppSheet - only removing from MongoDB
+        // The AppSheet record will be preserved for historical/reporting purposes
+        console.log(`Deleted estimate from MongoDB (AppSheet record preserved): ${idToUse}`);
         return {
-            message: 'Estimate deleted successfully',
+            message: 'Estimate deleted from MongoDB (AppSheet record preserved)',
             deleted: true,
             estimateId: idToUse
         };
