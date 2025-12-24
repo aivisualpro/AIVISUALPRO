@@ -46,9 +46,9 @@ export default async function practiceTracker(payload) {
             if (!selectedDays.includes(day)) continue;
 
             const baseRow = {
-                GFPPID: general.gfppid,
+                ReferenceID: general.gfppid,
                 Athlete: general.athlete,
-                Category: "Coach",
+                Day: day,
                 Date: dates[i],
             };
 
@@ -115,6 +115,7 @@ export default async function practiceTracker(payload) {
  * Returns the raw day-specific data block (Mon/Tue/…)
  */
 function getRawDayData(payload, day) {
+    const shortDay = day.slice(0, 3);
     const map = {
         Mon: payload.mondayData?.[0],
         Tue: payload.tuesdayData?.[0],
@@ -125,7 +126,7 @@ function getRawDayData(payload, day) {
         Sun: payload.sundayData?.[0],
     };
 
-    return map[day] || {};
+    return map[shortDay] || {};
 }
 
 /**
@@ -145,6 +146,11 @@ function normalizeKeys(data, day) {
         [`${prefix}StrengthTraining`]: "Strength Training (min)",
         [`${prefix}MobilityTraining`]: "Mobility Training (min)",
         [`${prefix}CardioTraining`]: "Cardio Training (Min)",
+        [`${prefix}StretchTraining`]: "Stretch Training (Min)",
+        [`${prefix}DrillsOthers`]: "Drills Others (min)",
+        [`${prefix}MentalOthers`]: "Mental Others (Min)",
+        [`${prefix}StudyOthers`]: "Study Others (min)",
+        [`${prefix}MiscOthers`]: "Misc Others (Min)",
         [`${prefix}Notes`]: "Notes",
     };
 

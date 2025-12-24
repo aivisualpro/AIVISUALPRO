@@ -8,15 +8,7 @@ const APPSHEET_TABLE = "Payroll";
 // Toggle existing week totals
 const USE_EXISTING_WEEK_TOTALS = true;
 
-// Ensure global fetch is available (Node 18+ has it built-in).
-// If you use Node <18, install node-fetch and uncomment:
-// import fetch from "node-fetch";
 
-/**
- * Main entrypoint for this script.
- * In your Express server, you'll call:
- *   const result = await ncStaffApp(payload);
- */
 export default async function ncStaffApp(payload) {
     const startedAt = Date.now();
 
