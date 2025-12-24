@@ -3,6 +3,8 @@
 const APPSHEET_APP_ID = process.env.NCSTAFFAPPSHEET_APP_ID;
 const APPSHEET_ACCESS = process.env.NCSTAFFAPPSHEET_ACCESS;
 const APPSHEET_TABLE = "Leaves Bucket";
+const RUN_AS_USER_EMAIL = "admin@aivisualpro.com";
+
 
 export default async function ncStaffLeaveBucketzHCRxhCl(payload) {
     const startedAt = Date.now();
@@ -125,6 +127,7 @@ async function appsheetInvoke(tableName, action, rows, properties) {
         Properties: {
             Locale: "en-US",
             Timezone: "Central Standard Time",
+            RunAsUserEmail: RUN_AS_USER_EMAIL,   // 👈 **this line is the key**
             UserSettings: {},
             ...(properties || {})
         },
@@ -151,6 +154,7 @@ async function appsheetInvoke(tableName, action, rows, properties) {
         return { Status: resp.status, Raw: txt };
     }
 }
+
 
 /*********************************
  * UTILS
