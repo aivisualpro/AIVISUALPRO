@@ -82,16 +82,7 @@ export default async function annProjectManagement(payload) {
 // GOOGLE DRIVE HELPERS
 // =========================================
 async function getAuth() {
-    // Priority 1: ANN specific credentials
     let raw = process.env.ANN_GOOGLE_APPLICATION_CREDENTIALS;
-
-    // Priority 2: MUNCHOFM credentials (fallback if user is reusing the same service account)
-    // This is a guess to be helpful since user didn't specify new creds but provided the folder ID 
-    // which implies they have a working setup.
-    if (!raw) {
-        console.log("ANN_GOOGLE_APPLICATION_CREDENTIALS not found, trying fallback to MUNCHOFM...");
-        raw = process.env.MUNCHOFM_GOOGLE_APPLICATION_CREDENTIALS;
-    }
 
     if (!raw) {
         throw new Error("Missing Google Credentials (ANN_GOOGLE_APPLICATION_CREDENTIALS)");
