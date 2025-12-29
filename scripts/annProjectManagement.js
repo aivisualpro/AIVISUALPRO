@@ -12,35 +12,68 @@ const TABLE_NAME = 'Projects';
 // =========================================
 export default async function annProjectManagement(payload) {
     console.log("annProjectManagement received:", JSON.stringify(payload));
-    const { projectName } = payload;
 
-    if (!projectName) {
-        return { error: "Missing projectName in payload" };
+    const projects = payload.projectData;
+    if (!projects || !Array.isArray(projects) || projects.length === 0) {
+        return { error: "Missing or empty 'projectData' array in payload" };
     }
 
+    const results = [];
+
     try {
-        // 1. Auth Google
+        // 1. Auth Google (do this once)
         const auth = await getAuth();
         const drive = google.drive({ version: 'v3', auth });
 
-        // 2. Create Folder
-        const folder = await createFolder(drive, projectName, PARENT_FOLDER_ID);
-        const folderLink = `https://drive.google.com/drive/folders/${folder.id}`;
-        console.log(`Created folder: ${projectName} (${folder.id})`);
+        // 2. Process each project
+        for (const proj of projects) {
+            const { projectName, projectId } = proj;
 
-        // 3. Update AppSheet
-        const appSheetResult = await addToAppSheet(projectName, folderLink);
-        console.log("AppSheet result:", JSON.stringify(appSheetResult));
+            if (!projectName || !projectId) {
+                results.push({ 
+                    error: "Missing projectName or projectId", 
+                    input: proj 
+                });
+                continue;
+            }
+
+            try {
+                // Create Folder
+                const folder = await createFolder(drive, projectName, PARENT_FOLDER_ID);
+                const folderLink = `https://drive.google.com/drive/folders/${folder.id}`;
+                console.log(`Created folder: ${projectName} (${folder.id})`);
+
+                // Update AppSheet
+                const appSheetResult = await updateAppSheet(projectId, folderLink);
+                console.log(`AppSheet update for ${projectId}:`, JSON.stringify(appSheetResult));
+
+                results.push({
+                    success: true,
+                    projectName,
+                    projectId,
+                    folderId: folder.id,
+                    folderLink,
+                    appSheetResult
+                });
+
+            } catch (err) {
+                console.error(`Error processing project ${projectName}:`, err);
+                results.push({
+                    success: false,
+                    projectName,
+                    projectId,
+                    error: err.message
+                });
+            }
+        }
 
         return {
             success: true,
-            folderId: folder.id,
-            folderLink,
-            appSheetResult
+            results
         };
 
     } catch (error) {
-        console.error("annProjectManagement Error:", error);
+        console.error("annProjectManagement Global Error:", error);
         return { error: error.message };
     }
 }
@@ -95,7 +128,7 @@ async function createFolder(drive, name, parentId) {
 // =========================================
 // APPSHEET HELPERS
 // =========================================
-async function addToAppSheet(projectName, link) {
+async function updateAppSheet(projectId, link) {
     if (!APP_ID || !ACCESS_KEY) {
         console.error("Missing AppSheet Credentials");
         return { error: "Missing AppSheet Credentials" };
@@ -103,19 +136,16 @@ async function addToAppSheet(projectName, link) {
     
     const url = `https://api.appsheet.com/api/v2/apps/${encodeURIComponent(APP_ID)}/tables/${encodeURIComponent(TABLE_NAME)}/Action`;
     
-    // Assuming we are Adding a new row. 
-    // If 'projectName' is the Key, this will work. 
-    // If there is another Key column required, this might fail unless it has an Initial Value.
     const body = {
-        Action: "Add", 
+        Action: "Edit", 
         Properties: {
             Locale: "en-US",
             Timezone: "UTC"
         },
         Rows: [
             {
-                "projectName": projectName, // Mapping payload 'projectName' to column 'projectName'
-                "projectFolderLink": link   // Mapping link to 'projectFolderLink'
+                "projectId": projectId,     // Key for identifying the record
+                "projectFolderLink": link   // Column to update
             }
         ]
     };
