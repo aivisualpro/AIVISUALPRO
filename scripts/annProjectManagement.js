@@ -135,7 +135,7 @@ async function updateAppSheet(projectId, link) {
         },
         Rows: [
             {
-                "projectId": projectId,     // Key for identifying the record
+                "Project_ID": projectId,     // Correct Key Column Name
                 "projectFolderLink": link   // Column to update
             }
         ]
