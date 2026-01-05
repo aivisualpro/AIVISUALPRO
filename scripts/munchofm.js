@@ -161,7 +161,10 @@ async function getDriveClient() {
     // Try: treat value as JSON credentials
     try {
         const credentials = JSON.parse(raw);
-
+        console.log("Munchofm: Parsed credentials from ENV string.");
+        // Log keys to debug "missing client_email"
+        console.log("Munchofm: Keys found in JSON:", Object.keys(credentials));
+        
         const auth = new google.auth.GoogleAuth({
             credentials,
             scopes: ["https://www.googleapis.com/auth/drive"],
@@ -170,6 +173,7 @@ async function getDriveClient() {
         return google.drive({ version: "v3", auth });
     } catch (e) {
         // Not valid JSON => treat as file path
+        console.log("Munchofm: ENV var is not JSON, treating as file path:", raw);
         const keyFile = raw;
         const auth = new google.auth.GoogleAuth({
             keyFilename: keyFile,
