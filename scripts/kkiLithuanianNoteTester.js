@@ -5,11 +5,11 @@ import kkiLithuanianNote from "./kkiLithuanianNote.js";
 async function runTest() {
     const testData = {
         
-        recordid: "10110",
-        
-        pestTypes: "Skruzdels, tarakonai",
+        recordid: "10101",
+        Speciality:"Specialisto vardas",
+        pestTypes: "Ziurkes",
 
-        text: "Skruzdels, tarakonai",
+        text: "pakartotine grauziku deratizacija 3 namo rusy pietine g 9 (V25-0359430-10), patikrinom kelias stoteles, biski dadetas masalas",
         
     };
 

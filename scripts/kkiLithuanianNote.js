@@ -338,45 +338,61 @@ async function updateAppSheetRow({ keyColumn, keyValue, text, tokens, specialist
     APPSHEET_APP_ID,
   )}/tables/${encodeURIComponent(APPSHEET_TABLE)}/Action`;
 
-  const rowObj = {
-    [keyColumn]: keyValue,
-    [COL_TEXT]: text,
-    [COL_TOKENS]: tokens != null ? Number(tokens) : null,
-  };
+  async function attemptEdit(val) {
+    const rowObj = {
+      [keyColumn]: val,
+      [COL_TEXT]: text,
+      [COL_TOKENS]: tokens != null ? Number(tokens) : null,
+    };
+    if (specialist != null) rowObj[COL_SPECIALIST] = specialist;
 
-  if (specialist != null) rowObj[COL_SPECIALIST] = specialist;
+    const body = {
+      Action: "Edit",
+      Properties: { Locale: "lt-LT", Timezone: "Europe/Vilnius" },
+      Rows: [rowObj],
+    };
 
-  const body = {
-    Action: "Edit",
-    Properties: { Locale: "lt-LT", Timezone: "Europe/Vilnius" },
-    Rows: [rowObj],
-  };
+    const resp = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        ApplicationAccessKey: APPSHEET_ACCESS,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
 
-  const resp = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      ApplicationAccessKey: APPSHEET_ACCESS,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
+    const raw = await resp.text();
+    if (!resp.ok) throw new Error("AppSheet HTTP " + resp.status + ": " + truncate(raw, 500));
 
-  const raw = await resp.text();
-  if (!resp.ok) throw new Error("AppSheet HTTP " + resp.status + ": " + truncate(raw, 500));
+    let json;
+    try {
+      json = JSON.parse(raw);
+    } catch {
+      throw new Error("Could not parse AppSheet response: " + truncate(raw, 500));
+    }
 
-  let json;
+    console.log("[KKI] AppSheet Edit response:", JSON.stringify(json, null, 2));
+
+    // AppSheet sometimes returns an array with Errors field
+    if (Array.isArray(json) && json[0]?.Errors) {
+      throw new Error("AppSheet row update failed: " + json[0].Errors);
+    }
+
+    return json;
+  }
+
+  // ✅ Try as-is (usually string)
   try {
-    json = JSON.parse(raw);
-  } catch {
-    throw new Error("Could not parse AppSheet response: " + truncate(raw, 500));
+    return await attemptEdit(keyValue);
+  } catch (e1) {
+    // ✅ If digits, try number too
+    if (/^\d+$/.test(String(keyValue))) {
+      return await attemptEdit(Number(keyValue));
+    }
+    throw e1;
   }
-
-  if (Array.isArray(json) && json.length > 0 && json[0].Errors) {
-    throw new Error("AppSheet row update failed: " + json[0].Errors);
-  }
-
-  return json;
 }
+
 
 // ========== Text Post-Processing Helpers ==========
 
