@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWS CRM Weekly Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-paper: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --border-color: #e5e7eb;
+            --primary-color: #2563eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .controls {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            background-color: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        /* Printable Area - Designed to look like a sheet of paper */
+        #report-container {
+            background-color: var(--bg-paper);
+            max-width: 100%; /* Flexible for web view, fixed for PDF */
+            margin: 0 auto;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            min-height: 11in; /* A4 approx height */
+        }
+
+        .report-header {
+            margin-bottom: 30px;
+        }
+
+        .report-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 10px 0;
+            color: var(--text-primary);
+        }
+
+        .report-meta {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .report-date {
+            margin-top: 20px;
+            font-weight: 400;
+        }
+
+        /* Table Styling */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem; /* Small font like the screenshot */
+            table-layout: fixed; /* Fix column widths */
+        }
+
+        .report-table th, .report-table td {
+            border: 1px solid #000; /* Distinct black borders like screenshot */
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+
+        .report-table th {
+            background-color: #fff;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Specific Column Widths to match screenshot ratio roughly */
+        .col-address { width: 14%; }
+        .col-job-status { width: 8%; }
+        .col-proj-status { width: 10%; }
+        .col-ssa { width: 6%; }
+        .col-install { width: 6%; }
+        .col-final { width: 6%; }
+        .col-pto { width: 6%; }
+        .col-startup { width: 8%; }
+        .col-notes { width: 36%; }
+
+        .notes-content {
+            white-space: pre-wrap; /* Preserve line breaks */
+            line-height: 1.4;
+        }
+
+        #loading, .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        /* Print Specifics */
+        @media print {
+            body { 
+                background: white; 
+                padding: 0; 
+            }
+            .controls { display: none; }
+            #report-container { 
+                box-shadow: none; 
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="generatePDF()">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download PDF
+        </button>
+    </div>
+
+    <div id="report-container">
+        <div id="header-section" class="report-header">
+            <!-- Header content injected by JS -->
+        </div>
+
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th class="col-address">Project Address</th>
+                    <th class="col-job-status">Job Status</th>
+                    <th class="col-proj-status">Project Status</th>
+                    <th class="col-ssa">SSA</th>
+                    <th class="col-install">Solar Install</th>
+                    <th class="col-final">Final</th>
+                    <th class="col-pto">PTO</th>
+                    <th class="col-startup">Start-Up / Monitor</th>
+                    <th class="col-notes">Project Notes</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr>
+                    <td colspan="9" id="loading">Loading report data...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="swsCRM.js"></script>
+</body>
+</html>

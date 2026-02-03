@@ -1,0 +1,84 @@
+{
+  "user": "admin@y2kgrouphosting.com",
+  "userName": "Administrator Y2K",
+  "salesRep": "Paul Martin",
+  "Projects": [
+    {
+      "Project": "188b1e6d",
+      "Customer": "3132 Dalemead St, Torrance, CA 90505, USA",
+      "JobStatus": "In Progress",
+      "ProjectStatus": "PENDING COMPLETION / CORRECTIONS",
+      "SSA": "1/13/2026",
+      "SolarInstall": "1/15/2026",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/13/2026 - Usage 8,711\nMeter #2222014-533235\nYear-1 Production (kWh)10872 , 01/14/2026 - sent sow and layout to gpn , 01/16/2026 - submitted for pto , requested permits , 01/20/2026 - plans rcvd, pending permits , 01/22/2026 - Requested revised plans , once received will resubmit again for permits , 01/27/2026 - rcvd revised plans and permits, scheduled completion for 2/2 , 01/29/2026 - cancelled completion on 2/2, requested for final inspection to be on 2/12 , 02/03/2026 - requested for final inspection to be on 2/13"
+    },
+    {
+      "Project": "d1027c58",
+      "Customer": "2105 Alsace Ave, Los Angeles, CA 90016, USA",
+      "JobStatus": "New Job",
+      "ProjectStatus": "NO APPROVAL",
+      "SSA": "1/26/2026",
+      "SolarInstall": "",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/26/2026 - Annual: 4,970 kWh/METER NUMBER 00009-00078637/Year-1 Production (kWh)5733 , 01/27/2026 - sent sow and layout to gpn"
+    },
+    {
+      "Project": "7e1410f5",
+      "Customer": "323 E Newfield St, Gardena, CA 90248, USA",
+      "JobStatus": "In Progress",
+      "ProjectStatus": "PENDING COMPLETION / CORRECTIONS",
+      "SSA": "1/19/2026",
+      "SolarInstall": "1/22/2026",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/19/2026 - Annual: 4,465 kWh/METER NUMBER 222010-583579/Year-1 Production (kWh)6558 , 01/20/2026 - sent sow and layout to gpn , 01/26/2026 - plans rcvd , pending permits , 01/27/2026 - Rcvd permits, pending panel install"
+    },
+    {
+      "Project": "ae5dfe63",
+      "Customer": "26226 Governor Ave, Harbor City, CA 90710, USA",
+      "JobStatus": "In Progress",
+      "ProjectStatus": "PENDING PANELS INSTALL",
+      "SSA": "",
+      "SolarInstall": "",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/29/2026 - Annual: 16,317 kWh/METER NUMBER F00009-01876086/Year-1 Production (kWh) , 01/29/2026 - Includes Tesla back-up battery , 02/02/2026 - sent sow and layout to gpn"
+    },
+    {
+      "Project": "a4275db0",
+      "Customer": "2660 108th St, Lynwood, CA 90262, USA",
+      "JobStatus": "New Job",
+      "ProjectStatus": "Pending Site Inspection",
+      "SSA": "",
+      "SolarInstall": "",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/27/2026 - Usage: 3000/METER NUMBER 222012-740220/Year-1 Production (kWh)5704"
+    },
+    {
+      "Project": "28a60f58",
+      "Customer": "9203 Mel Dar Ave, Downey, CA 90240, USA",
+      "JobStatus": "New Job",
+      "ProjectStatus": "NO APPROVAL",
+      "SSA": "",
+      "SolarInstall": "",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/28/2026 - Annual: 7,192 kWh/METER NUMBER 222014-708453/Year-1 Production (kWh)9492 , 01/29/2026 - sent sow and layout to gpn"
+    },
+    {
+      "Project": "8a34d4cb",
+      "Customer": "6420 Myrtle Avenue, Long Beach, CA 90805",
+      "JobStatus": "In Progress",
+      "ProjectStatus": "PENDING PERMITS / PLANCHECK",
+      "SSA": "1/16/2026",
+      "SolarInstall": "1/21/2026",
+      "FinalDate": "",
+      "StartUp": "",
+      "Notes": "01/16/2026 - Annual: 3,000 kWh/METER NUMBER 222011-588164/Year-1 Production (kWh)5917 , 01/16/2026 - Includes Roof layer under panels , 01/19/2026 - sent sow and layout to gpn , 01/22/2026 - going back on 1/26 to install , 01/23/2026 - plans rcvd, requested permits , 01/27/2026 - pending permits , 02/03/2026 - scheduled completion for 2/10"
+    }
+  ]
+}
